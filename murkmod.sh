@@ -44,8 +44,8 @@ murkmod() {
     install_patched_files
     echo "Creating stateful partition files..."
     create_stateful_files
-    read -n 1 -s -r -p "Press any key to reboot."
-    reboot
+    read -n 1 -s -r -p "Press any key to exit."
+    exit
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
