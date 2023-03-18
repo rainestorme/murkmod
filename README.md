@@ -20,6 +20,7 @@ It's pretty straightforward to create a pluign. Just create a `.sh` file with th
 ```sh
 #!/bin/bash
 PLUGIN_NAME="Hello World Plugin"
+PLUGIN_FUNCTION="Print a hello world message"
 PLUGIN_DESCRIPTION="The friendliest murkmod plugin you'll ever see."
 PLUGIN_AUTHOR="rainestorme"
 PLUGIN_VERSION=1
