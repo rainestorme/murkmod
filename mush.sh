@@ -74,13 +74,12 @@ main() {
 (7) Hard Enable Extensions
 (8) Emergency Revert & Re-Enroll
 (9) Edit Pollen
-(10) Run neofetch
-(11) Install plugins
-(12) Uninstall plugins
+(10) Install plugins
+(11) Uninstall plugins
 EOF
         if ! test -f /mnt/stateful_partition/crouton; then
-            echo "(13) Install Crouton"
-            echo "(14) Start Crouton (only run after running above)"
+            echo "(12) Install Crouton"
+            echo "(13) Start Crouton (only run after running above)"
         fi
 
         # Scan the plugins directory for plugin scripts
@@ -102,11 +101,10 @@ EOF
         7) runjob hardenableext ;;
         8) runjob revert ;;
         9) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
-        10) runjob do_neofetch ;;
-        11) runjob install_plugins ;;
-        12) runjob uninstall_plugins ;;
-        13) runjob install_crouton ;;
-        14) runjob run_crouton ;;
+        10) runjob install_plugins ;;
+        11) runjob uninstall_plugins ;;
+        12) runjob install_crouton ;;
+        13) runjob run_crouton ;;
 
         # Execute the chosen plugin script
         $((i+1))|$((i+2))|...) source "$(find "$PLUGIN_DIR" -name "*.sh" | sed -n "$((choice-i-1))p")";;
@@ -114,10 +112,6 @@ EOF
         *) echo "----- Invalid option ------" ;;
         esac
     done
-}
-
-do_neofetch() {
-    curl https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch | bash
 }
 
 install_plugins() {
