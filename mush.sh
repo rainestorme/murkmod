@@ -75,13 +75,23 @@ main() {
 (8) Emergency Revert & Re-Enroll
 (9) Edit Pollen
 (10) Run neofetch
+(11) Install plugins
+(12) Uninstall plugins
 EOF
         if ! test -f /mnt/stateful_partition/crouton; then
-            echo "(11) Install Crouton"
-            echo "(12) Start Crouton (only run after running above)"
+            echo "(13) Install Crouton"
+            echo "(14) Start Crouton (only run after running above)"
         fi
+
+        # Scan the plugins directory for plugin scripts
+        PLUGIN_DIR="/mnt/stateful_partition/murkmod/plugins"
+        for plugin_file in $(find "$PLUGIN_DIR" -name "*.sh"); do
+            source "$plugin_file"
+            echo "($((++i))) ${PLUGIN_NAME} (ver: ${PLUGIN_VERSION})"
+        done
+
         swallow_stdin
-        read -r -p "> (1-12): " choice
+        read -r -p "> (1-$((i+11))): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob bash ;;
@@ -93,8 +103,14 @@ EOF
         8) runjob revert ;;
         9) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
         10) runjob do_neofetch ;;
-        11) runjob install_crouton ;;
-        12) runjob run_crouton ;;
+        11) runjob install_plugins ;;
+        12) runjob uninstall_plugins ;;
+        13) runjob install_crouton ;;
+        14) runjob run_crouton ;;
+
+        # Execute the chosen plugin script
+        $((i+1))|$((i+2))|...) source "$(find "$PLUGIN_DIR" -name "*.sh" | sed -n "$((choice-i-1))p")";;
+
         *) echo "----- Invalid option ------" ;;
         esac
     done
@@ -102,6 +118,102 @@ EOF
 
 do_neofetch() {
     curl https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch | bash
+}
+
+install_plugins() {
+  local plugins_url="https://api.github.com/repos/rainestorme/murkmod/contents/plugins"
+  local plugins=$(curl -s $plugins_url | jq -r '.[] | select(.type == "file") | .name')
+
+  echo "Available plugins:"
+
+  for plugin in $plugins; do
+    local plugin_url="$plugins_url/$plugin"
+    local plugin_info=$(curl -s $plugin_url)
+
+    local plugin_name=$(echo "$plugin_info" | jq -r '.name')
+    local plugin_desc=$(echo "$plugin_info" | jq -r '.description')
+    local plugin_author=$(echo "$plugin_info" | jq -r '.author')
+
+    echo "$plugin_name by $plugin_author: $plugin_desc"
+    echo ""
+  done
+
+  echo "Enter the name of a plugin to install (or q to quit):"
+  read -r plugin_name
+
+  while [[ $plugin_name != "q" ]]; do
+    local plugin_url="$plugins_url/$plugin_name"
+    local plugin_info=$(curl -s $plugin_url)
+
+    if [[ $plugin_info == *"Not Found"* ]]; then
+      echo "Plugin not found"
+    else
+      local plugin_file_url=$(echo "$plugin_info" | jq -r '.download_url')
+      local plugin_path="/mnt/stateful_partition/murkmod/plugins/$plugin_name"
+      
+      curl -s $plugin_file_url > $plugin_path
+      echo "Installed $plugin_name"
+    fi
+
+    echo "Enter the name of a plugin to install (or q to quit):"
+    read -r plugin_name
+  done
+}
+
+
+uninstall_plugins() {
+    clear
+    
+    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
+    plugin_files=()
+
+    while IFS= read -r -d '' file; do
+        plugin_files+=("$file")
+    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
+
+    plugin_info=()
+    for file in "${plugin_files[@]}"; do
+        source "$file"
+        plugin_info+=("$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)")
+    done
+
+    if [ ${#plugin_info[@]} -eq 0 ]; then
+        echo "No plugins installed. Select "
+        return
+    fi
+
+    while true; do
+        echo "Installed plugins:"
+        for i in "${!plugin_info[@]}"; do
+            echo "$(($i+1)). ${plugin_info[$i]}"
+        done
+        echo "0. Exit back to mush"
+        read -r -p "Enter a number to uninstall a plugin, or 0 to exit: " choice
+
+        if [ "$choice" -eq 0 ]; then
+            clear
+            return
+        fi
+
+        index=$(($choice-1))
+
+        if [ "$index" -lt 0 ] || [ "$index" -ge ${#plugin_info[@]} ]; then
+            echo "Invalid choice."
+            continue
+        fi
+
+        plugin_file="${plugin_files[$index]}"
+        source "$plugin_file"
+        plugin_name="$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)"
+
+        read -r -p "Are you sure you want to uninstall $plugin_name? [y/n] " confirm
+        if [ "$confirm" == "y" ]; then
+            rm "$plugin_file"
+            echo "$plugin_name uninstalled."
+            unset plugin_info[$index]
+            plugin_info=("${plugin_info[@]}")
+        fi
+    done
 }
 
 powerwash() {
@@ -145,6 +257,7 @@ revert() {
     sleep 2
     doas reboot
     sleep 1000
+    echo "Your chromebook should have rebooted by now. If your chromebook doesn't reboot in the next couple of seconds, press Esc+Refresh to do it manually."
 }
 harddisableext() { # calling it "hard disable" because it only reenables when you press
     read -r -p "Enter extension ID > " extid
