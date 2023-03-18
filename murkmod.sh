@@ -12,7 +12,7 @@ install() {
     if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
         echo "Failed to install $1 to $2"
         rm -f "$TMP"
-        return 1
+        exit
     fi
     # Don't mv, that would break permissions
     cat "$TMP" >"$2"
@@ -26,12 +26,28 @@ show_logo() {
 }
 
 install_patched_files() {
-    install "mush.sh" /usr/bin/crosh
     install "fakemurk-daemon.sh" /sbin/fakemurk-daemon.sh
+    install "chromeos_startup.sh" /sbin/chromeos_startup.sh
+    install "mush.sh" /usr/bin/crosh
+    install "pre-startup.conf" /etc/init/pre-startup.conf
 }
 
 create_stateful_files() {
     mkdir -p /mnt/stateful_partition/murkmod/plugins
+    touch /mnt/stateful_partition/murkmod_version
+    echo $CURRENT_VERSION > /mnt/stateful_partition/murkmod_version  
+}
+
+check_for_murkmod() {
+    if [ -f /mnt/stateful_partition/murkmod_version ]; then
+        FILE_VERSION=$(cat /mnt/stateful_partition/murkmod_version)
+        if [ $FILE_VERSION -ge $CURRENT_VERSION ]; then
+            # Exit if the file version is greater than or equal to the current version
+            echo "Nothing to do, exiting..."
+            exit 0
+        fi
+        echo "Found pre-existing install. Will update files accordingly."
+    fi
 }
 
 murkmod() {
@@ -40,6 +56,8 @@ murkmod() {
         echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
         exit
     fi
+    echo "Checking for pre-existing murkmod install..."
+    check_for_murkmod
     echo "Installing patched files..."
     install_patched_files
     echo "Creating stateful partition files..."
