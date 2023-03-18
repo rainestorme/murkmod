@@ -36,15 +36,15 @@ create_stateful_files() {
 
 murkmod() {
     show_logo
-#     if [ ! -f /sbin/fakemurk-daemon.sh ] then
-#         echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
-#         exit
-#     fi
+    if [ ! -f /sbin/fakemurk-daemon.sh ] then
+        echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
+        exit
+    fi
     echo "Installing patched files..."
     install_patched_files
     echo "Creating stateful partition files..."
     create_stateful_files
-    read -n 1 -s -r -p "Press any key to exit."
+    read -n 1 -s -r -p "Done. Press any key to exit."
     exit
 }
 
