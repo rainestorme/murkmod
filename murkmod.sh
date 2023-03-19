@@ -41,7 +41,7 @@ create_stateful_files() {
 check_for_murkmod() {
     if [ -f /mnt/stateful_partition/murkmod_version ]; then
         FILE_VERSION=$(cat /mnt/stateful_partition/murkmod_version)
-        if [ $FILE_VERSION -ge $CURRENT_VERSION ]; then
+        if [ "$FILE_VERSION" -ge $CURRENT_VERSION ]; then
             # Exit if the file version is greater than or equal to the current version
             echo "Nothing to do, exiting..."
             exit 0
@@ -52,7 +52,7 @@ check_for_murkmod() {
 
 murkmod() {
     show_logo
-    if [ ! -f /sbin/fakemurk-daemon.sh ] then
+    if [ ! -f /sbin/fakemurk-daemon.sh ]; then
         echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
         exit
     fi
@@ -67,7 +67,7 @@ murkmod() {
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
-    if [ "$EUID" -ne 0 ] then
+    if [ "$EUID" -ne 0 ]; then
         echo "Please run this as root from mush. Use option 1 (root shell) instead of any other method of getting to a shell."
         exit
     fi
