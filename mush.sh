@@ -164,22 +164,25 @@ show_plugins() {
 
 install_plugins() {
   local plugins_url="https://api.github.com/repos/rainestorme/murkmod/contents/plugins"
+  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/"
   local plugins=$(curl -s $plugins_url | jq -r '.[] | select(.type == "file") | .name')
 
   echo "Available plugins:"
 
   for plugin in $plugins; do
-    local plugin_url="$plugins_url/$plugin"
-    local plugin_info=$(curl -s $plugin_url)
+    local plugin_url="$raw_url/$plugin"
+    local plugin_content=$(curl -s $plugin_url)
 
-    local plugin_name=$(echo "$plugin_info" | jq -r '.name')
-    local plugin_desc=$(echo "$plugin_info" | jq -r '.description')
-    local plugin_author=$(echo "$plugin_info" | jq -r '.author')
+    PLUGIN_NAME=$(grep -Po '(?<=PLUGIN_NAME=).*' <<< "$plugin_content")
+    PLUGIN_FUNCTION=$(grep -Po '(?<=PLUGIN_FUNCTION=).*' <<< "$plugin_content")
+    PLUGIN_DESCRIPTION=$(grep -Po '(?<=PLUGIN_DESCRIPTION=).*' <<< "$plugin_content")
+    PLUGIN_AUTHOR=$(grep -Po '(?<=PLUGIN_AUTHOR=).*' <<< "$plugin_content")
+    PLUGIN_VERSION=$(grep -Po '(?<=PLUGIN_VERSION=).*' <<< "$plugin_content")
 
-    echo "$plugin_name by $plugin_author: $plugin_desc"
-    echo ""
+    echo "$PLUGIN_NAME by $PLUGIN_AUTHOR: $PLUGIN_DESCRIPTION"
   done
 
+  echo
   echo "Enter the name of a plugin to install (or q to quit):"
   read -r plugin_name
 
@@ -193,7 +196,7 @@ install_plugins() {
       local plugin_file_url=$(echo "$plugin_info" | jq -r '.download_url')
       local plugin_path="/mnt/stateful_partition/murkmod/plugins/$plugin_name"
       
-      curl -s $plugin_file_url > $plugin_path
+      doas curl -s $plugin_file_url > $plugin_path
       echo "Installed $plugin_name"
     fi
 
