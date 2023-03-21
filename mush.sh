@@ -121,11 +121,11 @@ show_plugins() {
     plugin_info=()
     for file in "${plugin_files[@]}"; do
         plugin_script=$file
-        PLUGIN_NAME=$(grep -Po '(?<=PLUGIN_NAME=).*' "$plugin_script")
-        PLUGIN_FUNCTION=$(grep -Po '(?<=PLUGIN_FUNCTION=).*' "$plugin_script")
-        PLUGIN_DESCRIPTION=$(grep -Po '(?<=PLUGIN_DESCRIPTION=).*' "$plugin_script")
-        PLUGIN_AUTHOR=$(grep -Po '(?<=PLUGIN_AUTHOR=).*' "$plugin_script")
-        PLUGIN_VERSION=$(grep -Po '(?<=PLUGIN_VERSION=).*' "$plugin_script")
+        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' "$plugin_script" | cut -d= -f2-)
         plugin_info+=("$PLUGIN_FUNCTION (provided by $PLUGIN_NAME)")
     done
 
@@ -173,11 +173,12 @@ install_plugins() {
     local plugin_url="$raw_url/$plugin"
     local plugin_content=$(curl -s $plugin_url)
 
-    PLUGIN_NAME=$(grep -Po '(?<=PLUGIN_NAME=).*' <<< "$plugin_content")
-    PLUGIN_FUNCTION=$(grep -Po '(?<=PLUGIN_FUNCTION=).*' <<< "$plugin_content")
-    PLUGIN_DESCRIPTION=$(grep -Po '(?<=PLUGIN_DESCRIPTION=).*' <<< "$plugin_content")
-    PLUGIN_AUTHOR=$(grep -Po '(?<=PLUGIN_AUTHOR=).*' <<< "$plugin_content")
-    PLUGIN_VERSION=$(grep -Po '(?<=PLUGIN_VERSION=).*' <<< "$plugin_content")
+    PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=.*' <<< "$plugin_content" | cut -d= -f2-)
+    PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=.*' <<< "$plugin_content" | cut -d= -f2-)
+    PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' <<< "$plugin_content" | cut -d= -f2-)
+    PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' <<< "$plugin_content" | cut -d= -f2-)
+    PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' <<< "$plugin_content" | cut -d= -f2-)
+
 
     echo "$PLUGIN_NAME by $PLUGIN_AUTHOR: $PLUGIN_DESCRIPTION"
   done
@@ -219,11 +220,11 @@ uninstall_plugins() {
     plugin_info=()
     for file in "${plugin_files[@]}"; do
         plugin_script=$file
-        PLUGIN_NAME=$(grep -Po '(?<=PLUGIN_NAME=).*' $plugin_script)
-        PLUGIN_FUNCTION=$(grep -Po '(?<=PLUGIN_FUNCTION=).*' $plugin_script)
-        PLUGIN_DESCRIPTION=$(grep -Po '(?<=PLUGIN_DESCRIPTION=).*' $plugin_script)
-        PLUGIN_AUTHOR=$(grep -Po '(?<=PLUGIN_AUTHOR=).*' $plugin_script)
-        PLUGIN_VERSION=$(grep -Po '(?<=PLUGIN_VERSION=).*' $plugin_script)
+        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' "$plugin_script" | cut -d= -f2-)
         plugin_info+=("$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)")
     done
 
