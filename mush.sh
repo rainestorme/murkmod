@@ -163,28 +163,11 @@ show_plugins() {
 
 
 install_plugins() {
-  local plugins_url="https://api.github.com/repos/rainestorme/murkmod/contents/plugins"
   local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/"
-  local plugins=$(curl -s $plugins_url | jq -r '.[] | select(.type == "file") | .name')
 
-  echo "Available plugins:"
-
-  for plugin in $plugins; do
-    local plugin_url="$raw_url/$plugin"
-    local plugin_content=$(curl -s $plugin_url)
-
-    PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=.*' <<< "$plugin_content" | cut -d= -f2-)
-    PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=.*' <<< "$plugin_content" | cut -d= -f2-)
-    PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' <<< "$plugin_content" | cut -d= -f2-)
-    PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' <<< "$plugin_content" | cut -d= -f2-)
-    PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' <<< "$plugin_content" | cut -d= -f2-)
-
-
-    echo "$PLUGIN_NAME by $PLUGIN_AUTHOR: $PLUGIN_DESCRIPTION"
-  done
-
-  echo
-  echo "Enter the name of a plugin to install (or q to quit):"
+  echo "Find a plugin you want to install here: "
+  echo "  https://github.com/rainestorme/murkmod/tree/main/plugins"
+  echo "Enter the name of a plugin (including the .sh) to install it (or q to quit):"
   read -r plugin_name
 
   while [[ $plugin_name != "q" ]]; do
@@ -201,7 +184,7 @@ install_plugins() {
       echo "Installed $plugin_name"
     fi
 
-    echo "Enter the name of a plugin to install (or q to quit):"
+    echo "Enter the name of a plugin (including the .sh) to install (or q to quit):"
     read -r plugin_name
   done
 }
