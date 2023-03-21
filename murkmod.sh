@@ -20,17 +20,10 @@ install() {
 }
 
 show_logo() {
-    echo <<EOF
-                      __                      .___
-  _____  __ _________|  | __ _____   ____   __| _/
- /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | 
-|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | 
-|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | 
-      \/                  \/     \/            \/
-EOF
-    echo
-    echo "        The fakemurk plugin manager - v0.1:1"
+    echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
+    echo "        The fakemurk plugin manager - v0.1.1:$CURRENT_VERSION"
 }
+
 
 install_patched_files() {
     install "fakemurk-daemon.sh" /sbin/fakemurk-daemon.sh
