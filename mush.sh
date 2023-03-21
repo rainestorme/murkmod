@@ -82,6 +82,8 @@ EOF
             echo "(13) Start Crouton (only run after running above)"
         fi
 
+        echo "(14) Plugins"
+
         # Scan the plugins directory for plugin scripts
         PLUGIN_DIR="/mnt/stateful_partition/murkmod/plugins"
         for plugin_file in $(find "$PLUGIN_DIR" -name "*.sh"); do
@@ -90,7 +92,7 @@ EOF
         done
 
         swallow_stdin
-        read -r -p "> (1-$((i+11))): " choice
+        read -r -p "> (1-14): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob bash ;;
@@ -105,14 +107,66 @@ EOF
         11) runjob uninstall_plugins ;;
         12) runjob install_crouton ;;
         13) runjob run_crouton ;;
-
-        # Execute the chosen plugin script
-        $((i+1))|$((i+2))|...) source "$(find "$PLUGIN_DIR" -name "*.sh" | sed -n "$((choice-i-1))p")";;
+        14) runjob show_plugins ;;
 
         *) echo "----- Invalid option ------" ;;
         esac
     done
 }
+
+show_plugins() {
+    clear
+    
+    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
+    plugin_files=()
+
+    while IFS= read -r -d '' file; do
+        plugin_files+=("$file")
+    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
+
+    plugin_info=()
+    for file in "${plugin_files[@]}"; do
+        plugin_script=$file
+        PLUGIN_NAME=$(grep -Po '(?<=PLUGIN_NAME=).*' "$plugin_script")
+        PLUGIN_FUNCTION=$(grep -Po '(?<=PLUGIN_FUNCTION=).*' "$plugin_script")
+        PLUGIN_DESCRIPTION=$(grep -Po '(?<=PLUGIN_DESCRIPTION=).*' "$plugin_script")
+        PLUGIN_AUTHOR=$(grep -Po '(?<=PLUGIN_AUTHOR=).*' "$plugin_script")
+        PLUGIN_VERSION=$(grep -Po '(?<=PLUGIN_VERSION=).*' "$plugin_script")
+        plugin_info+=("$PLUGIN_FUNCTION (provided by $PLUGIN_NAME)")
+    done
+
+    # Print menu options
+    for i in "${!plugin_info[@]}"; do
+        printf "%s. %s\n" "$((i+1))" "${plugin_info[$i]}"
+    done
+
+    # Prompt user for selection
+    read -p "> Select a plugin (or q to quit): " selection
+
+    if [ "$selection" = "q" ]; then
+        return 0
+    else
+
+    # Validate user's selection
+    if ! [[ "$selection" =~ ^[1-9][0-9]*$ ]]; then
+        echo "Invalid selection. Please enter a number between 0 and ${#plugin_info[@]}"
+        return 1
+    fi
+
+    if ((selection < 1 || selection > ${#plugin_info[@]})); then
+        echo "Invalid selection. Please enter a number between 0 and ${#plugin_info[@]}"
+        return 1
+    fi
+
+    # Get plugin function name and corresponding file
+    selected_plugin=${plugin_info[$((selection-1))]}
+    selected_file=${plugin_files[$((selection-1))]}
+
+    # Execute the plugin
+    bash <(cat $selected_file) # weird syntax due to noexec mount
+    return 0
+}
+
 
 install_plugins() {
   local plugins_url="https://api.github.com/repos/rainestorme/murkmod/contents/plugins"
@@ -167,7 +221,12 @@ uninstall_plugins() {
 
     plugin_info=()
     for file in "${plugin_files[@]}"; do
-        source "$file"
+        plugin_script=$file
+        PLUGIN_NAME=$(grep -Po '(?<=PLUGIN_NAME=).*' $plugin_script)
+        PLUGIN_FUNCTION=$(grep -Po '(?<=PLUGIN_FUNCTION=).*' $plugin_script)
+        PLUGIN_DESCRIPTION=$(grep -Po '(?<=PLUGIN_DESCRIPTION=).*' $plugin_script)
+        PLUGIN_AUTHOR=$(grep -Po '(?<=PLUGIN_AUTHOR=).*' $plugin_script)
+        PLUGIN_VERSION=$(grep -Po '(?<=PLUGIN_VERSION=).*' $plugin_script)
         plugin_info+=("$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)")
     done
 
