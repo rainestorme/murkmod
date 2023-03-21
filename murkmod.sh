@@ -20,7 +20,14 @@ install() {
 }
 
 show_logo() {
-    echo "                          __                      .___\n  _____  __ _________\|  \| __ _____   ____   __\| _/\n /     \\\|  \|  \\_  __ \\  \|/ //     \\ /  _ \\ / __ \| \n\|  Y Y  \\  \|  /\|  \| \\/    \<\|  Y Y  \(  \<_\> \) /_/ \| \n\|__\|_\|  /____/ \|__\|  \|__\|_ \\__\|_\|  /\\____/\\____ \| \n      \\/                  \\/     \\/            \\/ "
+    echo <<EOF
+                      __                      .___
+  _____  __ _________|  | __ _____   ____   __| _/
+ /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | 
+|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | 
+|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | 
+      \/                  \/     \/            \/'
+EOF"
     echo
     echo "        The fakemurk plugin manager - v0.1:1"
 }
@@ -40,13 +47,7 @@ create_stateful_files() {
 
 check_for_murkmod() {
     if [ -f /mnt/stateful_partition/murkmod_version ]; then
-        FILE_VERSION=$(cat /mnt/stateful_partition/murkmod_version)
-        if [ "$FILE_VERSION" -ge $CURRENT_VERSION ]; then
-            # Exit if the file version is greater than or equal to the current version
-            echo "Nothing to do, exiting..."
-            exit 0
-        fi
-        echo "Found pre-existing install. Will update files accordingly."
+        echo "Found pre-existing install."
     fi
 }
 
