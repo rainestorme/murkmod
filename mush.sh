@@ -259,7 +259,7 @@ uninstall_plugins() {
 
         read -r -p "Are you sure you want to uninstall $plugin_name? [y/n] " confirm
         if [ "$confirm" == "y" ]; then
-            rm "$plugin_file"
+            doas rm "$plugin_file"
             echo "$plugin_name uninstalled."
             unset plugin_info[$index]
             plugin_info=("${plugin_info[@]}")
