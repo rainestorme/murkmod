@@ -333,7 +333,18 @@ run_crouton() {
     echo "Use Crtl+Shift+Alt+Forward and Ctrl+Shift+Alt+Back to toggle between desktops"
     doas "startxfce4"
 }
+
+wrapper() {
+  while true; do
+    # call the main function
+    main
+    # if the main function exits, then something went wrong
+    echo "Something went wrong. A root shell should be presented to you, and hopefully you can fix the issue."
+    doas bash
+  done
+}
+
 if [ "$0" = "$BASH_SOURCE" ]; then
     stty sane
-    main
+    wrapper
 fi
