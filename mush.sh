@@ -174,7 +174,7 @@ install_plugins() {
     local plugin_url="$plugins_url/$plugin_name"
     local plugin_info=$(curl -s $plugin_url)
 
-    if [[ $plugin_info == *"Not Found"* ]]; then
+    if [[ grep "Not Found" <<< $plugin_info ]]; then
       echo "Plugin not found"
     else
       local plugin_file_url=$(echo "$plugin_info" | jq -r '.download_url')
