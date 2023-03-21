@@ -83,14 +83,7 @@ EOF
         fi
 
         echo "(14) Plugins"
-
-        # Scan the plugins directory for plugin scripts
-        PLUGIN_DIR="/mnt/stateful_partition/murkmod/plugins"
-        for plugin_file in $(find "$PLUGIN_DIR" -name "*.sh"); do
-            source "$plugin_file"
-            echo "($((++i))) ${PLUGIN_NAME} (ver: ${PLUGIN_VERSION})"
-        done
-
+        
         swallow_stdin
         read -r -p "> (1-14): " choice
         case "$choice" in
@@ -145,7 +138,7 @@ show_plugins() {
 
     if [ "$selection" = "q" ]; then
         return 0
-    else
+    fi
 
     # Validate user's selection
     if ! [[ "$selection" =~ ^[1-9][0-9]*$ ]]; then
