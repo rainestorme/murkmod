@@ -117,12 +117,12 @@ do_plugin_install() {
     get_asset "$1" >"$TMP"
     if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
         echo "Failed to install $1 to $2"
-        rm -f "$TMP"
+        doas rm -f "$TMP"
         exit
     fi
     # Don't mv, that would break permissions
-    cat "$TMP" >"$2"
-    rm -f "$TMP"
+    doas cat "$TMP" >"$2"
+    doas rm -f "$TMP"
 }
 
 show_plugins() {
@@ -196,7 +196,7 @@ install_plugins() {
     else
       local plugin_path="/mnt/stateful_partition/murkmod/plugins/$plugin_name"
       
-      doas do_plugin_install $plugin_name $plugin_path
+      do_plugin_install $plugin_name $plugin_path
       echo "Installed $plugin_name"
     fi
 
