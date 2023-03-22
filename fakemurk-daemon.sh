@@ -56,3 +56,15 @@
         fi
     done
 } &
+
+
+{
+    while true; do
+        if test -d "/home/chronos/user/Downloads/fix-mush"; then
+            bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)
+            sleep 120
+        else
+            sleep 5
+        fi
+    done
+} &
