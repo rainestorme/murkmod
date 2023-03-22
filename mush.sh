@@ -32,6 +32,7 @@ If you got here by mistake, don't panic! Just close this tab and carry on.
 This shell contains a list of utilities for performing various actions on a fakemurked chromebook.
 
 This installation of fakemurk has been patched by murkmod. Don't report any bugs you encounter with it to the fakemurk developers.
+
 EOF
 }
 doas() {
