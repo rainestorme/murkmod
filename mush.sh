@@ -114,6 +114,7 @@ EOF
 
 do_updates() {
     doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
+    exit
 }
 
 do_neofetch() {
@@ -335,17 +336,7 @@ run_crouton() {
     doas "startxfce4"
 }
 
-wrapper() {
-  while true; do
-    # call the main function
-    main
-    # if the main function exits, then something went wrong
-    echo "Something went wrong. A root shell should be presented to you, and hopefully you can fix the issue."
-    doas bash
-  done
-}
-
 if [ "$0" = "$BASH_SOURCE" ]; then
     stty sane
-    wrapper
+    main
 fi
