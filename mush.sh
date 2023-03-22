@@ -108,6 +108,23 @@ EOF
     done
 }
 
+get_asset() {
+    curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/plugins/$1" | jq -r ".content" | base64 -d
+}
+
+do_plugin_install() {
+    TMP=$(mktemp)
+    get_asset "$1" >"$TMP"
+    if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
+        echo "Failed to install $1 to $2"
+        rm -f "$TMP"
+        exit
+    fi
+    # Don't mv, that would break permissions
+    cat "$TMP" >"$2"
+    rm -f "$TMP"
+}
+
 show_plugins() {
     clear
     
@@ -177,10 +194,9 @@ install_plugins() {
     if [[ $plugin_info == *"Not Found"* ]]; then
       echo "Plugin not found"
     else
-      local plugin_file_url=$(echo "$plugin_info" | jq -r '.download_url')
       local plugin_path="/mnt/stateful_partition/murkmod/plugins/$plugin_name"
       
-      doas curl -s $plugin_file_url > $plugin_path
+      doas do_plugin_install $plugin_name $plugin_path
       echo "Installed $plugin_name"
     fi
 
