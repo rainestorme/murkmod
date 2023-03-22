@@ -68,44 +68,50 @@ main() {
         cat <<-EOF
 (1) Root Shell
 (2) Chronos Shell
-(3) Crosh
-(4) Powerwash
-(5) Soft Disable Extensions
-(6) Hard Disable Extensions
-(7) Hard Enable Extensions
-(8) Emergency Revert & Re-Enroll
-(9) Edit Pollen
-(10) Install plugins
-(11) Uninstall plugins
+(3) Plugins
+(4) Crosh
+(5) Powerwash
+(6) Soft Disable Extensions
+(7) Hard Disable Extensions
+(8) Hard Enable Extensions
+(9) Emergency Revert & Re-Enroll
+(10) Edit Pollen
+(11) Install plugins
+(12) Uninstall plugins
+(13) Run neofetch
 EOF
         if ! test -f /mnt/stateful_partition/crouton; then
-            echo "(12) Install Crouton"
-            echo "(13) Start Crouton (only run after running above)"
+            echo "(14) Install Crouton"
+            echo "(15) Start Crouton (only run after running above)"
         fi
 
-        echo "(14) Plugins"
         
         swallow_stdin
         read -r -p "> (1-14): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob bash ;;
-        3) runjob /usr/bin/crosh.old ;;
-        4) runjob powerwash ;;
-        5) runjob softdisableext ;;
-        6) runjob harddisableext ;;
-        7) runjob hardenableext ;;
-        8) runjob revert ;;
-        9) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
-        10) runjob install_plugins ;;
-        11) runjob uninstall_plugins ;;
-        12) runjob install_crouton ;;
-        13) runjob run_crouton ;;
-        14) runjob show_plugins ;;
+        3) runjob show_plugins ;;
+        4) runjob /usr/bin/crosh.old ;;
+        5) runjob powerwash ;;
+        6) runjob softdisableext ;;
+        7) runjob harddisableext ;;
+        8) runjob hardenableext ;;
+        9) runjob revert ;;
+        10) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
+        11) runjob install_plugins ;;
+        12) runjob uninstall_plugins ;;
+        13) runjob do_neofetch ;;
+        14) runjob install_crouton ;;
+        15) runjob run_crouton ;;
 
         *) echo "----- Invalid option ------" ;;
         esac
     done
+}
+
+do_neofetch() {
+    curl https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch | bash
 }
 
 get_asset() {
