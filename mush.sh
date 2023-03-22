@@ -79,15 +79,16 @@ main() {
 (11) Install plugins
 (12) Uninstall plugins
 (13) Run neofetch
+(14) Check for updates
 EOF
         if ! test -f /mnt/stateful_partition/crouton; then
-            echo "(14) Install Crouton"
-            echo "(15) Start Crouton (only run after running above)"
+            echo "(15) Install Crouton"
+            echo "(16) Start Crouton (only run after running above)"
         fi
 
         
         swallow_stdin
-        read -r -p "> (1-14): " choice
+        read -r -p "> (1-16): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob bash ;;
@@ -102,33 +103,21 @@ EOF
         11) runjob install_plugins ;;
         12) runjob uninstall_plugins ;;
         13) runjob do_neofetch ;;
-        14) runjob install_crouton ;;
-        15) runjob run_crouton ;;
+        14) runjob do_updates ;;
+        15) runjob install_crouton ;;
+        16) runjob run_crouton ;;
 
         *) echo "----- Invalid option ------" ;;
         esac
     done
 }
 
+do_updates() {
+    doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
+}
+
 do_neofetch() {
     curl https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch | bash
-}
-
-get_asset() {
-    curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/plugins/$1" | jq -r ".content" | base64 -d
-}
-
-do_plugin_install() {
-    TMP=$(mktemp)
-    get_asset "$1" >"$TMP"
-    if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
-        echo "Failed to install $1 to $2"
-        doas rm -f "$TMP"
-        exit
-    fi
-    # Don't mv, that would break permissions
-    doas cat "$TMP" >"$2"
-    doas rm -f "$TMP"
 }
 
 show_plugins() {
