@@ -12,11 +12,11 @@ bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murk
 This command will download and install murkmod and its (almost minimal) dependencies. Once the installation is complete, you can start using murkmod by running mush as usual.
 
 ## Plugin Management
-Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a few new options, such as the ability to run `neofetch`, but the important ones here are `Install plugins` and `Uninstall plugins`.
+Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a few new options, such as the ability to run `neofetch`, but the important ones here are `Install plugins`, `Uninstall plugins` and `Plugins`.
 
-**Heads up: The following instructions are broken at the moment. Look at the bottom of this readme for up-to-date instructions.**
+To install a plugin, head over to [this link](https://github.com/rainestorme/murkmod/tree/main/plugins). Find the plugin you want and remember its filename. You'll need it in a bit. Select `Install plugins` and enter the filename. The file should be installed, then you can enter `q` to quit.
 
-To install a plugin, select the relevant option and find the plugin you want to install. murkmod will automatically fetch the plugin from this repo and install it to `/mnt/stateful_partition/murkmod/plugins`. You can then select `q` to quit, and the newly installed plugin should show up on the list of options for mush.
+You can go to `Plugins` to use your installed plugins. Once you select an option, it should execute the plugin's contents.
 
 ## Plugin Development
 It's pretty straightforward to create a pluign. Just create a `.sh` file with the following content:
@@ -31,11 +31,5 @@ PLUGIN_VERSION=1
 echo "Hello, World!"
 ```
 
-Of course, you should change this to match your plugin. Every time you update your plugin, you should increment `PLUGIN_VERSION`. Everything below the initial variabls, though, is what is executed when you run the plugin from the mush menu.
+Of course, you should change this to match your plugin. Every time you update your plugin, you should increment `PLUGIN_VERSION`. Everything below the initial variables, though, is what is executed when you run the plugin from the mush menu.
 
-## Plugin installation
-Although the plugin uninstallation feature is working, the plugin "shop"/installation is not (although I welcome a PR to fix it). In the meantime, you can still install murkmod plugins by opening a root shell and downloading them (probably via `curl`) to `/mnt/stateful_partition/murkmod/plugins`. An example of how to download the Hello World Plugin (`plugins/helloworld.sh`) is below:
-
-```sh
-pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/helloworld.sh -O helloworld.sh && popd && exit
-```
