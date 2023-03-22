@@ -103,7 +103,7 @@ EOF
         11) runjob install_plugins ;;
         12) runjob uninstall_plugins ;;
         13) runjob do_neofetch ;;
-        14) runjob do_updates ;;
+        14) runjob do_updates && exit 0 ;;
         15) runjob install_crouton ;;
         16) runjob run_crouton ;;
 
