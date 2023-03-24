@@ -191,7 +191,7 @@ install_plugins() {
     if [[ $plugin_info == *"Not Found"* ]]; then
       echo "Plugin not found"
     else      
-      doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O $plugin_name && popd"
+      doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O && popd"
       echo "Installed $plugin_name"
     fi
 
