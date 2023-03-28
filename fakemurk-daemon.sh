@@ -61,8 +61,31 @@
 {
     while true; do
         if test -d "/home/chronos/user/Downloads/fix-mush"; then
-            bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)
-            sleep 120
+
+            cat << 'EOF' > /usr/bin/crosh
+mush_info() {
+    echo "This is an emergency backup shell! If you triggered this accidentally, type the following command at the prompt:"
+    echo "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
+}
+
+doas() {
+    ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
+}
+
+runjob() {
+    trap 'kill -2 $! >/dev/null 2>&1' INT
+    (
+        # shellcheck disable=SC2068
+        $@
+    )
+    trap '' INT
+}
+
+mush_info
+runjob doas "bash"
+EOF
+
+            sleep 10
         else
             sleep 5
         fi
