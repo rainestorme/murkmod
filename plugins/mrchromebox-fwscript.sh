@@ -9,4 +9,4 @@ doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
 }
 
-cd; curl -LOk mrchromebox.tech/firmware-util.sh && doas bash firmware-util.sh
+cd; curl -LOk mrchromebox.tech/firmware-util.sh && doas "cd; bash firmware-util.sh"
