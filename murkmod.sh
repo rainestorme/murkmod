@@ -1,6 +1,8 @@
 #!/bin/bash
 
-CURRENT_VERSION=3
+CURRENT_MAJOR=0
+CURRENT_MINOR=1
+CURRENT_VERSION=4
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -21,7 +23,7 @@ install() {
 
 show_logo() {
     echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
-    echo "        The fakemurk plugin manager - v0.1.1:$CURRENT_VERSION"
+    echo "        The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION"
 }
 
 
@@ -38,9 +40,10 @@ create_stateful_files() {
     echo $CURRENT_VERSION > /mnt/stateful_partition/murkmod_version  
 }
 
-check_for_murkmod() {
-    if [ -f /mnt/stateful_partition/murkmod_version ]; then
-        echo "Found pre-existing install."
+check_for_emergencyshell() {
+    if test -d "/home/chronos/user/Downloads/fix-mush"; then
+        echo "Running from emergency shell, reverting..."
+        rm -Rf /home/chronos/user/Downloads/fix-mush
     fi
 }
 
@@ -50,8 +53,8 @@ murkmod() {
         echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
         exit
     fi
-    echo "Checking for pre-existing murkmod install..."
-    check_for_murkmod
+    echo "Checking for emergency shell..."
+    check_for_emergencyshell
     echo "Installing patched files..."
     install_patched_files
     echo "Creating stateful partition files..."
