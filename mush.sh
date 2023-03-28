@@ -177,7 +177,7 @@ show_plugins() {
 
 
 install_plugins() {
-  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/"
+  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
 
   echo "Find a plugin you want to install here: "
   echo "  https://github.com/rainestorme/murkmod/tree/main/plugins"
@@ -185,7 +185,7 @@ install_plugins() {
   read -r plugin_name
 
   while [[ $plugin_name != "q" ]]; do
-    local plugin_url="$plugins_url/$plugin_name"
+    local plugin_url="$raw_url/$plugin_name"
     local plugin_info=$(curl -s $plugin_url)
 
     if [[ $plugin_info == *"Not Found"* ]]; then
