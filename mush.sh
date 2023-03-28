@@ -46,6 +46,7 @@ runjob() {
         $@
     )
     trap '' INT
+    clear
 }
 
 swallow_stdin() {
