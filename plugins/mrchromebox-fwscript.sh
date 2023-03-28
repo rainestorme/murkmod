@@ -1,6 +1,6 @@
 #!/bin/bash
 PLUGIN_NAME="MrChromebox Firmware Utility Script"
-PLUGIN_FUNCTION="Runs MrChromebox's firmware utility script."
+PLUGIN_FUNCTION="Run MrChromebox's firmware utility script"
 PLUGIN_DESCRIPTION="Runs MrChromebox's firmware utility script."
 PLUGIN_AUTHOR="MrChromebox, DiffuseHyperion"
 PLUGIN_VERSION=1
