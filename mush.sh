@@ -40,6 +40,7 @@ doas() {
 }
 
 runjob() {
+    clear
     trap 'kill -2 $! >/dev/null 2>&1' INT
     (
         # shellcheck disable=SC2068
