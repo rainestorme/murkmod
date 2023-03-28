@@ -69,44 +69,40 @@ main() {
         cat <<-EOF
 (1) Root Shell
 (2) Chronos Shell
-(3) Plugins
-(4) Crosh
-(5) Powerwash
-(6) Soft Disable Extensions
-(7) Hard Disable Extensions
-(8) Hard Enable Extensions
-(9) Emergency Revert & Re-Enroll
-(10) Edit Pollen
-(11) Install plugins
-(12) Uninstall plugins
-(13) Run neofetch
-(14) Check for updates
+(3) Crosh
+(4) Plugins
+(5) Install plugins
+(6) Uninstall plugins
+(7) Powerwash
+(8) Emergency Revert & Re-Enroll
+(9) Soft Disable Extensions
+(10) Hard Disable Extensions
+(11) Hard Enable Extensions
+(12) Edit Pollen
+(13) Install Crouton
+(14) Start Crouton
+(15) Check for updates
 EOF
-        if ! test -f /mnt/stateful_partition/crouton; then
-            echo "(15) Install Crouton"
-            echo "(16) Start Crouton (only run after running above)"
-        fi
-
         
         swallow_stdin
         read -r -p "> (1-16): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob bash ;;
-        3) runjob show_plugins ;;
-        4) runjob /usr/bin/crosh.old ;;
-        5) runjob powerwash ;;
-        6) runjob softdisableext ;;
-        7) runjob harddisableext ;;
-        8) runjob hardenableext ;;
-        9) runjob revert ;;
-        10) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
-        11) runjob install_plugins ;;
-        12) runjob uninstall_plugins ;;
-        13) runjob do_neofetch ;;
-        14) runjob do_updates && exit 0 ;;
-        15) runjob install_crouton ;;
-        16) runjob run_crouton ;;
+        3) runjob /usr/bin/crosh.old ;;
+        4) runjob show_plugins ;;
+        5) runjob install_plugins ;;
+        6) runjob uninstall_plugins ;;
+        7) runjob powerwash ;;
+        8) runjob revert ;;
+        9) runjob softdisableext ;;
+        10) runjob harddisableext ;;
+        11) runjob hardenableext ;;
+        12) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
+        13) runjob install_crouton ;;
+        14) runjob run_crouton ;;
+        15) runjob do_updates && exit 0 ;;
+
 
         *) echo "----- Invalid option ------" ;;
         esac
@@ -116,10 +112,6 @@ EOF
 do_updates() {
     doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
     exit
-}
-
-do_neofetch() {
-    curl https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch | bash
 }
 
 show_plugins() {
