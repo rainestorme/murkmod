@@ -2,7 +2,7 @@
 
 CURRENT_MAJOR=0
 CURRENT_MINOR=1
-CURRENT_VERSION=4
+CURRENT_VERSION=5
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -75,9 +75,10 @@ do_policy_patch() {
     else
         read -r -p "Use murkmod reccomended pollen config? [Y/n] " choice
         case "$choice" in
-        1) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json
-        2) install_fakemurk "pollen.json" /etc/opt/chrome/policies/managed/policy.json
-        *) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json
+                1) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
+                2) install_fakemurk "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
+                *) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
+        esac
     fi
 }
 
