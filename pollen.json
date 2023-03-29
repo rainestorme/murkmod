@@ -73,5 +73,5 @@
 	"InstantTetheringAllowed": true,
 	"SmartLockSigninAllowed": true,
 	"NearbyShareAllowed": true,
-  "UptimeLimit": null
+        "UptimeLimit": null
 }
