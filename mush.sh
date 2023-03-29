@@ -87,7 +87,7 @@ main() {
 EOF
         
         swallow_stdin
-        read -r -p "> (1-16): " choice
+        read -r -p "> (1-15): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob bash ;;
