@@ -8,9 +8,26 @@ get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
 }
 
+get_asset_fakemurk() {
+    curl -s -f "https://api.github.com/repos/MercuryWorkshop/fakemurk/contents/$1" | jq -r ".content" | base64 -d
+}
+
 install() {
     TMP=$(mktemp)
     get_asset "$1" >"$TMP"
+    if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
+        echo "Failed to install $1 to $2"
+        rm -f "$TMP"
+        exit
+    fi
+    # Don't mv, that would break permissions
+    cat "$TMP" >"$2"
+    rm -f "$TMP"
+}
+
+install_fakemurk() {
+    TMP=$(mktemp)
+    get_asset_fakemurk "$1" >"$TMP"
     if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
         echo "Failed to install $1 to $2"
         rm -f "$TMP"
@@ -47,6 +64,23 @@ check_for_emergencyshell() {
     fi
 }
 
+do_policy_patch() {
+    url1="https://raw.githubusercontent.com/rainestorme/murkmod/main/pollen.json"
+    url2="https://raw.githubusercontent.com/MercuryWorkshop/fakemurk/main/pollen.json"
+    response1=$(curl -s "$url1")
+    response2=$(curl -s "$url2")
+
+    if [ "$response1" = "$response2" ]; then
+        install "pollen.json" /etc/opt/chrome/policies/managed/policy.json
+    else
+        read -r -p "Use murkmod reccomended pollen config? [Y/n] " choice
+        case "$choice" in
+        1) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json
+        2) install_fakemurk "pollen.json" /etc/opt/chrome/policies/managed/policy.json
+        *) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json
+    fi
+}
+
 murkmod() {
     show_logo
     if [ ! -f /sbin/fakemurk-daemon.sh ]; then
@@ -59,6 +93,8 @@ murkmod() {
     install_patched_files
     echo "Creating stateful partition files..."
     create_stateful_files
+    echo "Patching policy..."
+    do_policy_patch
     read -n 1 -s -r -p "Done. Press any key to exit."
     exit
 }
