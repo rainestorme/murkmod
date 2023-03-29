@@ -75,9 +75,8 @@ do_policy_patch() {
     else
         read -r -p "Use murkmod reccomended pollen config? [Y/n] " choice
         case "$choice" in
-        1) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
-        2) install_fakemurk "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
-        *) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
+            n | N) install_fakemurk "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
+            *) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
         esac
     fi
 }
