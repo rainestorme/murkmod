@@ -26,7 +26,7 @@ pushd /tmp
     esac
     echo "Updating wssocks..."
     filename="wssocks-linux-$architecture"
-    doas "pushd /root
+    doas "pushd /tmp
     curl -LOk https://github.com/genshen/wssocks/releases/download/v0.5.0/$filename
     chmod +x $filename
     echo 'Done!'
