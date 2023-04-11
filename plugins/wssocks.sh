@@ -3,14 +3,15 @@ PLUGIN_NAME="wssocks"
 PLUGIN_FUNCTION="Manage proxy connections"
 PLUGIN_DESCRIPTION="Allows you to connect to and use wssocks proxies - socks5 over websockets instead of traditional socks5 TCP connections (which could be blocked)"
 PLUGIN_AUTHOR="genshen, rainestorme"
-PLUGIN_VERSION=6
+PLUGIN_VERSION=7
 
 doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
 }
 
-echo "This plugin is a work-in-progress. Don't use this in production (or for anything critical)."
+clear
 
+echo "This plugin is a work-in-progress. Don't use this in production (or for anything critical)."
 pushd /tmp
     echo "Enter the wss:// or ws:// url to a wssocks proxy, or leave this field blank to use a hosted one (on replit, check the status here: https://10cf60a3-1599-4cc6-a7b5-db06769a323e.id.repl.co/status/)"
     read -p ' > ' wssocks_host
@@ -34,11 +35,12 @@ pushd /tmp
     echo 'Chmod-ing...'
     chmod +x $filename
     echo 'Done!'
+    clear
+    echo 'Version info:'
     ./$filename version
+    echo 'To connect to wssocks, point your Chromebook\'s proxy settings to \':1080\'. Press Ctrl+C to exit at any time.'
     echo 'Starting wssocks client...'
     ./$filename client --addr :1080 --remote $wssocks_host --http
     popd
     exit"
 popd
-
-read -p "Press enter to exit."
