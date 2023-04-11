@@ -3,7 +3,7 @@ PLUGIN_NAME="wssocks"
 PLUGIN_FUNCTION="Manage proxy connections"
 PLUGIN_DESCRIPTION="Allows you to connect to and use wssocks proxies - socks5 over websockets instead of traditional socks5 TCP connections (which could be blocked)"
 PLUGIN_AUTHOR="genshen, rainestorme"
-PLUGIN_VERSION=4
+PLUGIN_VERSION=5
 
 doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
@@ -26,7 +26,7 @@ pushd /tmp
     esac
     echo "Updating wssocks..."
     filename="wssocks-linux-$architecture"
-    doas "pushd /tmp
+    doas "pushd /root
     echo 'Downloading...'
     curl -LOk https://github.com/genshen/wssocks/releases/download/v0.5.0/$filename
     echo 'Chmod-ing...'
