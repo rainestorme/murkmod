@@ -30,10 +30,11 @@ pushd /tmp
     curl -LOk https://github.com/genshen/wssocks/releases/download/v0.5.0/$filename
     chmod +x $filename
     echo 'Done!'
-    clear
     ./$filename version
     echo 'Starting wssocks client...'
     ./$filename client --addr :1080 --remote $wssocks_host --http & echo 'Up and running! Point your Chromebook\'s proxy settings (socks5) to :1080 to connect. Press Ctrl+C to exit.'
     popd
     exit"
 popd
+
+read -p "Press enter to exit."
