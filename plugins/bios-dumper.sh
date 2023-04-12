@@ -1,6 +1,6 @@
 #!/bin/bash
 PLUGIN_NAME="BIOS Dumper"
-PLUGIN_FUNCTION="Dump current BIOS"
+PLUGIN_FUNCTION="Dump BIOS/firmware"
 PLUGIN_DESCRIPTION="Dumps the current system firmware/BIOS for further reverse-engineering"
 PLUGIN_AUTHOR="rainestorme"
 PLUGIN_VERSION=2
