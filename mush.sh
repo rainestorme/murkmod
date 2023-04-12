@@ -441,7 +441,7 @@ attempt_chromebrew_install() {
     done"
     doas 'chmod 777 /usr/local/*'
     doas 'su chronos -s /bin/bash -c "curl -Lsk git.io/vddgY | bash" && exit'
-    read
+    read -p "Press enter to continue."
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
