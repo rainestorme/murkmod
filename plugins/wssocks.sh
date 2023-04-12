@@ -1,9 +1,9 @@
 #!/bin/bash
 PLUGIN_NAME="wssocks"
-PLUGIN_FUNCTION="Manage proxy connections"
+PLUGIN_FUNCTION="Start a wssocks connection"
 PLUGIN_DESCRIPTION="Allows you to connect to and use wssocks proxies - socks5 over websockets instead of traditional socks5 TCP connections (which could be blocked)"
 PLUGIN_AUTHOR="genshen, rainestorme"
-PLUGIN_VERSION=9
+PLUGIN_VERSION=10
 
 doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
