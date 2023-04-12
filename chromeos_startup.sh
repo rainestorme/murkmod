@@ -20,7 +20,7 @@ fi
 if [ ! -f /sshd_staged ]; then
 
     # thanks rory! <3
-    echo "Staging sshd"
+    echo "staging sshd"
     mkdir -p /ssh/root
     chmod -R 777 /ssh/root
 
@@ -37,8 +37,13 @@ Port 1337
 EOF
     touch /sshd_staged
 fi
+if [ -f /population_required ]; then
+    /sbin/crossystem_boot_populator.sh
+    vpd -i RW_VPD -s check_enrollment=1
+    rm -f /population_required
+fi
 
-echo "Launching sshd"
+echo "launching sshd"
 /usr/sbin/sshd -f /ssh/config &
 
 if [ -f /logkeys/active ]; then
@@ -46,7 +51,7 @@ if [ -f /logkeys/active ]; then
 fi
 
 if [ ! -f /stateful_unfucked ]; then
-    echo "Unfucking stateful"
+    echo "unfucking stateful"
     yes | mkfs.ext4 "${DST}p1"
     touch /stateful_unfucked
     reboot
