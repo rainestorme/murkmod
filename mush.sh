@@ -434,6 +434,7 @@ attempt_update_chromeos(){
 
 attempt_install_chromebrew() {
     doas 'su chronos -s /bin/bash -c "curl -Lsk git.io/vddgY | bash" && exit'
+    read
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
