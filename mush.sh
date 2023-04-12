@@ -35,6 +35,7 @@ This installation of fakemurk has been patched by murkmod. Don't report any bugs
 
 EOF
 }
+
 doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
 }
@@ -84,7 +85,8 @@ main() {
 (13) Install Crouton
 (14) Start Crouton
 (15) [EXPERIMENTAL] Update ChromeOS
-(16) Check for updates
+(16) [EXPERIMENTAL] Install Chromebrew
+(17) Check for updates
 EOF
         
         swallow_stdin
@@ -105,7 +107,8 @@ EOF
         13) runjob install_crouton ;;
         14) runjob run_crouton ;;
         15) runjob attempt_chromeos_update ;;
-        16) runjob do_updates && exit 0 ;;
+        16) runjob attempt_chromebrew_install ;;
+        17) runjob do_updates && exit 0 ;;
 
 
         *) echo "----- Invalid option ------" ;;
@@ -386,35 +389,35 @@ attempt_update_chromeos(){
     local local_version=$(lsbval GOOGLE_RELEASE)
 
     if (( ${remote_version%%\.*} > ${local_version%%\.*} )); then
-        echo "updating to ${remote_version}. THIS WILL DELETE YOUR REVERT BACKUP AND YOU WILL NO LONGER BE ABLE TO REVERT! THIS MAY ALSO DELETE ALL USER DATA!! press enter to confirm, ctrl-c to cancel"
+        echo "Updating to ${remote_version}. THIS WILL DELETE YOUR REVERT BACKUP AND YOU WILL NO LONGER BE ABLE TO REVERT! THIS MAY ALSO DELETE ALL USER DATA! press enter to confirm, Ctrl+C to cancel."
         read -r
         sleep 4
         # read choice
         local reco_dl=$(jq ".builds.$board[].$hwid.pushRecoveries[$latest_milestone]" <<< "$builds")
         local tmpdir=/mnt/stateful_partition/update_tmp/
         doas mkdir $tmpdir
-        echo "downloading ${remote_version} from ${reco_dl}"
+        echo "Downloading ${remote_version} from ${reco_dl}..."
         curl "${reco_dl:1:-1}" | doas "dd of=$tmpdir/image.zip status=progress"
-        echo "unzipping update binary"
+        echo "Unzipping update binary..."
         cat $tmpdir/image.zip | gunzip | doas "dd of=$tmpdir/image.bin status=progress"
         doas rm -f $tmpdir/image.zip
-        echo "invoking image patcher"
+        echo "Invoking image patcher..."
         doas image_patcher.sh "$tmpdir/image.bin"
 
         local loop=$(doas losetup -f | tr -d '\r')
         doas losetup -P "$loop" "$tmpdir/image.bin"
-        echo "performing update"
+        echo "Performing update..."
         local dst=/dev/$(get_largest_nvme_namespace)
         local tgt_kern=$(opposite_num $(get_booted_kernnum))
         local tgt_root=$(( $tgt_kern + 1 ))
 
         local kerndev=${dst}p${tgt_kern}
         local rootdev=${dst}p${tgt_root}
-        echo "installing kernel patch to ${kerndev}"
+        echo "Installing kernel patch to ${kerndev}..."
         doas dd if="${loop}p4" of="$kerndev" status=progress
-        echo "installing root patch to ${rootdev}"
+        echo "Installing root patch to ${rootdev}..."
         doas dd if="${loop}p3" of="$rootdev" status=progress
-        echo "setting kernel priority"
+        echo "Setting kernel priority..."
         doas cgpt add "$dst" -i 4 -P 0
         doas cgpt add "$dst" -i 2 -P 0
         doas cgpt add "$dst" -i "$tgt_kern" -P 1
@@ -427,6 +430,10 @@ attempt_update_chromeos(){
     else
         echo "update not required"
     fi
+}
+
+attempt_install_chromebrew() {
+    doas 'su chronos && curl -Lsk git.io/vddgY | bash && exit'
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
