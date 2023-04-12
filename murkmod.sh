@@ -2,7 +2,7 @@
 
 CURRENT_MAJOR=0
 CURRENT_MINOR=2
-CURRENT_VERSION=1
+CURRENT_VERSION=2
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -101,6 +101,19 @@ do_policy_patch() {
     fi
 }
 
+set_chronos_password() {
+    echo "murkmod" | passwd chronos --stdin
+}
+
+set_sudo_perms() {
+    if ! cat /etc/sudoers | grep chronos; then
+        echo "Sudo permissions are not already set, setting..."
+        echo "chronos ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers 
+    else
+        echo "Looks like sudo permissions are already set correctly."
+    fi
+}
+
 murkmod() {
     show_logo
     if [ ! -f /sbin/fakemurk-daemon.sh ]; then
@@ -115,6 +128,10 @@ murkmod() {
     create_stateful_files
     echo "Patching policy..."
     do_policy_patch
+    echo "Setting chronos user password..."
+    set_chronos_password
+    echo "Checking sudo perms..."
+    set_sudo_perms
     read -n 1 -s -r -p "Done. Press any key to exit."
     exit
 }
