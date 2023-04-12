@@ -11,6 +11,8 @@ bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murk
 
 This command will download and install murkmod and its (almost minimal) dependencies. Once the installation is complete, you can start using murkmod by running mush as usual.
 
+> Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
+
 ## Plugin Management
 Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a few new options, such as the ability to run `neofetch`, but the important ones here are `Install plugins`, `Uninstall plugins` and `Plugins`.
 
