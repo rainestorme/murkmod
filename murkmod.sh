@@ -2,7 +2,7 @@
 
 CURRENT_MAJOR=0
 CURRENT_MINOR=2
-CURRENT_VERSION=2
+CURRENT_VERSION=3
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -102,7 +102,7 @@ do_policy_patch() {
 }
 
 set_chronos_password() {
-    echo "murkmod" | passwd chronos --stdin
+    echo -en "murkmod\nmurkmod\n" | passwd chronos
 }
 
 set_sudo_perms() {
