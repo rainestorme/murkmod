@@ -1,8 +1,8 @@
 #!/bin/bash
 
 CURRENT_MAJOR=0
-CURRENT_MINOR=1
-CURRENT_VERSION=5
+CURRENT_MINOR=2
+CURRENT_VERSION=1
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -10,6 +10,10 @@ get_asset() {
 
 get_asset_fakemurk() {
     curl -s -f "https://api.github.com/repos/MercuryWorkshop/fakemurk/contents/$1" | jq -r ".content" | base64 -d
+}
+
+get_built_asset_fakemurk() {
+    curl -SLk "https://github.com/MercuryWorkshop/fakemurk/releases/latest/download/$1"
 }
 
 install() {
@@ -38,6 +42,18 @@ install_fakemurk() {
     rm -f "$TMP"
 }
 
+install_built_fakemurk() {
+    TMP=$(mktemp)
+    get_built_asset_fakemurk "$1" >"$TMP"
+    if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
+        echo "failed to install $1 to $2"
+        rm -f "$TMP"
+        return 1
+    fi
+    cat "$TMP" >"$2"
+    rm -f "$TMP"
+}
+
 show_logo() {
     echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
     echo "        The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION"
@@ -49,12 +65,16 @@ install_patched_files() {
     install "chromeos_startup.sh" /sbin/chromeos_startup.sh
     install "mush.sh" /usr/bin/crosh
     install "pre-startup.conf" /etc/init/pre-startup.conf
+    install "cr50-update.conf" /etc/init/cr50-update.conf
+    install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
+    install_built_fakemurk "image_patcher.sh" /sbin/image_patcher.sh
+    chmod 777 /sbin/fakemurk-daemon.sh /sbin/chromeos_startup.sh /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
 }
 
 create_stateful_files() {
     mkdir -p /mnt/stateful_partition/murkmod/plugins
     touch /mnt/stateful_partition/murkmod_version
-    echo $CURRENT_VERSION > /mnt/stateful_partition/murkmod_version  
+    echo "$CURRENT_MAJOR $CURRENT_MINOR $CURRENT_VERSION" > /mnt/stateful_partition/murkmod_version  
 }
 
 check_for_emergencyshell() {
