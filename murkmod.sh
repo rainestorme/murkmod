@@ -72,9 +72,18 @@ install_patched_files() {
 }
 
 create_stateful_files() {
-    mkdir -p /mnt/stateful_partition/murkmod/plugins
+    # This is only here for backwards compatibility
     touch /mnt/stateful_partition/murkmod_version
-    echo "$CURRENT_MAJOR $CURRENT_MINOR $CURRENT_VERSION" > /mnt/stateful_partition/murkmod_version  
+    echo "$CURRENT_MAJOR $CURRENT_MINOR $CURRENT_VERSION" > /mnt/stateful_partition/murkmod_version
+    
+    mkdir -p /mnt/stateful_partition/murkmod/plugins
+    touch /mnt/stateful_partition/murkmod/settings
+    if [ ! -f /mnt/stateful_partition/murkmod/settings ]; then
+        echo "# ----- murkmod settings -----" > /mnt/stateful_partition/murkmod/settings
+        echo "" >> /mnt/stateful_partition/murkmod/settings
+        echo "# Whether or not to show experimental features" >> /mnt/stateful_partition/murkmod/settings
+        echo "show_experimental=false" >> /mnt/stateful_partition/murkmod/settings
+    fi
 }
 
 check_for_emergencyshell() {
