@@ -73,5 +73,13 @@
 	"InstantTetheringAllowed": true,
 	"SmartLockSigninAllowed": true,
 	"NearbyShareAllowed": true,
-        "UptimeLimit": null
+        "UptimeLimit": null,
+	"EasyUnlockAllowed": true,
+	"EmojiSuggestionEnabled": null,
+	"OsColorMode": "dark",
+        "PasswordManagerEnabled": true,
+	"ProxyMode": null,
+	"IsolatedAppsDeveloperModeAllowed": true,
+	"PinUnlockAutosubmitEnabled": true,
+	"WebAppInstallForceList": null,
 }
