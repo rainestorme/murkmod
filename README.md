@@ -36,3 +36,12 @@ echo "Hello, World!"
 Of course, you should change this to match your plugin. Every time you update your plugin, you should increment `PLUGIN_VERSION`. Everything below the initial variables, though, is what is executed when you run the plugin from the mush menu.
 
 To add a plugin to this repository (for easy download from mush), just fork the repo, add the file in `/plugins/` and make a PR. I'll review it and merge it if it doesn't do anything malicious.
+
+## Using Hacked Sudo
+
+Murkmod makes a few changes to system permission to allow chronos to use sudo with no password, and setting the password to the chronos account so that root can `su` into it, meaning that you can properly use sudo in a command line if you run the following at a root bash prompt:
+
+```
+su chronos
+sudo <your command here>
+```
