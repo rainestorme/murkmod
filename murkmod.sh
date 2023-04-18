@@ -2,7 +2,7 @@
 
 CURRENT_MAJOR=0
 CURRENT_MINOR=3
-CURRENT_VERSION=1
+CURRENT_VERSION=2
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
