@@ -377,7 +377,7 @@ opposite_num() {
     fi
 }
 
-attempt_update_chromeos(){
+attempt_chromeos_update(){
     local builds=$(curl https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
     local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
     local board=${release_board%%-*}
