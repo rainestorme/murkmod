@@ -93,7 +93,7 @@ EOF
         read -r -p "> (1-15): " choice
         case "$choice" in
         1) runjob doas bash ;;
-        2) runjob bash ;;
+        2) runjob doas "su chronos" ;;
         3) runjob /usr/bin/crosh.old ;;
         4) runjob show_plugins ;;
         5) runjob install_plugins ;;
