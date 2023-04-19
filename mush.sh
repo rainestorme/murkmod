@@ -435,9 +435,13 @@ attempt_chromeos_update(){
 attempt_chromebrew_install() {
     # Chromebrew's folders are linked to /mnt/stateful_partition so that install will work correctly without running out of space
     doas mkdir -p /mnt/stateful_partition/murkmod/chromebrew
-    doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew/{etc,include,lib,lib64,share,tmp}
+    doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew/{etc,include,lib,lib64,share,tmp,bin}
+    doas "for i in etc include lib lib64 share tmp; do
+      ln -sv /mnt/stateful_partition/murkmod/chromebrew/$i /usr/local/$i
+    done"
     doas 'chmod 777 /mnt/stateful_partition/murkmod/chromebrew/*'
     doas 'su chronos -s /bin/bash -c "curl -Ls https://raw.githubusercontent.com/rainestorme/chromebrew/master/install.sh | bash" && exit'
+    echo "Don't worry. Seeing an erorr at the end of chromebrew installation about ln failing to make a symlink is normal. Chromebrew has to be invoked in a weird way for anything to work."
     read -p "Press enter to continue."
 }
 
