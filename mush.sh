@@ -433,7 +433,7 @@ attempt_chromeos_update(){
 }
 
 attempt_chromebrew_install() {
-    # Chromebrew's folders are linked to /mnt/stateful_partition so that install will work correctly without running out of space
+    # Chromebrew's folders are still unneccecarily referenced at some points, so they're symlinked to the actual location
     doas mkdir -p /mnt/stateful_partition/murkmod/chromebrew
     doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew/{etc,include,lib,lib64,share,tmp,bin}
     doas "for i in etc include lib lib64 share tmp; do
