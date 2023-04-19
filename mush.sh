@@ -434,13 +434,10 @@ attempt_chromeos_update(){
 
 attempt_chromebrew_install() {
     # Chromebrew's folders are linked to /mnt/stateful_partition so that install will work correctly without running out of space
-    doas mkdir -p /mnt/stateful_partition/murkmod/chromebrew_mount
-    doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew_mount/{etc,include,lib,lib64,share,tmp}
-    doas "for i in etc include lib lib64 share tmp; do
-      ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/$i /usr/local/$i
-    done"
-    doas 'chmod 777 /usr/local/*'
-    doas 'su chronos -s /bin/bash -c "curl -Lsk git.io/vddgY | bash" && exit'
+    doas mkdir -p /mnt/stateful_partition/murkmod/chromebrew
+    doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew/{etc,include,lib,lib64,share,tmp}
+    doas 'chmod 777 /mnt/stateful_partition/murkmod/chromebrew/*'
+    doas 'su chronos -s /bin/bash -c "curl -Ls https://raw.githubusercontent.com/rainestorme/chromebrew/master/install.sh | bash" && exit'
     read -p "Press enter to continue."
 }
 
