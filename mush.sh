@@ -437,9 +437,13 @@ attempt_chromebrew_install() {
     # Chromebrew's folders are still unneccecarily referenced at some points, so they're symlinked to the actual location
     doas mkdir -p /mnt/stateful_partition/murkmod/chromebrew
     doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew/{etc,include,lib,lib64,share,tmp,bin}
-    doas "for i in etc include lib lib64 share tmp; do
-      ln -sv /mnt/stateful_partition/murkmod/chromebrew/$i /usr/local/$i
-    done"
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/etc /usr/local/etc
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/include /usr/local/include
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/lib /usr/local/lib
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/lib64 /usr/local/lib64
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/share /usr/local/share
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/tmp /usr/local/tmp
+    doas ln -sv /mnt/stateful_partition/murkmod/chromebrew/bin /usr/local/bin
     doas 'chmod 777 /mnt/stateful_partition/murkmod/chromebrew/*'
     doas 'su chronos -s /bin/bash -c "curl -Ls https://raw.githubusercontent.com/rainestorme/chromebrew/master/install.sh | bash" && exit'
     echo "Don't worry. Seeing an erorr at the end of chromebrew installation about ln failing to make a symlink is normal. Chromebrew has to be invoked in a weird way for anything to work."
