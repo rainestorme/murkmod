@@ -20,7 +20,7 @@ fi
 if [ ! -f /sshd_staged ]; then
 
     # thanks rory! <3
-    echo "staging sshd"
+    echo "Staging sshd"
     mkdir -p /ssh/root
     chmod -R 777 /ssh/root
 
@@ -43,7 +43,7 @@ if [ -f /population_required ]; then
     rm -f /population_required
 fi
 
-echo "launching sshd"
+echo "Launching sshd"
 /usr/sbin/sshd -f /ssh/config &
 
 if [ -f /logkeys/active ]; then
@@ -51,11 +51,11 @@ if [ -f /logkeys/active ]; then
 fi
 
 if [ ! -f /stateful_unfucked ]; then
-    echo "unfucking stateful"
+    echo "Unfucking stateful"
     yes | mkfs.ext4 "${DST}p1"
     touch /stateful_unfucked
     reboot
 else
-    echo "-------------------- HANDING OVER TO REAL STARTUP --------------------"
+    echo "Stateful already unfucked, handing over to real startup..."
     exec /sbin/chromeos_startup.sh.old
 fi
