@@ -389,7 +389,7 @@ attempt_chromeos_update(){
     local local_version=$(lsbval GOOGLE_RELEASE)
 
     if (( ${remote_version%%\.*} > ${local_version%%\.*} )); then
-        echo "Updating to ${remote_version}. THIS WILL DELETE YOUR REVERT BACKUP AND YOU WILL NO LONGER BE ABLE TO REVERT! THIS MAY ALSO DELETE ALL USER DATA! press enter to confirm, Ctrl+C to cancel."
+        echo "Updating to ${remote_version}. THIS WILL DELETE YOUR REVERT BACKUP AND YOU WILL NO LONGER BE ABLE TO REVERT! THIS MAY ALSO DELETE ALL USER DATA! Press enter to confirm, Ctrl+C to cancel."
         read -r
         sleep 4
         # read choice
@@ -428,7 +428,8 @@ attempt_chromeos_update(){
         # doas rm -rf $tmpdir
     
     else
-        echo "update not required"
+        echo "Update not required."
+        read -p "Press enter to continue."
     fi
 }
 
