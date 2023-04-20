@@ -45,3 +45,7 @@ Murkmod makes a few changes to system permission to allow chronos to use sudo wi
 su chronos
 sudo <your command here>
 ```
+
+## Regarding Chromebrew
+
+Chromebrew is *almost* functional in the current state. I welcome PRs to fix issues you encounter with it.
