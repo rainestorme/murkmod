@@ -67,7 +67,7 @@ install_patched_files() {
     install "pre-startup.conf" /etc/init/pre-startup.conf
     install "cr50-update.conf" /etc/init/cr50-update.conf
     install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
-    install_built_fakemurk "image_patcher.sh" /sbin/image_patcher.sh
+    install "image_patcher.sh" /sbin/image_patcher.sh
     chmod 777 /sbin/fakemurk-daemon.sh /sbin/chromeos_startup.sh /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
 }
 

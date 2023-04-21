@@ -85,8 +85,9 @@ main() {
 (13) Install Crouton
 (14) Start Crouton
 (15) [EXPERIMENTAL] Update ChromeOS
-(16) [EXPERIMENTAL] Install Chromebrew
-(17) Check for updates
+(16) [EXPERIMENTAL] Restore Emergency Revert Backup (run after updating)
+(17) [EXPERIMENTAL] Install Chromebrew
+(18) Check for updates
 EOF
         
         swallow_stdin
@@ -107,11 +108,12 @@ EOF
         13) runjob install_crouton ;;
         14) runjob run_crouton ;;
         15) runjob attempt_chromeos_update ;;
-        16) runjob attempt_chromebrew_install ;;
-        17) runjob do_updates && exit 0 ;;
+        16) runjob restore_emergency_backup ;;
+        17) runjob attempt_chromebrew_install ;;
+        18) runjob do_updates && exit 0 ;;
 
 
-        *) echo "----- Invalid option ------" ;;
+        *) echo "\nInvalid option, dipshit.\n" ;;
         esac
     done
 }
@@ -277,7 +279,7 @@ powerwash() {
 }
 
 revert() {
-    echo "This option will re-enroll your chromebook restore to before fakemurk was run. This is useful if you need to quickly go back to normal"
+    echo "This option will re-enroll your chromebook and restore it to its exact state before fakemurk was run. This is useful if you need to quickly go back to normal."
     echo "This is *permanent*. You will not be able to fakemurk again unless you re-run everything from the beginning."
     echo "Are you sure - 100% sure - that you want to continue? (press enter to continue, ctrl-c to cancel)"
     swallow_stdin
@@ -334,8 +336,13 @@ install_crouton() {
 }
 
 run_crouton() {
-    echo "Use Crtl+Shift+Alt+Forward and Ctrl+Shift+Alt+Back to toggle between desktops"
-    doas "startxfce4"
+    if [ -f /mnt/stateful_partition/crouton ] ; then
+        echo "Use Crtl+Shift+Alt+Forward and Ctrl+Shift+Alt+Back to toggle between desktops"
+        doas "startxfce4"
+    else
+        echo "Install Crouton first!"
+        read -p "Press enter to continue."
+    fi
 }
 
 # https://chromium.googlesource.com/chromiumos/docs/+/master/lsb-release.md
@@ -377,6 +384,29 @@ opposite_num() {
     fi
 }
 
+restore_emergency_backup(){
+    echo "Looking for backup files..."
+    local dst=/dev/$(get_largest_nvme_namespace)
+    local tgt_kern=$(opposite_num $(get_booted_kernnum))
+    local tgt_root=$(( $tgt_kern + 1 ))
+
+    local kerndev=${dst}p${tgt_kern}
+    local rootdev=${dst}p${tgt_root}
+
+    if [ -f /mnt/stateful_partition/murkmod/kern_backup.img ] && [ -f /mnt/stateful_partition/murkmod/root_backup.img ]; then
+        echo "Backup files found!"
+        echo "Press enter to begin copying backups, Ctrl+C to cancel."
+        read -r
+        echo "Restoring kernel..."
+        dd if=/mnt/stateful_partition/murkmod/kern_backup.img of=$kerndev bs=4M status=progress
+        echo "Restoring rootfs..."
+        dd if=/mnt/stateful_partition/murkmod/root_backup.img of=$rootdev bs=4M status=progress
+        echo "Done!"
+    else
+        echo "At least one of the two required backup images does not exist!"
+    fi
+}
+
 attempt_chromeos_update(){
     local builds=$(curl https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
     local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
@@ -388,10 +418,31 @@ attempt_chromeos_update(){
     local remote_version=${remote_version:1:-1}
     local local_version=$(lsbval GOOGLE_RELEASE)
 
-    if (( ${remote_version%%\.*} > ${local_version%%\.*} )); then
+    if (( ${remote_version%%\.*} > ${local_version%%\.*} )); then        
         echo "Updating to ${remote_version}. THIS WILL DELETE YOUR REVERT BACKUP AND YOU WILL NO LONGER BE ABLE TO REVERT! THIS MAY ALSO DELETE ALL USER DATA! Press enter to confirm, Ctrl+C to cancel."
         read -r
-        sleep 4
+        printf "Starting in 3..."
+        sleep 1
+        printf "2..."
+        sleep 1
+        echo "1..."
+        sleep 1
+
+        echo "Dumping emergency revert backup to stateful (this might take a while)..."
+        local dst=/dev/$(get_largest_nvme_namespace)
+        local tgt_kern=$(opposite_num $(get_booted_kernnum))
+        local tgt_root=$(( $tgt_kern + 1 ))
+
+        local kerndev=${dst}p${tgt_kern}
+        local rootdev=${dst}p${tgt_root}
+
+        echo "Dumping kernel..."
+        dd if=$kerndev of=/mnt/stateful_partition/murkmod/kern_backup.img bs=4M status=progress
+        echo "Dumping rootfs..."
+        dd if=$rootdev of=/mnt/stateful_partition/murkmod/root_backup.img bs=4M status=progress
+
+        echo "Done!"
+
         # read choice
         local reco_dl=$(jq ".builds.$board[].$hwid.pushRecoveries[$latest_milestone]" <<< "$builds")
         local tmpdir=/mnt/stateful_partition/update_tmp/
@@ -406,13 +457,8 @@ attempt_chromeos_update(){
 
         local loop=$(doas losetup -f | tr -d '\r')
         doas losetup -P "$loop" "$tmpdir/image.bin"
-        echo "Performing update..."
-        local dst=/dev/$(get_largest_nvme_namespace)
-        local tgt_kern=$(opposite_num $(get_booted_kernnum))
-        local tgt_root=$(( $tgt_kern + 1 ))
 
-        local kerndev=${dst}p${tgt_kern}
-        local rootdev=${dst}p${tgt_root}
+        echo "Performing update..."
         echo "Installing kernel patch to ${kerndev}..."
         doas dd if="${loop}p4" of="$kerndev" status=progress
         echo "Installing root patch to ${rootdev}..."
@@ -424,6 +470,11 @@ attempt_chromeos_update(){
 
         doas crossystem.old block_devmode=0
         doas vpd -i RW_VPD -s block_devmode=0
+
+        echo "Done!"
+
+        echo "Upon rebooting, you'll need to run the 'Restore Backup' function from mush if you want your emergency backup back."
+        read -p "Press enter to continue."
 
         # doas rm -rf $tmpdir
     
