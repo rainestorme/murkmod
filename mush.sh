@@ -113,7 +113,7 @@ EOF
         18) runjob do_updates && exit 0 ;;
 
 
-        *) echo "----- Invalid option ------" ;;
+        *) echo "\nInvalid option, dipshit.\n" ;;
         esac
     done
 }
