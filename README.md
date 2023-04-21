@@ -3,6 +3,9 @@
 murkmod is a utility script that patches fakemurk and mush to include additional useful utilities, with the most prominent being a plugin manager. This tool enables you to easily install and manage various packages and plugins for mush, and, eventually, fakemurk itself. murkmod also includes additional useful tools and features that can aid you in your various Chromebook hacking tasks.
 
 ## Installation
+
+> In order to use all of the features of murkmod, you **must** create a emergency revert backup during the installation of fakemurk.
+
 To install murkmod, simply spawn a root shell (option 1) from mush, and paste in the following command:
 
 ```sh
