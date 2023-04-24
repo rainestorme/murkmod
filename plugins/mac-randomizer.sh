@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="MAC Address Randomizer"
 PLUGIN_FUNCTION="Randomize MAC Address"
 PLUGIN_DESCRIPTION="Randomize your device's MAC address"

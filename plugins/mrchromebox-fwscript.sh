@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="MrChromebox Firmware Utility Script"
 PLUGIN_FUNCTION="Run MrChromebox's firmware utility script"
 PLUGIN_DESCRIPTION="Runs MrChromebox's firmware utility script."

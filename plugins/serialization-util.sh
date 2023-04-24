@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="Chromebook Serialization Utility"
 PLUGIN_FUNCTION="Run the Chromebook Serialization Utility"
 PLUGIN_DESCRIPTION="Allows you to change your Chromebook's serial number and other VPD (vital product data)"

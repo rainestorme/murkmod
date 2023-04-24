@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="GBB Tools"
 PLUGIN_FUNCTION="Open GBB tools"
 PLUGIN_DESCRIPTION="Allows you to view, edit, and remove GBB (Google Binary Block) flags on the system easily"

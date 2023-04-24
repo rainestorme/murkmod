@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="Hello World Plugin"
 PLUGIN_FUNCTION="Print hello world to the console"
 PLUGIN_DESCRIPTION="The friendliest murkmod plugin you'll ever see."
