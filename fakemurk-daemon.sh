@@ -1,5 +1,12 @@
 #!/bin/bash
 
+run_plugin() {
+    local script=$1
+    while true; do
+        bash "$script"
+    done & disown
+}
+
 get_largest_nvme_namespace() {
     # this function doesn't exist if the version is old enough, so we redefine it
     local largest size tmp_size dev
@@ -152,7 +159,7 @@ EOF
 
 {
     # technically this should go in chromeos_startup.sh but it would slow down the boot process
-    echo "Waiting for boot (just in case)"
+    echo "Waiting for boot on emergency restore (just in case)"
     sleep 60
     echo "Checking for restore flag..."
     if [ -f /restore-emergency-backup ]; then
@@ -184,4 +191,16 @@ EOF
     else 
         echo "No need to restore."
     fi
+} &
+
+{
+    echo "Witing for boot on daemon plugins (also just in case)"
+    sleep 60
+    echo "Finding daemon plugins..."
+    for file in /mnt/stateful_partition/murkmod/plugins/*.sh do
+        if grep -q "daemon_plugin" "$file" then
+            echo "Spawning plugin $FILE..."
+            run_plugin $FILE
+        fi
+    done
 } &

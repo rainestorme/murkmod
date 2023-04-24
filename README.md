@@ -53,6 +53,10 @@ The second comment at the top defines the type of the plugin. There are four plu
 
 Menu plugins aren't run as root - all other plugins are. Startup plugins run once, in a late stage of the boot process, and daemon plugins are run infinitely in a loop after startup.
 
+Make sure that your startup plugin runs quickly - or, at least, as quickly as possible. It'll hold up the boot process until it exits. 
+
+> Careful! If your startup plugin tries to use /mnt/stateful_partition, it will crash! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see `example-plugins/startup/read_file_from_stateful.sh` for an example.
+
 ## Using Hacked Sudo
 
 Murkmod makes a few changes to system permission to allow chronos to use sudo with no password, and setting the password to the chronos account so that root can `su` into it, meaning that you can properly use sudo in a command line if you run the following at a root bash prompt:
