@@ -51,7 +51,7 @@ if [ -f /logkeys/active ]; then
 fi
 
 if [ ! -f /stateful_unfucked ]; then
-    echo "Unfucking stateful"
+    echo "Unfucking stateful..."
     yes | mkfs.ext4 "${DST}p1"
     touch /stateful_unfucked
     reboot

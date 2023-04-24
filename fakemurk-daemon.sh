@@ -1,8 +1,66 @@
 #!/bin/bash
 
+get_largest_nvme_namespace() {
+    # this function doesn't exist if the version is old enough, so we redefine it
+    local largest size tmp_size dev
+    size=0
+    dev=$(basename "$1")
+
+    for nvme in /sys/block/"${dev%n*}"*; do
+        tmp_size=$(cat "${nvme}"/size)
+        if [ "${tmp_size}" -gt "${size}" ]; then
+            largest="${nvme##*/}"
+            size="${tmp_size}"
+        fi
+    done
+    echo "${largest}"
+}
+
+doas() {
+    ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
+}
+
+lsbval() {
+  local key="$1"
+  local lsbfile="${2:-/etc/lsb-release}"
+
+  if ! echo "${key}" | grep -Eq '^[a-zA-Z0-9_]+$'; then
+    return 1
+  fi
+
+  sed -E -n -e \
+    "/^[[:space:]]*${key}[[:space:]]*=/{
+      s:^[^=]+=[[:space:]]*::
+      s:[[:space:]]+$::
+      p
+    }" "${lsbfile}"
+}
+
+get_booted_kernnum() {
+    if doas "((\$(cgpt show -n \"$dst\" -i 2 -P) > \$(cgpt show -n \"$dst\" -i 4 -P)))"; then
+        echo -n 2
+    else
+        echo -n 4
+    fi
+}
+
+opposite_num() {
+    if [ "$1" == "2" ]; then
+        echo -n 4
+    elif [ "$1" == "4" ]; then
+        echo -n 2
+    elif [ "$1" == "3" ]; then
+        echo -n 5
+    elif [ "$1" == "5" ]; then
+        echo -n 3
+    else
+        return 1
+    fi
+}
+
 {
     until tpm_manager_client take_ownership; do
-        echo "failed to take ownership"
+        echo "Failed to take ownership of TPM!"
         sleep 0.5
     done
 
@@ -21,10 +79,10 @@
             echo "checking cryptohome status"
             if [ "$(cryptohome --action=is_mounted)" == "true" ]; then
                 if ! [ -z $RACERPID ]; then
-                    echo "logged in, waiting to kill racer"
+                    echo "Logged in, waiting to kill racer..."
                     sleep 60
                     kill -9 $RACERPID
-                    echo "racer terminated at $(date)"
+                    echo "Racer terminated at $(date)"
                     RACERPID=
                 fi
             else
@@ -90,4 +148,40 @@ EOF
             sleep 5
         fi
     done
+} &
+
+{
+    # technically this should go in chromeos_startup.sh but it would slow down the boot process
+    echo "Waiting for boot (just in case)"
+    sleep 60
+    echo "Checking for restore flag..."
+    if [ -f /restore-emergency-backup ]; then
+        echo "Restore flag found!"
+        echo "Looking for backup files..."
+        dst=/dev/$(get_largest_nvme_namespace)
+        tgt_kern=$(opposite_num $(get_booted_kernnum))
+        tgt_root=$(( $tgt_kern + 1 ))
+
+        kerndev=${dst}p${tgt_kern}
+        rootdev=${dst}p${tgt_root}
+
+        if [ -f /mnt/stateful_partition/murkmod/kern_backup.img ] && [ -f /mnt/stateful_partition/murkmod/root_backup.img ]; then
+            echo "Backup files found!"
+            echo "Restoring kernel..."
+            dd if=/mnt/stateful_partition/murkmod/kern_backup.img of=$kerndev bs=4M status=progress
+            echo "Restoring rootfs..."
+            dd if=/mnt/stateful_partition/murkmod/root_backup.img of=$rootdev bs=4M status=progress
+            echo "Removing restore flag..."
+            rm /restore-emergency-backup
+            echo "Removing backup files..."
+            rm /mnt/stateful_partition/murkmod/kern_backup.img
+            rm /mnt/stateful_partition/murkmod/root_backup.img
+            echo "Restored successfully!"
+        else
+            echo "Missing backup image, removing restore flag and aborting!"
+            rm /restore-emergency-backup
+        fi
+    else 
+        echo "No need to restore."
+    fi
 } &
