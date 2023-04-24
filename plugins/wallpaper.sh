@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="Wallpaper Manager"
 PLUGIN_FUNCTION="Manage wallpaper"
 PLUGIN_DESCRIPTION="Allows you to manage policy-set wallpapers through Pollen automagically"

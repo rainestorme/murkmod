@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="Neofetch"
 PLUGIN_FUNCTION="Run Neofetch"
 PLUGIN_DESCRIPTION="Originally built-in to murkmod, now a plugin. Take screenshots on your Chromebook in style!"

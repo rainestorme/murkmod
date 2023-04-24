@@ -1,4 +1,5 @@
 #!/bin/bash
+# menu_plugin
 PLUGIN_NAME="BIOS Dumper"
 PLUGIN_FUNCTION="Dump BIOS/firmware"
 PLUGIN_DESCRIPTION="Dumps the current system firmware/BIOS for further reverse-engineering"

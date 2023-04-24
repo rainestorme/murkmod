@@ -139,7 +139,9 @@ show_plugins() {
         PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_script" | cut -d= -f2-)
         PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_script" | cut -d= -f2-)
         PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_script" | cut -d= -f2-)
-        plugin_info+=("$PLUGIN_FUNCTION (provided by $PLUGIN_NAME)")
+        if grep -q "menu_plugin" "$plugin_script"; then
+            plugin_info+=("$(echo $PLUGIN_FUNCTION (provided by $PLUGIN_NAME))")
+        fi
     done
 
     # Print menu options
@@ -218,7 +220,7 @@ uninstall_plugins() {
         PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' "$plugin_script" | cut -d= -f2-)
         PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' "$plugin_script" | cut -d= -f2-)
         PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' "$plugin_script" | cut -d= -f2-)
-        plugin_info+=("$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)")
+        plugin_info+=("$(echo $PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR))")
     done
 
     if [ ${#plugin_info[@]} -eq 0 ]; then

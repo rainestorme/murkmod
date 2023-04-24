@@ -14,6 +14,8 @@
 # v1.1.1 - hotfix for stupid crossystem
 # v1.1.0 - implemented <var>?<value> functionality (searches for value in var)
 # v1.0.0 - basic functionality implemented
+
+# God damn, there are a lot of unused functions in here!
 ascii_info() {
     cat <<-EOF
  ________ ________  ___  __    _______   _____ ______   ___  ___  ________  ___  __
@@ -28,6 +30,8 @@ THIS IS FREE SOFTWARE! if you paid for this, you have been scammed and should de
 
 fakemurk - a tool made by Mercury Workshop to spoof verified boot while enrolled
 you can find this script, its explanation, and documentation here: https://github.com/MercuryWorkshop/fakemurk
+
+This version of image_patcher.sh contains the murkmod payload. Don't report issues you have with it to MercuryWorkshop!
 EOF
 
     # spaces get mangled by makefile, so this must be separate
@@ -65,27 +69,6 @@ leave() {
     echo "exiting successfully"
     exit
 }
-config() {
-    swallow_stdin
-
-    swallow_stdin
-    echo
-    read -r -p "Would you like to enable rootfs restore? It will add an option to quickly revert all changes and re-enroll. (Y/n)" choice
-    case "$choice" in
-    N | n | no | No | NO) ROOTFS_BACKUP=0 ;;
-    *) ROOTFS_BACKUP=1 ;;
-    esac
-
-    if [ "$DEVBUILD" == "1" ]; then
-        devbuild_config
-    fi
-}
-
-swallow_stdin() {
-    while read -t 0 notused; do
-        read input
-    done
-}
 
 csys() {
     if [ "$COMPAT" == "1" ]; then
@@ -94,15 +77,6 @@ csys() {
         "$ROOT/usr/bin/crossystem.old" "$@"
     else
         "$ROOT/usr/bin/crossystem" "$@"
-    fi
-}
-cvpd() {
-    if [ "$COMPAT" == "1" ]; then
-        vpd "$@"
-    elif test -f "$ROOT/usr/sbin/vpd.old"; then
-        "$ROOT/usr/sbin/vpd.old" "$@"
-    else
-        "$ROOT/usr/sbin/vpd" "$@"
     fi
 }
 
@@ -810,11 +784,10 @@ EOF
 
 drop_image_patcher(){
   local path=$ROOT/sbin/image_patcher.sh
-
-  # trust me
   echo "$(< $0)"> $path
   chmod 777 $path
 }
+
 patch_root() {
     disable_autoupdates
     drop_cr50_update
@@ -834,17 +807,7 @@ patch_root() {
     drop_image_patcher
 }
 
-murkmod_patch_root() {
-    echo "Murkmod-ing root"
-    install "fakemurk-daemon.sh" $ROOT/sbin/fakemurk-daemon.sh
-    install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
-    install "mush.sh" $ROOT/usr/bin/crosh
-    install "pre-startup.conf" $ROOT/etc/init/pre-startup.conf
-    install "cr50-update.conf" $ROOT/etc/init/cr50-update.conf
-    install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
-    install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
-    chmod 777 $ROOT/sbin/fakemurk-daemon.sh $ROOT/sbin/chromeos_startup.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh
-}   
+
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -863,6 +826,17 @@ install() {
     rm -f "$TMP"
 }
 
+murkmod_patch_root() {
+    echo "Murkmod-ing root"
+    install "fakemurk-daemon.sh" $ROOT/sbin/fakemurk-daemon.sh
+    install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
+    install "mush.sh" $ROOT/usr/bin/crosh
+    install "pre-startup.conf" $ROOT/etc/init/pre-startup.conf
+    install "cr50-update.conf" $ROOT/etc/init/cr50-update.conf
+    install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
+    install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
+    chmod 777 $ROOT/sbin/fakemurk-daemon.sh $ROOT/sbin/chromeos_startup.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh
+}
 
 main() {
   traps
@@ -871,7 +845,7 @@ main() {
   echo $SSD_UTIL
 
   if [ -z $1 ] || [ ! -f $1 ]; then
-    echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image."
+    echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image. You thought you were smart, huh? YOU THOUGHT YOU WERE FUCKING SMART, KIDDO? TRYING TO POKE AROUND INSIDE OF INTERNAL FILES. FUCKING IDIOT!"
     exit
   fi
   local bin=$1
