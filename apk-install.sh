@@ -13,10 +13,6 @@ die() {
   exit 1
 }
 
-context_exists() {
-  printf "$1" > /sys/fs/selinux/context 2>/dev/null
-}
-
 nsenter_flags=
 pid=
 
@@ -62,16 +58,6 @@ else
       die "Container PID file not found, is the container running?"
 fi
 
-context="$(id -Z)"
-
-# Use the su context if available and the 'su' binary exists (both are true
-# only on userdebug builds).
-su_context="u:r:su:s0"
-if context_exists "${su_context}" && \
-   [ -f "${container_root}/system/xbin/su" ]; then
-  context=${su_context}
-fi
-
 /usr/bin/env -i \
   ANDROID_ASSETS=/assets \
   ANDROID_DATA=/data \
@@ -82,4 +68,4 @@ fi
   PATH=/sbin:/vendor/bin:/system/bin:/system/xbin \
   /usr/bin/nsenter -t "${pid}" -C -m -U -i -n -p -r -w \
   ${nsenter_flags} \
-  /system/bin/runcon "${context}" /system/bin/pm "$1"
+  /system/bin/pm "$1"
