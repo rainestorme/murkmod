@@ -85,8 +85,10 @@ main() {
 (13) Install Crouton
 (14) Start Crouton
 (15) [EXPERIMENTAL] Update ChromeOS
-(16) [EXPERIMENTAL] Install Chromebrew
-(17) Check for updates
+(16) [EXPERIMENTAL] Update Emergency Backup
+(17) [EXPERIMENTAL] Restore Emergency Backup Backup
+(18) [EXPERIMENTAL] Install Chromebrew
+(19) Check for updates
 EOF
         
         swallow_stdin
@@ -107,8 +109,10 @@ EOF
         13) runjob install_crouton ;;
         14) runjob run_crouton ;;
         15) runjob attempt_chromeos_update ;;
-        16) runjob attempt_chromebrew_install ;;
-        17) runjob do_updates && exit 0 ;;
+        16) runjob attempt_backup_update ;;
+        17) runjob attempt_restore_backup_backup ;;
+        18) runjob attempt_chromebrew_install ;;
+        19) runjob do_updates && exit 0 ;;
 
 
         *) echo "\nInvalid option, dipshit.\n" ;;
@@ -332,11 +336,11 @@ softdisableext() {
 
 install_crouton() {
     echo "Installing Crouton..."
-    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bullseye" && touch /mnt/stateful_partition/crouton
+    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bullseye" && touch /mnt/stateful_partition/crouton_installed
 }
 
 run_crouton() {
-    if [ -f /mnt/stateful_partition/crouton ] ; then
+    if [ -f /mnt/stateful_partition/crouton_installed ] ; then
         echo "Use Crtl+Shift+Alt+Forward and Ctrl+Shift+Alt+Back to toggle between desktops"
         doas "startxfce4"
     else
@@ -396,9 +400,9 @@ attempt_chromeos_update(){
     local local_version=$(lsbval GOOGLE_RELEASE)
 
     if (( ${remote_version%%\.*} > ${local_version%%\.*} )); then        
-        echo "Updating to ${remote_version}. THIS WILL DELETE YOUR REVERT BACKUP AND YOU WILL NO LONGER BE ABLE TO REVERT! THIS MAY ALSO DELETE ALL USER DATA! Press enter to confirm, Ctrl+C to cancel."
+        echo "Updating to ${remote_version}. THIS MAY DELETE ALL USER DATA! Press enter to confirm, Ctrl+C to cancel."
         read -r
-        printf "Starting in 3..."
+        printf "Starting in 3 (this is your last chance to cancel)..."
         sleep 1
         printf "2..."
         sleep 1
@@ -406,6 +410,7 @@ attempt_chromeos_update(){
         sleep 1
 
         echo "Dumping emergency revert backup to stateful (this might take a while)..."
+        echo "Finding correct partitions..."
         local dst=/dev/$(get_largest_nvme_namespace)
         local tgt_kern=$(opposite_num $(get_booted_kernnum))
         local tgt_root=$(( $tgt_kern + 1 ))
@@ -459,6 +464,108 @@ attempt_chromeos_update(){
         read -p "Done! Press enter to continue."
     else
         echo "Update not required."
+        read -p "Press enter to continue."
+    fi
+}
+
+attempt_backup_update(){
+    local builds=$(curl https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
+    local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
+    local board=${release_board%%-*}
+    local hwid=$(jq "(.builds.$board[] | keys)[0]" <<<"$builds")
+    local hwid=${hwid:1:-1}
+    local latest_milestone=$(jq "(.builds.$board[].$hwid.pushRecoveries | keys) | .[length - 1]" <<<"$builds")
+    local remote_version=$(jq ".builds.$board[].$hwid[$latest_milestone].version" <<<"$builds")
+    local remote_version=${remote_version:1:-1}
+
+    read -p "Do you want to make a backup of your backup, just in case? (Y/n) " yn
+
+    case $yn in 
+        [yY] ) do_backup=true ;;
+        [nN] ) do_backup=false ;;
+        * ) do_backup=true ;;
+    esac
+
+    echo "Updating to ${remote_version}. THIS CAN POSSIBLY DAMAGE YOUR EMERGENCY BACKUP! Press enter to confirm, Ctrl+C to cancel."
+    read -r
+    printf "Starting in 3 (this is your last chance to cancel)..."
+    sleep 1
+    printf "2..."
+    sleep 1
+    echo "1..."
+    sleep 1
+
+    echo "Finding correct partitions..."
+    local dst=/dev/$(get_largest_nvme_namespace)
+    local tgt_kern=$(opposite_num $(get_booted_kernnum))
+    local tgt_root=$(( $tgt_kern + 1 ))
+
+    local kerndev=${dst}p${tgt_kern}
+    local rootdev=${dst}p${tgt_root}
+
+    if [ "$do_backup" = true ] ; then
+        echo "Dumping emergency revert backup to stateful (this might take a while)..."
+
+        echo "Dumping kernel..."
+        doas dd if=$kerndev of=/mnt/stateful_partition/murkmod/kern_backup.img bs=4M status=progress
+        echo "Dumping rootfs..."
+        doas dd if=$rootdev of=/mnt/stateful_partition/murkmod/root_backup.img bs=4M status=progress
+
+        echo "Backups complete, actually updating now..."
+    fi
+
+    # read choice
+    local reco_dl=$(jq ".builds.$board[].$hwid.pushRecoveries[$latest_milestone]" <<< "$builds")
+    local tmpdir=/mnt/stateful_partition/update_tmp/
+    doas mkdir $tmpdir
+    echo "Downloading ${remote_version} from ${reco_dl}..."
+    curl "${reco_dl:1:-1}" | doas "dd of=$tmpdir/image.zip status=progress"
+    echo "Unzipping update binary..."
+    cat $tmpdir/image.zip | gunzip | doas "dd of=$tmpdir/image.bin status=progress"
+    doas rm -f $tmpdir/image.zip
+
+    echo "Creating loop device..."
+    local loop=$(doas losetup -f | tr -d '\r')
+    doas losetup -P "$loop" "$tmpdir/image.bin"
+
+    echo "Performing update..."
+    echo "Installing kernel patch to ${kerndev}..."
+    doas dd if="${loop}p4" of="$kerndev" status=progress
+    echo "Installing root patch to ${rootdev}..."
+    doas dd if="${loop}p3" of="$rootdev" status=progress
+
+    echo "Setting crossystem and vpd block_devmode (idk why, but it can't hurt to be safe)..."
+    doas crossystem.old block_devmode=0
+    doas vpd -i RW_VPD -s block_devmode=0
+
+    echo "Cleaning up..."
+    doas rm -Rf $tmpdir
+
+    read -p "Done! Press enter to continue."
+}
+
+attempt_restore_backup_backup() {
+    echo "Looking for backup files..."
+    dst=/dev/$(get_largest_nvme_namespace)
+    tgt_kern=$(opposite_num $(get_booted_kernnum))
+    tgt_root=$(( $tgt_kern + 1 ))
+
+    kerndev=${dst}p${tgt_kern}
+    rootdev=${dst}p${tgt_root}
+
+    if [ -f /mnt/stateful_partition/murkmod/kern_backup.img ] && [ -f /mnt/stateful_partition/murkmod/root_backup.img ]; then
+        echo "Backup files found!"
+        echo "Restoring kernel..."
+        dd if=/mnt/stateful_partition/murkmod/kern_backup.img of=$kerndev bs=4M status=progress
+        echo "Restoring rootfs..."
+        dd if=/mnt/stateful_partition/murkmod/root_backup.img of=$rootdev bs=4M status=progress
+        echo "Removing backup files..."
+        rm /mnt/stateful_partition/murkmod/kern_backup.img
+        rm /mnt/stateful_partition/murkmod/root_backup.img
+        echo "Restored successfully!"
+        read -p "Press enter to continue."
+    else
+        echo "Missing backup image, aborting!"
         read -p "Press enter to continue."
     fi
 }
