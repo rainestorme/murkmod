@@ -448,6 +448,7 @@ crossystem_values() {
         echo "$key=$(escape "$val")"
     done
 }
+
 move_bin() {
     if test -f "$1"; then
         mv "$1" "$1.old"
@@ -466,7 +467,6 @@ disable_autoupdates() {
     # bye bye trollers! (trollers being cros devs)
     rm -rf "$ROOT/opt/google/cr50/firmware/" || :
 }
-
 
 : "this is essentially just wax for fakemurk"
 SCRIPT_DIR=$(dirname "$0")
