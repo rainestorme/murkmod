@@ -69,3 +69,14 @@ sudo <your command here>
 ## Regarding Chromebrew
 
 Chromebrew is *almost* functional in the current state. I welcome PRs to fix issues you encounter with it.
+
+## Are your menu plugins no longer showing up after updating?
+
+Open a chronos shell and run the following commands:
+
+```sh
+rm /mnt/stateful_partition/murkmod/plugins/*
+exit
+```
+
+Now, reinstall all plugins you want to use.
