@@ -84,11 +84,12 @@ main() {
 (12) Edit Pollen
 (13) Install Crouton
 (14) Start Crouton
-(15) [EXPERIMENTAL] Update ChromeOS
-(16) [EXPERIMENTAL] Update Emergency Backup
-(17) [EXPERIMENTAL] Restore Emergency Backup Backup
-(18) [EXPERIMENTAL] Install Chromebrew
-(19) Check for updates
+(15) Enable dev_boot_usb
+(16) [EXPERIMENTAL] Update ChromeOS
+(17) [EXPERIMENTAL] Update Emergency Backup
+(18) [EXPERIMENTAL] Restore Emergency Backup Backup
+(19) [EXPERIMENTAL] Install Chromebrew
+(20) Check for updates
 EOF
         
         swallow_stdin
@@ -108,16 +109,21 @@ EOF
         12) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
         13) runjob install_crouton ;;
         14) runjob run_crouton ;;
-        15) runjob attempt_chromeos_update ;;
-        16) runjob attempt_backup_update ;;
-        17) runjob attempt_restore_backup_backup ;;
-        18) runjob attempt_chromebrew_install ;;
-        19) runjob do_updates && exit 0 ;;
+        15) runjob set_dev_boot_usb ;;
+        16) runjob attempt_chromeos_update ;;
+        17) runjob attempt_backup_update ;;
+        18) runjob attempt_restore_backup_backup ;;
+        19) runjob attempt_chromebrew_install ;;
+        20) runjob do_updates && exit 0 ;;
 
 
         *) echo "\nInvalid option, dipshit.\n" ;;
         esac
     done
+}
+
+set_dev_boot_usb() {
+    doas crossystem.old dev_boot_usb=1
 }
 
 do_updates() {
