@@ -80,3 +80,7 @@ exit
 ```
 
 Now, reinstall all plugins you want to use.
+
+## Notes on USB Boot
+
+In order to boot a traditionally built linux distro (one not designed to be used on Chromebook hardware), you'll need to install MrChromebox's RW_LEGACY firmware. To do so, the `mrchromebox-fwscript.sh` plugin is provided. However, it is highly reccomended that you use [depthboot](https://eupnea-linux.github.io/docs/depthboot/requirements) to build a more compatible linux image that you can then boot from with `Ctrl+U` at the developer mode warning screen. Keep in mind that the step requiring the enabling of `dev_boot_usb` can be performed from the mush menu.
