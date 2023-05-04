@@ -85,11 +85,12 @@ main() {
 (13) Install Crouton
 (14) Start Crouton
 (15) Enable dev_boot_usb
-(16) [EXPERIMENTAL] Update ChromeOS
-(17) [EXPERIMENTAL] Update Emergency Backup
-(18) [EXPERIMENTAL] Restore Emergency Backup Backup
-(19) [EXPERIMENTAL] Install Chromebrew
-(20) Check for updates
+(16) Disable dev_boot_usb
+(17) [EXPERIMENTAL] Update ChromeOS
+(18) [EXPERIMENTAL] Update Emergency Backup
+(19) [EXPERIMENTAL] Restore Emergency Backup Backup
+(20) [EXPERIMENTAL] Install Chromebrew
+(21) Check for updates
 EOF
         
         swallow_stdin
@@ -109,12 +110,13 @@ EOF
         12) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
         13) runjob install_crouton ;;
         14) runjob run_crouton ;;
-        15) runjob set_dev_boot_usb ;;
-        16) runjob attempt_chromeos_update ;;
-        17) runjob attempt_backup_update ;;
-        18) runjob attempt_restore_backup_backup ;;
-        19) runjob attempt_chromebrew_install ;;
-        20) runjob do_updates && exit 0 ;;
+        15) runjob enable_dev_boot_usb ;;
+        16) runjob disable_dev_boot_usb ;;
+        17) runjob attempt_chromeos_update ;;
+        18) runjob attempt_backup_update ;;
+        19) runjob attempt_restore_backup_backup ;;
+        20) runjob attempt_chromebrew_install ;;
+        21) runjob do_updates && exit 0 ;;
 
 
         *) echo "\nInvalid option, dipshit.\n" ;;
@@ -122,8 +124,14 @@ EOF
     done
 }
 
-set_dev_boot_usb() {
-    doas crossystem.old dev_boot_usb=1
+disable_dev_boot_usb() {
+  echo "Disabling dev_boot_usb"
+  sed -i 's/\(dev_boot_usb=\).*/\10/' /usr/bin/crossystem
+}
+
+enable_dev_boot_usb() {
+  echo "Enabling dev_boot_usb"
+  sed -i 's/\(dev_boot_usb=\).*/\11/' /usr/bin/crossystem
 }
 
 do_updates() {
