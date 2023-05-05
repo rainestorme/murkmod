@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CURRENT_MAJOR=0
-CURRENT_MINOR=3
-CURRENT_VERSION=3
+CURRENT_MAJOR=4
+CURRENT_MINOR=0
+CURRENT_VERSION=0
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
