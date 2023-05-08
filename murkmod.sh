@@ -158,7 +158,7 @@ collect_analytics() {
 }
 
 get_analytics_permission() {
-    read -r -p "Opt-in to analytics? This will only send basic information about your device and the version of fakemurk you're on, all data will be anonymized. This will only run once per update - not in the background. [y/N] " choice
+    read -r -p "Opt-in to analytics? This will only send basic information about your device. [y/N] " choice
     case "$choice" in
         y | Y) collect_analytics && touch /mnt/stateful_partition/murkmod/analytics_opted_in ;;
         *) echo "Opting out of analytics." && touch /mnt/stateful_partition/murkmod/analytics_opted_out ;;
