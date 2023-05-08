@@ -123,6 +123,48 @@ set_sudo_perms() {
     fi
 }
 
+lsbval() {
+  local key="$1"
+  local lsbfile="${2:-/etc/lsb-release}"
+
+  if ! echo "${key}" | grep -Eq '^[a-zA-Z0-9_]+$'; then
+    return 1
+  fi
+
+  sed -E -n -e \
+    "/^[[:space:]]*${key}[[:space:]]*=/{
+      s:^[^=]+=[[:space:]]*::
+      s:[[:space:]]+$::
+      p
+    }" "${lsbfile}"
+}
+
+collect_analytics() {
+    fakemurk_version=$(cat /mnt/stateful_partition/fakemurk_version | base64 -w 0)
+    murkmod_version=$(cat /mnt/stateful_partition/murkmod_version | base64 -w 0)
+    hwid=$(crossystem.old hwid)
+    release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
+    devicetype=$(lsbval DEVICETYPE)
+    auserver=$(lsbval CHROMEOS_AUSERVER)
+    chromeos_version=$(lsbval CHROMEOS_RELEASE_DESCRIPTION)
+    build_type=$(lsbval CHROMEOS_RELEASE_BUILD_TYPE)
+    chrome_milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE)
+    release_track=$(lsbval CHROMEOS_RELEASE_TRACK)
+    curl -X POST \
+         -H "Content-Type: application/json" \
+         -d "{\"murkmod_version\":\"${murkmod_version}\",\"fakemurk_version\":\"${fakemurk_version}\",\"hwid\":\"${hwid}\",\"release_board\":\"${release_board}\",\"devicetype\":\"${devicetype}\",\"auserver\":\"${auserver}\",\"cros_version\":\"${chromeos_version}\",\"build_type\":\"${build_type}\",\"chrome_milestone\":\"${chrome_milestone}\",\"release_track\":\"${release_track}\"}" \
+         https://murkmod-analytics.besthaxer.repl.co/analytics > /dev/null
+    echo "Analytics collected."
+}
+
+get_analytics_permission() {
+    read -r -p "Opt-in to analytics? This will only send basic information about your device and the version of fakemurk you're on, all data will be anonymized. This will only run once per update - not in the background. [y/N] " choice
+    case "$choice" in
+        y | Y) collect_analytics && touch /mnt/stateful_partition/murkmod/analytics_opted_in ;;
+        *) echo "Opting out of analytics." && touch /mnt/stateful_partition/murkmod/analytics_opted_out ;;
+    esac
+}
+
 murkmod() {
     show_logo
     if [ ! -f /sbin/fakemurk-daemon.sh ]; then
@@ -141,6 +183,13 @@ murkmod() {
     set_chronos_password
     echo "Checking sudo perms..."
     set_sudo_perms
+    if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_in ]; then
+        if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_out ];
+            get_analytics_permission
+        fi
+    else
+        collect_analytics
+    fi
     read -n 1 -s -r -p "Done. Press any key to exit."
     exit
 }
