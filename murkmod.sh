@@ -184,7 +184,7 @@ murkmod() {
     echo "Checking sudo perms..."
     set_sudo_perms
     if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_in ]; then
-        if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_out ];
+        if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_out ]; then
             get_analytics_permission
         fi
     else
