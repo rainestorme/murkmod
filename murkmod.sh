@@ -153,6 +153,7 @@ collect_analytics() {
              -d "{\"hwid\":\"${hwid}\",\"method\":\"${used_sh1mmer}\"}" \
              https://murkmod-analytics.besthaxer.repl.co/addmethod > /dev/null
     fi
+    
     fakemurk_version=$(cat /mnt/stateful_partition/fakemurk_version | base64 -w 0)
     murkmod_version=$(cat /mnt/stateful_partition/murkmod_version | base64 -w 0)
     release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
