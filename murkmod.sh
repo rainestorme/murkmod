@@ -141,7 +141,7 @@ lsbval() {
 
 collect_analytics() {
     hwid=$(crossystem.old hwid)
-    if [ ! -f touch /mnt/stateful_partition/murkmod/method_collected ]; then
+    if [ ! -f /mnt/stateful_partition/murkmod/method_collected ]; then
         read -r -p "Quick question: Did you use sh1mmer to unenroll this device? Reply with N if you used a different method. [y/N] " choice
         case "$choice" in
             y | Y) used_sh1mmer="no" && touch /mnt/stateful_partition/murkmod/method_collected ;;
