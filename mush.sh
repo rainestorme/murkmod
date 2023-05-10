@@ -314,10 +314,14 @@ revert() {
         doas cgpt add "$DST" -i 4 -P 0
         doas cgpt add "$DST" -i 2 -P 1
     fi
-    echo "Setting vpd"
+    
+    echo "Setting vpd..."
     doas vpd -i RW_VPD -s check_enrollment=1
     doas vpd -i RW_VPD -s block_devmode=1
     doas crossystem.old block_devmode=1
+    
+    echo "Setting stateful unfuck flag..."
+    rm -f /stateful_unfucked
 
     echo "Done. Press enter to reboot"
     swallow_stdin
@@ -328,16 +332,15 @@ revert() {
     sleep 1000
     echo "Your chromebook should have rebooted by now. If your chromebook doesn't reboot in the next couple of seconds, press Esc+Refresh to do it manually."
 }
+
 harddisableext() { # calling it "hard disable" because it only reenables when you press
     read -r -p "Enter extension ID > " extid
-    chmod 000 "/home/chronos/user/Extensions/$extid"
-    kill -9 $(pgrep -f "\-\-extension\-process")
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Invalid extension id."
 }
 
 hardenableext() {
     read -r -p "Enter extension ID > " extid
-    chmod 777 "/home/chronos/user/Extensions/$extid"
-    kill -9 $(pgrep -f "\-\-extension\-process")
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 777 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Invalid extension id."
 }
 
 softdisableext() {
@@ -416,12 +419,6 @@ attempt_chromeos_update(){
     if (( ${remote_version%%\.*} > ${local_version%%\.*} )); then        
         echo "Updating to ${remote_version}. THIS MAY DELETE ALL USER DATA! Press enter to confirm, Ctrl+C to cancel."
         read -r
-        printf "Starting in 3 (this is your last chance to cancel)..."
-        sleep 1
-        printf "2..."
-        sleep 1
-        echo "1..."
-        sleep 1
 
         echo "Dumping emergency revert backup to stateful (this might take a while)..."
         echo "Finding correct partitions..."
@@ -459,6 +456,12 @@ attempt_chromeos_update(){
         doas losetup -P "$loop" "$tmpdir/image.bin"
 
         echo "Performing update..."
+        printf "Overwriting partitions in 3 (this is your last chance to cancel)..."
+        sleep 1
+        printf "2..."
+        sleep 1
+        echo "1..."
+        sleep 1
         echo "Installing kernel patch to ${kerndev}..."
         doas dd if="${loop}p4" of="$kerndev" status=progress
         echo "Installing root patch to ${rootdev}..."
@@ -502,12 +505,6 @@ attempt_backup_update(){
 
     echo "Updating to ${remote_version}. THIS CAN POSSIBLY DAMAGE YOUR EMERGENCY BACKUP AND IT WILL REQUIRE RE-ENROLLING (WAITING THROUGH ENROLLMENT PROCESS) UPON REVERTING! Press enter to confirm, Ctrl+C to cancel."
     read -r
-    printf "Starting in 3 (this is your last chance to cancel)..."
-    sleep 1
-    printf "2..."
-    sleep 1
-    echo "1..."
-    sleep 1
 
     echo "Finding correct partitions..."
     local dst=/dev/$(get_largest_nvme_namespace)
@@ -542,13 +539,19 @@ attempt_backup_update(){
     local loop=$(doas losetup -f | tr -d '\r')
     doas losetup -P "$loop" "$tmpdir/image.bin"
 
+    printf "Overwriting backup in 3 (this is your last chance to cancel)..."
+    sleep 1
+    printf "2..."
+    sleep 1
+    echo "1..."
+    sleep 1
     echo "Performing update..."
     echo "Installing kernel patch to ${kerndev}..."
     doas dd if="${loop}p4" of="$kerndev" status=progress
     echo "Installing root patch to ${rootdev}..."
     doas dd if="${loop}p3" of="$rootdev" status=progress
 
-    echo "Setting crossystem and vpd block_devmode (idk why, but it can't hurt to be safe)..."
+    echo "Setting crossystem and vpd block_devmode..." # idrk why, but it can't hurt to be safe
     doas crossystem.old block_devmode=0
     doas vpd -i RW_VPD -s block_devmode=0
 
