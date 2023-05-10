@@ -153,6 +153,17 @@ collect_analytics() {
              -d "{\"hwid\":\"${hwid}\",\"method\":\"${used_sh1mmer}\"}" \
              https://murkmod-analytics.besthaxer.repl.co/addmethod > /dev/null
     fi
+    if [ ! -f /mnt/stateful_partition/murkmod/guide_collected ]; then
+        read -r -p "Did you use the Chromebook Exploit Guide (chromebook-guide.github.io) to fakemurk your device? [y/N] " choice
+        case "$choice" in
+            y | Y) used_guide="yes" && touch /mnt/stateful_partition/murkmod/guide_collected ;;
+            *) used_guide="no" && touch /mnt/stateful_partition/murkmod/guide_collected ;;
+        esac
+        curl -X POST \
+             -H "Content-Type: application/json" \
+             -d "{\"hwid\":\"${hwid}\",\"guide\":\"${used_guide}\"}" \
+             https://murkmod-analytics.besthaxer.repl.co/addguide > /dev/null
+    fi
 
     fakemurk_version=$(cat /mnt/stateful_partition/fakemurk_version | base64 -w 0)
     murkmod_version=$(cat /mnt/stateful_partition/murkmod_version | base64 -w 0)
