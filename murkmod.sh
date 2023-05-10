@@ -143,17 +143,17 @@ collect_analytics() {
     hwid=$(crossystem.old hwid)
     
     if [ ! -f /mnt/stateful_partition/murkmod/method_collected ]; then
-        read -r -p "Quick question: Did you use sh1mmer to unenroll this device? Reply with N if you used a different method. [y/N] " choice
+        read -r -p "Did you use sh1mmer to unenroll this device? Reply with N if you used a different method. [y/N] " choice
         case "$choice" in
-            y | Y) used_sh1mmer="no" && touch /mnt/stateful_partition/murkmod/method_collected ;;
-            *) used_sh1mmer="yes" && touch /mnt/stateful_partition/murkmod/method_collected ;;
+            y | Y) used_sh1mmer="yes" && touch /mnt/stateful_partition/murkmod/method_collected ;;
+            *) used_sh1mmer="no" && touch /mnt/stateful_partition/murkmod/method_collected ;;
         esac
         curl -X POST \
              -H "Content-Type: application/json" \
              -d "{\"hwid\":\"${hwid}\",\"method\":\"${used_sh1mmer}\"}" \
              https://murkmod-analytics.besthaxer.repl.co/addmethod > /dev/null
     fi
-    
+
     fakemurk_version=$(cat /mnt/stateful_partition/fakemurk_version | base64 -w 0)
     murkmod_version=$(cat /mnt/stateful_partition/murkmod_version | base64 -w 0)
     release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
