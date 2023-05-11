@@ -108,7 +108,7 @@ EOF
         9) runjob softdisableext ;;
         10) runjob harddisableext ;;
         11) runjob hardenableext ;;
-        12) runjob autodisableexts ;;
+        12) echo "Under maintenence" && read -p "Press enter to continue" ;;
         13) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
         14) runjob install_crouton ;;
         15) runjob run_crouton ;;
@@ -126,12 +126,12 @@ EOF
     done
 }
 
-autodisableexts() {
-  for extid in haldlgldplgnggkjaafhelgiaglafanh dikiaagfielfbnbbopidjjagldjopbpa cgbbbjmgdpnifijconhamggjehlamcif inoeonmfapjbbkmdafoankkfajkcphgd enfolipbjmnmleonhhebhalojdpcpdoo joflmkccibkooplaeoinecjbmdebglab iheobagjkfklnlikgihanlhcddjoihkg adkcpkpghahmbopkjchobieckeoaoeem jcdhmojfecjfmbdpchihbeilohgnbdci jdogphakondfdmcanpapfahkdomaicfa aceopacgaepdcelohobicpffbbejnfac kmffehbidlalibfeklaefnckpidbodff jaoebcikabjppaclpgbodmmnfjihdngk
- ghlpmldmjjhmdgmneoaibbegkjjbonbk ddfbkhpmcdbciejenfcolaaiebnjcbfc jfbecfmiegcjddenjhlbhlikcbfmnafd jjpmjccpemllnmgiaojaocgnakpmfgjg; do
-    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Invalid extension id."
-  done 
-}
+# autodisableexts() {
+#   for extid in ("haldlgldplgnggkjaafhelgiaglafanh", "dikiaagfielfbnbbopidjjagldjopbpa", "cgbbbjmgdpnifijconhamggjehlamcif", "inoeonmfapjbbkmdafoankkfajkcphgd", "enfolipbjmnmleonhhebhalojdpcpdoo", "joflmkccibkooplaeoinecjbmdebglab", "iheobagjkfklnlikgihanlhcddjoihkg", "adkcpkpghahmbopkjchobieckeoaoeem", "jcdhmojfecjfmbdpchihbeilohgnbdci", "jdogphakondfdmcanpapfahkdomaicfa", "aceopacgaepdcelohobicpffbbejnfac", "kmffehbidlalibfeklaefnckpidbodff", "jaoebcikabjppaclpgbodmmnfjihdngk",
+#  "ghlpmldmjjhmdgmneoaibbegkjjbonbk", "ddfbkhpmcdbciejenfcolaaiebnjcbfc", "jfbecfmiegcjddenjhlbhlikcbfmnafd", "jjpmjccpemllnmgiaojaocgnakpmfgjg"); do
+#     echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Invalid extension id."
+#   done 
+# }
 
 disable_dev_boot_usb() {
   echo "Disabling dev_boot_usb"
