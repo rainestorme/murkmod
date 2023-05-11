@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURRENT_MAJOR=4
-CURRENT_MINOR=2
+CURRENT_MINOR=3
 CURRENT_VERSION=0
 
 get_asset() {
