@@ -598,11 +598,13 @@ attempt_restore_backup_backup() {
 
 attempt_install_chromebrew() {
     # Chromebrew's folders are linked to /mnt/stateful_partition so that install will work correctly without running out of space
-    doas mkdir -p /mnt/stateful_partition/murkmod/chromebrew_mount
-    doas mkdir -pv /mnt/stateful_partition/murkmod/chromebrew_mount/{etc,include,lib,lib64,share,tmp}
-    doas "for i in etc include lib lib64 share tmp; do
-      ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/$i /usr/local/$i
-    done"
+    mkdir -p /mnt/stateful_partition/murkmod/chromebrew_mount
+    mkdir -pv /mnt/stateful_partition/murkmod/chromebrew_mount/{etc,include,lib,lib64,share,tmp}
+    doas 'mv /usr/local/etc/* /mnt/stateful_partition/murkmod/chromebrew_mount/etc/ && rm -Rf /usr/local/etc && ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/etc /usr/local'
+    doas 'mv /usr/local/include/* /mnt/stateful_partition/murkmod/chromebrew_mount/include/ && rm -Rf /usr/local/include && ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/include /usr/local'
+    doas 'mv /usr/local/lib/* /mnt/stateful_partition/murkmod/chromebrew_mount/lib/ && rm -Rf /usr/local/lib && ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/lib /usr/local'
+    doas 'mv /usr/local/lib64/* /mnt/stateful_partition/murkmod/chromebrew_mount/lib64/ && rm -Rf /usr/local/lib64 && ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/lib64 /usr/local'
+    doas 'mv /usr/local/share/* /mnt/stateful_partition/murkmod/chromebrew_mount/share/ && rm -Rf /usr/local/share && ln -sv /mnt/stateful_partition/murkmod/chromebrew_mount/share /usr/local'
     doas 'chmod 777 /usr/local/*'
     doas 'su chronos -s /bin/bash -c "curl -Lsk git.io/vddgY | bash" && exit'
     read -p 'Press enter to exit'
