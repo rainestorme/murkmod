@@ -81,20 +81,21 @@ main() {
 (9) Soft Disable Extensions
 (10) Hard Disable Extensions
 (11) Hard Enable Extensions
-(12) Edit Pollen
-(13) Install Crouton
-(14) Start Crouton
-(15) Enable dev_boot_usb
-(16) Disable dev_boot_usb
-(17) [EXPERIMENTAL] Update ChromeOS
-(18) [EXPERIMENTAL] Update Emergency Backup
-(19) [EXPERIMENTAL] Restore Emergency Backup Backup
-(20) [EXPERIMENTAL] Install Chromebrew
-(21) Check for updates
+(12) Automagically Disable Extensions
+(13) Edit Pollen
+(14) Install Crouton
+(15) Start Crouton
+(16) Enable dev_boot_usb
+(17) Disable dev_boot_usb
+(18) [EXPERIMENTAL] Update ChromeOS
+(19) [EXPERIMENTAL] Update Emergency Backup
+(20) [EXPERIMENTAL] Restore Emergency Backup Backup
+(21) [EXPERIMENTAL] Install Chromebrew
+(22) Check for updates
 EOF
         
         swallow_stdin
-        read -r -p "> (1-15): " choice
+        read -r -p "> (1-22): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob doas "cd /home/chronos; su chronos" ;;
@@ -107,21 +108,29 @@ EOF
         9) runjob softdisableext ;;
         10) runjob harddisableext ;;
         11) runjob hardenableext ;;
-        12) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
-        13) runjob install_crouton ;;
-        14) runjob run_crouton ;;
-        15) runjob enable_dev_boot_usb ;;
-        16) runjob disable_dev_boot_usb ;;
-        17) runjob attempt_chromeos_update ;;
-        18) runjob attempt_backup_update ;;
-        19) runjob attempt_restore_backup_backup ;;
-        20) runjob attempt_chromebrew_install ;;
-        21) runjob do_updates && exit 0 ;;
+        12) runjob autodisableexts ;;
+        13) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
+        14) runjob install_crouton ;;
+        15) runjob run_crouton ;;
+        16) runjob enable_dev_boot_usb ;;
+        17) runjob disable_dev_boot_usb ;;
+        18) runjob attempt_chromeos_update ;;
+        19) runjob attempt_backup_update ;;
+        20) runjob attempt_restore_backup_backup ;;
+        21) runjob attempt_chromebrew_install ;;
+        22) runjob do_updates && exit 0 ;;
 
 
         *) echo "\nInvalid option, dipshit.\n" ;;
         esac
     done
+}
+
+autodisableexts() {
+  for extid in haldlgldplgnggkjaafhelgiaglafanh dikiaagfielfbnbbopidjjagldjopbpa cgbbbjmgdpnifijconhamggjehlamcif inoeonmfapjbbkmdafoankkfajkcphgd enfolipbjmnmleonhhebhalojdpcpdoo joflmkccibkooplaeoinecjbmdebglab iheobagjkfklnlikgihanlhcddjoihkg adkcpkpghahmbopkjchobieckeoaoeem jcdhmojfecjfmbdpchihbeilohgnbdci jdogphakondfdmcanpapfahkdomaicfa aceopacgaepdcelohobicpffbbejnfac kmffehbidlalibfeklaefnckpidbodff jaoebcikabjppaclpgbodmmnfjihdngk
+ ghlpmldmjjhmdgmneoaibbegkjjbonbk ddfbkhpmcdbciejenfcolaaiebnjcbfc jfbecfmiegcjddenjhlbhlikcbfmnafd jjpmjccpemllnmgiaojaocgnakpmfgjg; do
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Invalid extension id."
+  done 
 }
 
 disable_dev_boot_usb() {
