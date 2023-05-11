@@ -311,7 +311,14 @@ revert() {
     echo "Are you sure - 100% sure - that you want to continue? (press enter to continue, ctrl-c to cancel)"
     swallow_stdin
     read -r
-    sleep 4
+    
+    printf "Setting kernel priority in 3 (this is your last chance to cancel)..."
+    sleep 1
+    printf "2..."
+    sleep 1
+    echo "1..."
+    sleep 1
+    
     echo "Setting kernel priority"
 
     DST=/dev/$(get_largest_nvme_namespace)
