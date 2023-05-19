@@ -22,6 +22,13 @@ This command will download and install murkmod and its (almost minimal) dependen
 
 > Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
 
+#### Tip:
+If you get an error about a filesystem being readonly run
+`fsck -f $(rootdev)`
+then reboot
+
+
+
 ## Plugin Management
 Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a few new options, such as the ability to run `neofetch`, but the important ones here are `Install plugins`, `Uninstall plugins` and `Plugins`.
 
