@@ -77,7 +77,7 @@ sudo <your command here>
 
 ## Regarding Chromebrew
 
-Chromebrew is *almost* functional in the current state. I welcome PRs to fix issues you encounter with it.
+Chromebrew is now functional with the official `cros_debug` patch from MercuryWorkshop.
 
 ## Are your menu plugins no longer showing up after updating?
 
