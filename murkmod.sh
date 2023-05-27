@@ -189,6 +189,10 @@ get_analytics_permission() {
     esac
 }
 
+set_cros_debug() {
+    sed -i "s/\(cros_debug=\).*/\11/" /usr/bin/crossystem
+}
+
 murkmod() {
     show_logo
     if [ ! -f /sbin/fakemurk-daemon.sh ]; then
@@ -207,6 +211,8 @@ murkmod() {
     set_chronos_password
     echo "Checking sudo perms..."
     set_sudo_perms
+    echo "Setting crossystem cros_debug..."
+    set_cros_debug
     if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_in ]; then
         if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_out ]; then
             get_analytics_permission
@@ -214,7 +220,7 @@ murkmod() {
     else
         collect_analytics
     fi
-    read -n 1 -s -r -p "Done. Press any key to exit."
+    read -n 1 -s -r -p "Done. If cros_debug was enabled for the first time, a reboot may be required. Press any key to exit."
     exit
 }
 
