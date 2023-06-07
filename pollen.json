@@ -84,5 +84,7 @@
 	"ProxyMode": null,
 	"IsolatedAppsDeveloperModeAllowed": true,
 	"PinUnlockAutosubmitEnabled": true,
-	"WebAppInstallForceList": null
+	"WebAppInstallForceList": null,
+	"UserAvatarCustomizationSelectorsEnabled": true,
+	"DnsOverHttpsMode": null
 }
