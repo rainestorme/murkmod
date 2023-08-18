@@ -5,7 +5,7 @@ CURRENT_MINOR=3
 CURRENT_VERSION=0
 
 get_asset() {
-    curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
+    curl -s -f "https://api.github.com/repos/cognito-inc-real/murkmod/contents/$1" | jq -r ".content" | base64 -d
 }
 
 get_asset_fakemurk() {
