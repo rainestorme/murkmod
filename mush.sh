@@ -25,14 +25,14 @@ traps() {
 
 mush_info() {
     cat <<-EOF
-Welcome to mush, the fakemurk developer shell.
+Welcome to the Cognito Inc. Configuration Menu
 
 If you got here by mistake, don't panic! Just close this tab and carry on.
 
-This shell contains a list of utilities for performing various actions on a fakemurked chromebook.
+This shell contains a list of utilities for performing various actions on this hromebook.
 
-This installation of fakemurk has been patched by murkmod. Don't report any bugs you encounter with it to the fakemurk developers.
-
+This device was hacked by Cognito Inc. As such, the options that you can perform have been restricted.
+If you need to configure your device, or, if something is still blocked, please contact a Cognito Inc. Goon.
 EOF
 }
 
