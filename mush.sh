@@ -25,14 +25,14 @@ traps() {
 
 mush_info() {
     cat <<-EOF
-Welcome to the Cognito Inc. Configuration Menu
+Welcome to mush, the fakemurk developer shell.
 
 If you got here by mistake, don't panic! Just close this tab and carry on.
 
-This shell contains a list of utilities for performing various actions on this hromebook.
+This shell contains a list of utilities for performing various actions on a fakemurked chromebook.
 
-This device was hacked by Cognito Inc. As such, the options that you can perform have been restricted.
-If you need to configure your device, or, if something is still blocked, please contact a Cognito Inc. Goon.
+This installation of fakemurk has been patched by murkmod. Don't report any bugs you encounter with it to the fakemurk developers.
+
 EOF
 }
 
@@ -66,45 +66,6 @@ edit() {
 }
 
 main() {
-    traps
-    mush_info
-    while true; do
-        cat <<-EOF
-(1) Emergency Revert & Re-Enroll
-(2) Soft Disable Extensions
-(3) Hard Disable Extensions
-(4) Hard Enable Extensions
-(5) Enter Cognito Inc. Repair Mode
-(6) Check for updates
-EOF
-        
-        swallow_stdin
-        read -r -p "> (1-22): " choice
-        case "$choice" in
-        1) runjob revert ;;
-        2) runjob softdisableext ;;
-        3) runjob harddisableext ;;
-        4) runjob hardenableext ;;
-        5) runjob enter_repair_mode ;;
-        6) runjob do_updates && exit 0 ;;
-
-        *) echo "\nInvalid option, dipshit.\n" ;;
-        esac
-    done
-}
-
-enter_repair_mode() {
-    echo "WARNING: Modifications made to the system not by Cognito employees will void your warranty"
-    echo "Please enter your Cognito Inc. Access Code™"
-    read accesscode
-    if [$accesscode == "C0gn1t0!nc"] then
-        runjob main_repair
-    else
-        read -p "Wrong password, dumbass. Press enter to exit."
-    end
-}
-
-main_repair() {
     traps
     mush_info
     while true; do
@@ -160,7 +121,7 @@ EOF
         22) runjob do_updates && exit 0 ;;
 
 
-        *) echo && echo "Invalid option, dipshit." && echo ;;
+        *) echo "\nInvalid option, dipshit.\n" ;;
         esac
     done
 }
