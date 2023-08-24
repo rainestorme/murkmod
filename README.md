@@ -10,6 +10,12 @@ v1.2.0 of fakemurk is mostly working with murkmod, but in some rare edge cases i
 
 Want a complete guide, with steps all the way from choosing an exploit to configuring fakemurk? Check out the [Chromebook Exploit Guide](https://chromebook-guide.github.io/).
 
+### New Method (SMUT + SH1mmer)
+
+See the [Chromebook Exploit Guide](https://chromebook-guide.github.io/).
+
+### Old Method (fakemurk > murkmod upgrade)
+
 > In order to use all of the features of murkmod, you **must** create a emergency revert backup during the installation of fakemurk.
 
 To install murkmod, simply spawn a root shell (option 1) from mush, and paste in the following command:
