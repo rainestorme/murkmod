@@ -24,7 +24,8 @@ traps() {
 }
 
 mush_info() {
-    cat <<-EOF
+    if [ ! -f /mnt/stateful_partition/custom_greeting ]; then
+        cat <<-EOF
 Welcome to mush, the fakemurk developer shell.
 
 If you got here by mistake, don't panic! Just close this tab and carry on.
@@ -34,6 +35,9 @@ This shell contains a list of utilities for performing various actions on a fake
 This installation of fakemurk has been patched by murkmod. Don't report any bugs you encounter with it to the fakemurk developers.
 
 EOF
+    else
+        cat /mnt/stateful_partition/custom_greeting
+    fi
 }
 
 doas() {
