@@ -69,7 +69,40 @@ edit() {
     fi
 }
 
+locked_main() {
+    traps
+    mush_info
+    while true; do
+        cat <<-EOF
+(1) Emergency Revert & Re-Enroll
+(2) Soft Disable Extensions
+(3) Hard Disable Extensions
+(4) Hard Enable Extensions
+(5) Enter Admin Mode (Password-Protected)
+(6) Check for updates
+EOF
+        
+        swallow_stdin
+        read -r -p "> (1-5): " choice
+        case "$choice" in
+        1) runjob revert ;;
+        2) runjob softdisableext ;;
+        3) runjob harddisableext ;;
+        4) runjob hardenableext ;;
+        5) runjob prompt_passwd ;;
+        6) runjob do_updates && exit 0 ;;
+
+
+        *) echo && echo "Invalid option, dipshit." && echo ;;
+        esac
+    done
+}
+
 main() {
+    if [ -f /mnt/statful_partition/murkmod/mush_password ]; then
+        locked_main
+        return
+    fi
     traps
     mush_info
     while true; do
@@ -91,15 +124,17 @@ main() {
 (15) Start Crouton
 (16) Enable dev_boot_usb
 (17) Disable dev_boot_usb
-(18) [EXPERIMENTAL] Update ChromeOS
-(19) [EXPERIMENTAL] Update Emergency Backup
-(20) [EXPERIMENTAL] Restore Emergency Backup Backup
-(21) [EXPERIMENTAL] Install Chromebrew
-(22) Check for updates
+(18) Set mush password
+(19) Remove mush password
+(20) [EXPERIMENTAL] Update ChromeOS
+(21) [EXPERIMENTAL] Update Emergency Backup
+(22) [EXPERIMENTAL] Restore Emergency Backup Backup
+(23) [EXPERIMENTAL] Install Chromebrew
+(24) Check for updates
 EOF
         
         swallow_stdin
-        read -r -p "> (1-22): " choice
+        read -r -p "> (1-24): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob doas "cd /home/chronos; su chronos" ;;
@@ -118,14 +153,16 @@ EOF
         15) runjob run_crouton ;;
         16) runjob enable_dev_boot_usb ;;
         17) runjob disable_dev_boot_usb ;;
-        18) runjob attempt_chromeos_update ;;
-        19) runjob attempt_backup_update ;;
-        20) runjob attempt_restore_backup_backup ;;
-        21) runjob attempt_chromebrew_install ;;
-        22) runjob do_updates && exit 0 ;;
+        18) runjob set_passwd ;;
+        19) runjob remove_passwd ;;
+        20) runjob attempt_chromeos_update ;;
+        21) runjob attempt_backup_update ;;
+        22) runjob attempt_restore_backup_backup ;;
+        23) runjob attempt_chromebrew_install ;;
+        24) runjob do_updates && exit 0 ;;
 
 
-        *) echo "\nInvalid option, dipshit.\n" ;;
+        *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
 }
@@ -136,6 +173,31 @@ EOF
 #     echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Invalid extension id."
 #   done 
 # }
+
+set_passwd() {
+  echo "Enter a new password to use for mush. This will be required to perform any future administrative actions, so make sure you write it down somewhere!"
+  read -r -p " > " newpassword
+  touch /mnt/stateful_partition/murkmod/mush_password
+  echo "$newpassword" > /mnt/stateful_partition/murkmod/mush_password
+}
+
+remove_passwd() {
+  echo "Removing password from mush..."
+  rm -f /mnt/stateful_partition/murkmod/mush_password
+}
+
+prompt_passwd() {
+  echo "Enter your password:"
+  read -r -p " > " password
+  if grep "$password" /mnt/stateful_partition/murkmod/mush_password >/dev/null
+  then
+    main
+    return
+  else
+    echo "Incorrect password."
+    read -r -p "Press enter to continue." throwaway
+  fi
+}
 
 disable_dev_boot_usb() {
   echo "Disabling dev_boot_usb"
