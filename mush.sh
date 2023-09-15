@@ -435,7 +435,14 @@ softdisableext() {
 
 install_crouton() {
     echo "Installing Crouton..."
-    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bookworm" && touch /mnt/stateful_partition/crouton_installed
+    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bullseye"
+    doas enter-chroot -n bullseye
+    doas apt purge '~o'
+    doas sed -i 's/bullseye/bookworm/g' /etc/apt/sources.list
+    doas apt update
+    doas apt upgrade --without-new-pkgs
+    doas apt full-upgrade
+    doas edit-chroot -m bookworm bullseye
 }
 
 run_crouton() {
