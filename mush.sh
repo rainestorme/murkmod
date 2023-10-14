@@ -130,7 +130,8 @@ main() {
 (21) [EXPERIMENTAL] Update Emergency Backup
 (22) [EXPERIMENTAL] Restore Emergency Backup Backup
 (23) [EXPERIMENTAL] Install Chromebrew
-(24) Check for updates
+(24) [EXPERIMENTAL] Install Gentoo Boostrap (dev_install)
+(25) Check for updates
 EOF
         
         swallow_stdin
@@ -159,7 +160,8 @@ EOF
         21) runjob attempt_backup_update ;;
         22) runjob attempt_restore_backup_backup ;;
         23) runjob attempt_chromebrew_install ;;
-        24) runjob do_updates && exit 0 ;;
+        24) runjob attempt_dev_install ;;
+        25) runjob do_updates && exit 0 ;;
 
 
         *) echo && echo "Invalid option, dipshit." && echo ;;
@@ -366,7 +368,7 @@ powerwash() {
     echo "(Press enter to continue, ctrl-c to cancel)"
     swallow_stdin
     read -r
-    doas echo "fast safe" >/mnt/stateful_partition/factory_install_reset
+    doas rm -f /stateful_unfucked
     doas reboot
     exit
 }
@@ -672,6 +674,10 @@ attempt_restore_backup_backup() {
 attempt_install_chromebrew() {
     doas 'su chronos -s /bin/bash -c "curl -Lsk git.io/vddgY | bash" && exit' # kinda works now with cros_debug
     read -p 'Press enter to exit'
+}
+
+attempt_dev_install() {
+    doas 'dev_install' # more complicated logic to come later, i'm still working out all the strange quirks with dev_install on older platform versions
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
