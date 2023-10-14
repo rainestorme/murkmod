@@ -6,7 +6,7 @@ murkmod is a utility script that patches fakemurk and mush to include additional
 
 ### New Method (Post-tsunami, SH1mmer + SMUT)
 
-Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image with a murkmod image built with the included image patcher script - instructions are in the repo. Once you've done this, flash the image to a drive and boot into it as you would with a normal SH1mmer image. From there, select `Utiliites` > `Unblock Devmode`. Head back and select `Payloads` > `SH1mmer Multiboot UTility (SMUT)` - select option 1 
+Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image with a murkmod image built with the included image patcher script - instructions are in the repo. Once you've done this, flash the image to a drive and boot into it as you would with a normal SH1mmer image. From there, select `Utiliites` > `Unblock Devmode`. Head back and select `Payloads` > `SH1mmer Multiboot UTility (SMUT)` - select option 1 (`Install fakemurk/murkmod image to unused partition`) and then enter the exact filename of the image you created earlier. Follow all prompts and wait for the installation to complete (the kernel patch is 512mb and the root patch is 4gb). Then, reboot and handle installation as you would with normal fakemurk.
 
 ### Old Method (fakemurk > murkmod upgrade)
 
