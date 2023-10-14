@@ -1,22 +1,16 @@
 # murkmod
 
-murkmod is a utility script that patches fakemurk and mush to include additional useful utilities, with the most prominent being a plugin manager. This tool enables you to easily install and manage various packages and plugins for mush, and, eventually, fakemurk itself. murkmod also includes additional useful tools and features that can aid you in your various Chromebook hacking tasks.
-
-## Heads up!
-
-v1.2.0 of fakemurk is mostly working with murkmod, but in some rare edge cases it breaks, and it breaks badly. Use caution!
+murkmod is a utility script that patches fakemurk and mush to include additional useful utilities, with the most prominent being a plugin manager. At this point, it's basically a continuation of what fakemurk tried to be, since MercuryWorkshop ghosted me after I offered to make a PR. 
 
 ## Installation
 
-Want a complete guide, with steps all the way from choosing an exploit to configuring fakemurk? Check out the [Chromebook Exploit Guide](https://chromebook-guide.github.io/).
+### New Method (Post-tsunami, SH1mmer + SMUT)
 
-### New Method (SMUT + SH1mmer)
-
-See the [Chromebook Exploit Guide](https://chromebook-guide.github.io/).
+Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image with a murkmod image built with the included image patcher script - instructions are in the repo. Once you've done this, flash the image to a drive and boot into it as you would with a normal SH1mmer image. From there, select `Utiliites` > `Unblock Devmode`. Head back and select `Payloads` > `SH1mmer Multiboot UTility (SMUT)` - select option 1 
 
 ### Old Method (fakemurk > murkmod upgrade)
 
-> In order to use all of the features of murkmod, you **must** create a emergency revert backup during the installation of fakemurk.
+> ⚠ In order to use all of the features of murkmod, you **must** enable emergency revert during the installation of fakemurk.
 
 To install murkmod, simply spawn a root shell (option 1) from mush, and paste in the following command:
 
@@ -24,21 +18,16 @@ To install murkmod, simply spawn a root shell (option 1) from mush, and paste in
 bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)
 ```
 
-This command will download and install murkmod and its (almost minimal) dependencies. Once the installation is complete, you can start using murkmod by running mush as usual.
+This command will download and install murkmod to your device. Once the installation is complete, you can start using murkmod by opening mush as usual.
 
-> Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
+> 📝 Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
 
-#### Tip:
-If you get an error about a filesystem being readonly run
-`fsck -f $(rootdev)`
-then reboot
-
-
+> ⚠ If you get an error about a filesystem being readonly run `fsck -f $(rootdev)` then reboot.
 
 ## Plugin Management
-Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a few new options, such as the ability to run `neofetch`, but the important ones here are `Install plugins`, `Uninstall plugins` and `Plugins`.
+Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a bunch of new options, but the important ones for this guide are `Install plugins`, `Uninstall plugins` and `Plugins`.
 
-To install a plugin, head over to [this link](https://github.com/rainestorme/murkmod/tree/main/plugins). Find the plugin you want and remember its filename. You'll need it in a bit. Select `Install plugins` and enter the filename. The file should be installed, then you can enter `q` to quit.
+To install a plugin, head over to [this link](https://github.com/rainestorme/murkmod/tree/main/plugins). Find the plugin you want and remember its filename. Select `Install plugins` and enter said filename. The plugin should be fetched from Github, and then you can enter `q` to quit.
 
 You can go to `Plugins` to use your installed plugins. Once you select an option, it should execute the plugin's contents.
 
@@ -70,31 +59,7 @@ Menu plugins aren't run as root - all other plugins are. Startup plugins run onc
 
 Make sure that your startup plugin runs quickly - or, at least, as quickly as possible. It'll hold up the boot process until it exits. 
 
-> Careful! If your startup plugin tries to use /mnt/stateful_partition, it will crash! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see `example-plugins/startup/read_file_from_stateful.sh` for an example.
-
-## Using Hacked Sudo
-
-Murkmod makes a few changes to system permission to allow chronos to use sudo with no password, and setting the password to the chronos account so that root can `su` into it, meaning that you can properly use sudo in a command line if you run the following at a root bash prompt:
-
-```
-su chronos
-sudo <your command here>
-```
-
-## Regarding Chromebrew
-
-Chromebrew is now functional with the official `cros_debug` patch from MercuryWorkshop.
-
-## Are your menu plugins no longer showing up after updating?
-
-Open a root shell and run the following commands:
-
-```sh
-rm /mnt/stateful_partition/murkmod/plugins/*
-exit
-```
-
-Now, reinstall all plugins you want to use.
+> ⚠ If your startup plugin tries to use /mnt/stateful_partition, it will fail! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see [`example-plugins/startup/read_file_from_stateful.sh`](https://github.com/rainestorme/murkmod/blob/main/example-plugins/startup/read_file_from_stateful.sh) for an example.
 
 ## Notes on USB Boot
 
