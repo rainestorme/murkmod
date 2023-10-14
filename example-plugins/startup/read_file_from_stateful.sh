@@ -19,7 +19,7 @@ mount_dir=$(mktemp -d)
 mount "$stateful_dev" "$mount_dir"
 echo "Mounted stateful on $mount_dir, reading value..."
 
-echo "You're using murkmod version: $(cat /mnt/stateful_partition/murkmod_version)"
+echo "You're using murkmod version: $(cat /mnt/stateful_partition/murkmod_version)" # note that although we can access unencrypted files here, we cannot modify user data without booting into the system fully and letting chromeos handle authentication
 
 # Unmount
 umount "$stateful_dev"
