@@ -24,6 +24,7 @@ traps() {
 }
 
 mush_info() {
+    echo -ne "\033]0;Welcome to mush! \007" & sleep 1 && echo -ne "\033]0;mush\007"
     if [ ! -f /mnt/stateful_partition/custom_greeting ]; then
         cat <<-EOF
 Welcome to mush, the fakemurk developer shell.
@@ -73,6 +74,7 @@ locked_main() {
     traps
     mush_info
     while true; do
+        echo -ne "\033]0;mush\007"
         cat <<-EOF
 (1) Emergency Revert & Re-Enroll
 (2) Soft Disable Extensions
@@ -106,6 +108,7 @@ main() {
     traps
     mush_info
     while true; do
+        echo -ne "\033]0;mush\007"
         cat <<-EOF
 (1) Root Shell
 (2) Chronos Shell
