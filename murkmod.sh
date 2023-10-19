@@ -81,8 +81,7 @@ create_stateful_files() {
     if [ ! -f /mnt/stateful_partition/murkmod/settings ]; then
         echo "# ----- murkmod settings -----" > /mnt/stateful_partition/murkmod/settings
         echo "" >> /mnt/stateful_partition/murkmod/settings
-        echo "# Whether or not to show experimental features" >> /mnt/stateful_partition/murkmod/settings
-        echo "show_experimental=false" >> /mnt/stateful_partition/murkmod/settings
+        echo "# this file is unused for now, but this might change" >> /mnt/stateful_partition/murkmod/settings
     fi
 }
 
