@@ -6,13 +6,15 @@ murkmod is a utility script that patches fakemurk and mush to include additional
 
 ### New Method (Post-tsunami, SH1mmer + SMUT)
 
-> ⚠️ You should have hardware write protect disabled before following the instructions below. On most Chromebooks with RMA shims leaked, disconnecting the battery from the motherboard accomplishes that task. However, some Chromebooks may require additional steps and you should consult [MrChromeBox's excellent guide](https://mrchromebox.tech/#devices) to determine your WP type.
+> [!WARNING]
+> You should have hardware write protect disabled before following the instructions below. On most Chromebooks with RMA shims leaked, disconnecting the battery from the motherboard accomplishes that task. However, some Chromebooks may require additional steps and you should consult [MrChromeBox's excellent guide](https://mrchromebox.tech/#devices) to determine your WP type.
 
 Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image with a murkmod image built with the included image patcher script - instructions are in the repo. Once you've done this, flash the image to a drive. Pop off the back of your Chromebook and remove the battery. Now, boot into the flashed USB drive as you would with normal SH1mmer. From there, select `Utiliites` > `Unblock Devmode`. Head back and select `Payloads` > `SH1mmer Multiboot UTility (SMUT)` - answer `Y` at the prompt to defog and select option 1 (`Install fakemurk/murkmod image to unused partition`) and then enter the exact filename of the image you created earlier. Follow all prompts and wait for the installation to complete (the kernel patch is 512mb and the root patch is 4gb). Then, reboot and handle installation as you would with normal fakemurk. 
 
 ### Old Method (fakemurk > murkmod upgrade)
 
-> ⚠️ In order to use all of the features of murkmod, you **must** enable emergency revert during the installation of fakemurk.
+> [!WARNING]
+> In order to use all of the features of murkmod, you **must** enable emergency revert during the installation of fakemurk.
 
 To install murkmod, simply spawn a root shell (option 1) from mush, and paste in the following command:
 
@@ -22,9 +24,11 @@ bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murk
 
 This command will download and install murkmod to your device. Once the installation is complete, you can start using murkmod by opening mush as usual.
 
-> 📝 Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
+> [!NOTE]
+> Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
 
-> ⚠️ If you get an error about a filesystem being readonly run `fsck -f $(rootdev)` then reboot.
+> [!WARNING]
+> If you get an error about a filesystem being readonly run `fsck -f $(rootdev)` then reboot.
 
 ## Plugin Management
 Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a bunch of new options, but the important ones for this guide are `Install plugins`, `Uninstall plugins` and `Plugins`.
@@ -61,7 +65,8 @@ Menu plugins aren't run as root - all other plugins are. Startup plugins run onc
 
 Make sure that your startup plugin runs quickly - or, at least, as quickly as possible. It'll hold up the boot process until it exits. 
 
-> ⚠️ If your startup plugin tries to use /mnt/stateful_partition, it will fail! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see [`example-plugins/startup/read_file_from_stateful.sh`](https://github.com/rainestorme/murkmod/blob/main/example-plugins/startup/read_file_from_stateful.sh) for an example.
+> [!IMPORTANT]
+> If your startup plugin tries to use /mnt/stateful_partition, it will fail! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see [`example-plugins/startup/read_file_from_stateful.sh`](https://github.com/rainestorme/murkmod/blob/main/example-plugins/startup/read_file_from_stateful.sh) for an example.
 
 ## Notes on USB Boot
 
