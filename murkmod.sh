@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURRENT_MAJOR=5
-CURRENT_MINOR=0
+CURRENT_MINOR=1
 CURRENT_VERSION=0
 
 get_asset() {
@@ -59,16 +59,37 @@ show_logo() {
     echo "        The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION"
 }
 
+lsbval() {
+  local key="$1"
+  local lsbfile="${2:-/etc/lsb-release}"
+
+  if ! echo "${key}" | grep -Eq '^[a-zA-Z0-9_]+$'; then
+    return 1
+  fi
+
+  sed -E -n -e \
+    "/^[[:space:]]*${key}[[:space:]]*=/{
+      s:^[^=]+=[[:space:]]*::
+      s:[[:space:]]+$::
+      p
+    }" "${lsbfile}"
+}
 
 install_patched_files() {
     install "fakemurk-daemon.sh" /sbin/fakemurk-daemon.sh
-    install "chromeos_startup.sh" /sbin/chromeos_startup.sh
+    local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
+    if [ "$milestone" -gt "118" ]; then
+        echo "Detected v118 or higher, using new chromeos_startup"
+        install "chromeos_startup_v118.sh" /sbin/chromeos_startup
+    else
+        install "chromeos_startup.sh" /sbin/chromeos_startup.sh
+    fi
     install "mush.sh" /usr/bin/crosh
     install "pre-startup.conf" /etc/init/pre-startup.conf
     install "cr50-update.conf" /etc/init/cr50-update.conf
     install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
     install "image_patcher.sh" /sbin/image_patcher.sh
-    chmod 777 /sbin/fakemurk-daemon.sh /sbin/chromeos_startup.sh /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
+    chmod 777 /sbin/fakemurk-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
 }
 
 create_stateful_files() {
@@ -120,22 +141,6 @@ set_sudo_perms() {
     else
         echo "Looks like sudo permissions are already set correctly."
     fi
-}
-
-lsbval() {
-  local key="$1"
-  local lsbfile="${2:-/etc/lsb-release}"
-
-  if ! echo "${key}" | grep -Eq '^[a-zA-Z0-9_]+$'; then
-    return 1
-  fi
-
-  sed -E -n -e \
-    "/^[[:space:]]*${key}[[:space:]]*=/{
-      s:^[^=]+=[[:space:]]*::
-      s:[[:space:]]+$::
-      p
-    }" "${lsbfile}"
 }
 
 collect_analytics() {

@@ -807,7 +807,22 @@ patch_root() {
     drop_image_patcher
 }
 
+# https://chromium.googlesource.com/chromiumos/docs/+/main/lsb-release.md
+lsbval() {
+  local key="$1"
+  local lsbfile="${2:-/etc/lsb-release}"
 
+  if ! echo "${key}" | grep -Eq '^[a-zA-Z0-9_]+$'; then
+    return 1
+  fi
+
+  sed -E -n -e \
+    "/^[[:space:]]*${key}[[:space:]]*=/{
+      s:^[^=]+=[[:space:]]*::
+      s:[[:space:]]+$::
+      p
+    }" "${lsbfile}"
+}
 
 get_asset() {
     curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
@@ -828,8 +843,16 @@ install() {
 
 murkmod_patch_root() {
     echo "Murkmod-ing root"
+    # check if lsb-release CHROMEOS_RELEASE_CHROME_MILESTONE is 118 or higher
+    local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
+    if [ "$milestone" -gt "118" ]; then
+        echo "Detected v118 or higher, using new chromeos_startup"
+        move_bin "$ROOT/sbin/chromeos_startup"
+        install "chromeos_startup_v118.sh" $ROOT/sbin/chromeos_startup
+    else
+        install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
+    fi
     install "fakemurk-daemon.sh" $ROOT/sbin/fakemurk-daemon.sh
-    install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
     install "mush.sh" $ROOT/usr/bin/crosh
     install "pre-startup.conf" $ROOT/etc/init/pre-startup.conf
     install "cr50-update.conf" $ROOT/etc/init/cr50-update.conf
@@ -845,7 +868,7 @@ main() {
   echo $SSD_UTIL
 
   if [ -z $1 ] || [ ! -f $1 ]; then
-    echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image. You thought you were smart, huh? YOU THOUGHT YOU WERE FUCKING SMART, KIDDO? TRYING TO POKE AROUND INSIDE OF INTERNAL FILES. FUCKING IDIOT!"
+    echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image."
     exit
   fi
   local bin=$1

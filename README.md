@@ -1,6 +1,6 @@
 # murkmod
 
-murkmod is a utility script that patches fakemurk and mush to include additional useful utilities, with the most prominent being a plugin manager. At this point, it's basically a continuation of what fakemurk tried to be, since MercuryWorkshop ghosted me after asking me to make a PR. 
+murkmod is a utility script that patches fakemurk and mush to include additional useful utilities, with the most prominent being a plugin manager. At this point, it's basically a continuation of what fakemurk tried to be, since MercuryWorkshop ghosted me after asking me to make a PR.
 
 ## Installation
 
@@ -9,12 +9,15 @@ murkmod is a utility script that patches fakemurk and mush to include additional
 > [!WARNING]
 > You should have hardware write protect disabled before following the instructions below. On most Chromebooks with RMA shims leaked, disconnecting the battery from the motherboard accomplishes that task. However, some Chromebooks may require additional steps and you should consult [MrChromeBox's excellent guide](https://mrchromebox.tech/#devices) to determine your WP type.
 
-Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image with a murkmod image built with the included image patcher script - instructions are in the repo. Once you've done this, flash the image to a drive. Pop off the back of your Chromebook and remove the battery. Now, boot into the flashed USB drive as you would with normal SH1mmer. From there, select `Utiliites` > `Unblock Devmode`. Head back and select `Payloads` > `SH1mmer Multiboot UTility (SMUT)` - answer `Y` at the prompt to defog and select option 1 (`Install fakemurk/murkmod image to unused partition`) and then enter the exact filename of the image you created earlier. Follow all prompts and wait for the installation to complete (the kernel patch is 512mb and the root patch is 4gb). Then, reboot and handle installation as you would with normal fakemurk. 
+Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image with a murkmod image built with the image_patcher.sh script on a Chromebook from SH1mmer - instructions are in the repo. Once you've done this, flash the image to a drive. Pop off the back of your Chromebook and remove the battery. Now, boot into the flashed USB drive as you would with normal SH1mmer. From there, select `Utiliites` > `Unblock Devmode`. Head back and select `Payloads` > `SH1mmer Multiboot UTility (SMUT)` - answer `Y` at the prompt to defog and select option 1 (`Install fakemurk/murkmod image to unused partition`) and then enter the exact filename of the image you created earlier. Follow all prompts and wait for the installation to complete (the kernel patch is 512mb and the root patch is 4gb). Then, reboot and handle installation as you would with normal fakemurk. 
 
 ### Old Method (fakemurk > murkmod upgrade)
 
 > [!WARNING]
 > In order to use all of the features of murkmod, you **must** enable emergency revert during the installation of fakemurk.
+
+> [!IMPORTANT]
+> This method will only work with ChromeOS v105. If you wish to use a newer version (v118+ is supported), you must use the new method above.
 
 To install murkmod, simply spawn a root shell (option 1) from mush, and paste in the following command:
 
