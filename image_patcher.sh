@@ -843,10 +843,10 @@ install() {
 
 murkmod_patch_root() {
     echo "Murkmod-ing root"
-    # check if lsb-release CHROMEOS_RELEASE_CHROME_MILESTONE is 118 or higher
+    # check if lsb-release CHROMEOS_RELEASE_CHROME_MILESTONE is 118 for compat
     local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
-    if [ "$milestone" -gt "118" ]; then
-        echo "Detected v118 or higher, using new chromeos_startup"
+    if [ "$milestone" -eq "118" ]; then
+        echo "Detected v118, using new chromeos_startup"
         move_bin "$ROOT/sbin/chromeos_startup"
         install "chromeos_startup_v118.sh" $ROOT/sbin/chromeos_startup
     else
