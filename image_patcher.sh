@@ -859,6 +859,7 @@ murkmod_patch_root() {
     install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
     install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
     chmod 777 $ROOT/sbin/fakemurk-daemon.sh $ROOT/sbin/chromeos_startup.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh
+    chmod 755 $ROOT/sbin/chromeos_startup # whoops
 }
 
 main() {
