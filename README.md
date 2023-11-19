@@ -28,7 +28,7 @@ This command will download and install murkmod to your device. Once the installa
 
 > [!NOTE]
 > Installing (or updating) fakemurk will set the password for the `chronos` user to `murkmod`.
-> 
+
 > [!WARNING]
 > If you get an error about a filesystem being readonly run `fsck -f $(rootdev)` then reboot.
 
