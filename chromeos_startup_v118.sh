@@ -5,7 +5,7 @@ exec 2>/fakemurk_startup_err
 chmod 644 /fakemurk_startup_log /fakemurk_startup_err
 
 run_plugin() {
-    bash "$1"
+    bash "$1" # i know this seems redundant, but this is just here incase something changes in the future
 }
 
 runjob() {
@@ -86,8 +86,12 @@ else
     stateful_dev=${DST}p1
     first_mount_dir=$(mktemp -d)
     mount "$stateful_dev" "$first_mount_dir"
-    echo "Mounted stateful on $first_mount_dir, looking for startup plugins..."
+    echo "Mounted stateful on $first_mount_dir"
+    
+    echo "Unfucking devmode..."
+    touch $first_mount_dir/.developer_mode
 
+    echo "Looking for plugins..."
     plugin_dir="$first_mount_dir/murkmod/plugins"
     temp_dir=$(mktemp -d)
 

@@ -75,8 +75,11 @@ csys() {
         crossystem "$@"
     elif test -f "$ROOT/usr/bin/crossystem.old"; then
         "$ROOT/usr/bin/crossystem.old" "$@"
-    else
+    elif test -f "$ROOT/usr/bin/crossystem"; then
         "$ROOT/usr/bin/crossystem" "$@"
+    else
+        echo "crossystem not found">&2
+        echo
     fi
 }
 
