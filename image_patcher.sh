@@ -875,8 +875,19 @@ main() {
     echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image."
     exit
   fi
-  local bin=$1
+  if [ -z $2 ]; then
+    echo "Not using a custom bootsplash."
+    local bootsplash=0
+  elif [ ! -f $2 ]; then
+    echo "file $2 not found for custom bootsplash"
+    local bootsplash=0
+  else
+    echo "Using custom bootsplash $2"
+    local bootsplash=$2
+  fi
 
+  local bin=$1
+  
   echo "Creating loop device..."
   local loop=$(losetup -f)
   losetup -P "$loop" "$bin"
@@ -896,6 +907,13 @@ main() {
   ROOT=/tmp/mnt
   patch_root
   murkmod_patch_root
+
+  if [ $bootsplash -ne 0 ]; then
+    echo "Adding custom bootsplash..."
+    for i in $(seq -f "%05g" 0 30) do
+      cp -v $bootsplash $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
+    done
+  fi
 
   sleep 2
   sync
