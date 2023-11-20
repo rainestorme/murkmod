@@ -591,7 +591,7 @@ attempt_backup_update(){
         * ) do_backup=true ;;
     esac
 
-    echo "Updating to ${remote_version}. THIS CAN POSSIBLY DAMAGE YOUR EMERGENCY BACKUP AND IT WILL REQUIRE RE-ENROLLING (WAITING THROUGH ENROLLMENT PROCESS) UPON REVERTING! Press enter to confirm, Ctrl+C to cancel."
+    echo "Updating to ${remote_version}. THIS CAN POSSIBLY DAMAGE YOUR EMERGENCY BACKUP! Press enter to confirm, Ctrl+C to cancel."
     read -r
 
     echo "Finding correct partitions..."
