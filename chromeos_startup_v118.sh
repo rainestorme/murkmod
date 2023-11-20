@@ -32,7 +32,16 @@ fi
 
 # note that this will lead to confusing behaviour, since it will appear as if it crashed as a result of fakemurk
 
-# startup plugins are also launched here, for low-level control over 
+# startup plugins are also launched here, for low(er)-level control over the system
+
+# funny boot messages
+echo "Oh fuck." >/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
+echo "ChromeOS detected developer mode and is trying to disable it to" >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
+echo "comply with FWMP. This is most likely a bug and should be reported to" >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
+echo "the murkmod GitHub issues page." >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
+echo "i sure hope you did that on purpose (powerwashing system)" >/usr/share/chromeos-assets/text/boot_messages/en/power_wash.txt
+echo "oops UwU i did a little fucky wucky and your system is trying to repair" >/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
+echo "itself~ sorry OwO" >>/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
 
 if [ ! -f /sshd_staged ]; then
     # thanks rory! <3
