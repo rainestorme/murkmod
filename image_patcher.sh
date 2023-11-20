@@ -910,7 +910,7 @@ main() {
 
   if [ "$bootsplash" != "0" ]; then
     echo "Adding custom bootsplash..."
-    for i in $(seq -f "%05g" 0 30); do
+    for i in $(seq -f "%02g" 0 30); do
       cp -v $bootsplash $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
     done
   fi
