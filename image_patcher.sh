@@ -877,10 +877,10 @@ main() {
   fi
   if [ -z $2 ]; then
     echo "Not using a custom bootsplash."
-    local bootsplash=0
+    local bootsplash="0"
   elif [ ! -f $2 ]; then
     echo "file $2 not found for custom bootsplash"
-    local bootsplash=0
+    local bootsplash="0"
   else
     echo "Using custom bootsplash $2"
     local bootsplash=$2
@@ -908,7 +908,7 @@ main() {
   patch_root
   murkmod_patch_root
 
-  if [ $bootsplash -ne 0 ]; then
+  if [ "$bootsplash" != "0" ]; then
     echo "Adding custom bootsplash..."
     for i in $(seq -f "%05g" 0 30); do
       cp -v $bootsplash $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
