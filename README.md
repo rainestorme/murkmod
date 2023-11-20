@@ -15,6 +15,7 @@ Create a [SH1mmer-SMUT](https://github.com/cognito-inc-real/sh1mmer-smut) image 
 
 > [!WARNING]
 > In order to use all of the features of murkmod, you **must** enable emergency revert during the installation of fakemurk.
+
 > [!IMPORTANT]
 > This method will only work with ChromeOS v105. If you wish to use a newer version (v118+ is supported), you must use the new method above.
 
