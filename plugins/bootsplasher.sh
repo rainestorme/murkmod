@@ -17,9 +17,9 @@ echo " 1. Set custom static bootsplash"
 echo " 2. Restore murkmod default bootsplash"
 read -p '> ' choice
 
-case $variable in
-    "1" ) set_custom ;;
-    "2" ) restore_murkmod ;;
+case $choice in
+    1 ) set_custom ;;
+    2 ) restore_murkmod ;;
     * ) echo "Invalid choice." ;;
 esac
 
