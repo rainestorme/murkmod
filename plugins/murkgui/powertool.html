@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>murkmod Powertool</title>
+    <style>
+        div.container {
+            position: absolute;
+            top: 12.5%;
+            left: 12.5%;
+            text-align: center;
+            height: 75%;
+            width: 75%;
+            background-color: rgba(0, 0, 0, 0.357);
+            border-radius: 50px;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(310deg, #00ac97, #bb00ce);
+            background-size: 400% 400%;
+
+            -webkit-animation: backgroundgradient 11s ease infinite;
+            -moz-animation: backgroundgradient 11s ease infinite;
+            animation: backgroundgradient 11s ease infinite;
+        }
+
+        @-webkit-keyframes backgroundgradient {
+            0%{background-position:0% 10%}
+            50%{background-position:100% 91%}
+            100%{background-position:0% 10%}
+        }
+        @-moz-keyframes backgroundgradient {
+            0%{background-position:0% 10%}
+            50%{background-position:100% 91%}
+            100%{background-position:0% 10%}
+        }
+        @keyframes backgroundgradient {
+            0%{background-position:0% 10%}
+            50%{background-position:100% 91%}
+            100%{background-position:0% 10%}
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button {
+            border-radius: 10px;
+            padding: 5px;
+            background: linear-gradient(270deg, #220027, #6e0043);
+            background-size: 400% 400%;
+            color: white;
+            -webkit-animation: button 11s ease infinite;
+            -moz-animation: button 11s ease infinite;
+            animation: button 11s ease infinite;
+            border: 1px black solid;
+        }
+
+        @-webkit-keyframes button {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @-moz-keyframes button {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+        @keyframes button {
+            0%{background-position:0% 50%}
+            50%{background-position:100% 50%}
+            100%{background-position:0% 50%}
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="popup">
+        <br>
+        <h1>Powertool</h1>
+        <p>v0.1a</p>
+        <br><br><br><br><br>
+        <p>In order to connect to the running plugin, select the <code>murkgui</code> folder in your Downloads.</p>
+        <button onclick="start()">Open murkgui folder</button>
+    </div>
+
+    <div class="container hidden" id="main">
+        <br>
+        <h1>Powertool</h1>
+        <p>v0.1a</p>
+        <br><br><br><br><br>
+        <label for="fanspeed" id="fanspeedlabel">Fan speed:</label>
+        <input id="fanspeed" type="range" min="0" max="100" value="35" oninput="document.getElementById('fanspeedlabel').innerHTML = 'Fan speed: ' + this.value.toString() + '%';">
+    </div>
+
+    <script>
+        var lastSpeed = 0;
+
+        function generateCommand() {
+            return "exec ectool fanduty " + document.getElementById("fanspeed").value.toString()
+        }
+
+        function start() {
+            document.getElementById("popup").className = "container hidden";
+            document.getElementById("main").className = "container";
+            if ('showDirectoryPicker' in window) {
+                // Function to repeatedly save changes to the file
+                async function saveChangesToFile(fileHandle) {
+                    try {
+                        const writable = await fileHandle.createWritable();
+                        const content = generateCommand();
+                        await writable.write(content);
+                        await writable.close();
+                        console.log('File saved successfully');
+                    } catch (error) {
+                        alert('Error saving file:', error);
+                    }
+                }
+                
+                async function openFile() {
+                    try {
+                        const directoryHandle = await window.showDirectoryPicker();
+                        const fileHandle = await directoryHandle.getFileHandle("up", { mode: 'readwrite' });
+                        setInterval(() => {
+                            if (document.getElementById("fanspeed").value != lastSpeed) {
+                                lastSpeed = document.getElementById("fanspeed").value;
+                                saveChangesToFile(fileHandle);
+                            }
+                        }, 100);
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+                openFile();
+            } else {
+                alert('Filesystem Access API is not supported in this browser.');
+            }
+        }
+    </script>
+</body>
+</html>
