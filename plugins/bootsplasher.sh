@@ -38,7 +38,7 @@ install() {
 
 set_custom() {
   read -p 'Enter filename (downloads folder) > ' bootsplash
-  cp "$bootsplash" /tmp/bootsplash.png
+  cp "/home/chronos/user/Downloads/$bootsplash" /tmp/bootsplash.png
   copy_bootsplash_static
 }
 
