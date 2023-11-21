@@ -13,7 +13,7 @@ doas() {
 copy_bootsplash_static() {
   echo "Copying bootsplash..."
   for i in $(seq -f "%02g" 0 30); do
-    cp /tmp/bootsplash.png /usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
+    cp /tmp/bootsplash.png /usr/share/chromeos-assets/images_100_percent/boot_splash_frame"${i}".png
   done
   rm -f /tmp/bootsplash.png
   echo "Done!"
@@ -38,7 +38,7 @@ install() {
 
 set_custom() {
   read -p 'Enter filename (downloads folder) > ' bootsplash
-  cp $bootsplash /tmp/bootsplash.png
+  cp "$bootsplash" /tmp/bootsplash.png
   copy_bootsplash_static
 }
 
