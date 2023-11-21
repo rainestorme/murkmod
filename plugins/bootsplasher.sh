@@ -15,12 +15,11 @@ echo "Currently, only static boot splashes are supported. Up to 30 frames of ani
 echo "Select an option:"
 echo " 1. Set custom static bootsplash"
 echo " 2. Restore murkmod default bootsplash"
-read -p '> ' choice
-
-case $choice in
-    "1" ) set_custom ;;
-    "2" ) restore_murkmod ;;
-    * ) echo "Invalid choice." ;;
+read -r -p "> (1-2): " choice
+case "$choice" in
+1) set_custom ;;
+2) restore_murkmod ;;
+*) echo && echo "Invalid option, dipshit." && echo ;;
 esac
 
 copy_bootsplash_static() {
