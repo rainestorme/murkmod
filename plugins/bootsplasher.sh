@@ -10,18 +10,6 @@ doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
 }
 
-echo "Make sure your bootsplash is in PNG format!"
-echo "Currently, only static boot splashes are supported. Up to 30 frames of animation (1 second) can be added manually, and through this plugin in the future."
-echo "Select an option:"
-echo " 1. Set custom static bootsplash"
-echo " 2. Restore murkmod default bootsplash"
-read -r -p "> (1-2): " choice
-case "$choice" in
-1) set_custom ;;
-2) restore_murkmod ;;
-*) echo && echo "Invalid option, dipshit." && echo ;;
-esac
-
 copy_bootsplash_static() {
   echo "Copying bootsplash..."
   for i in $(seq -f "%02g" 0 30); do
@@ -59,3 +47,15 @@ restore_murkmod() {
   install "chromeos-bootsplash-v2.png" /tmp/bootsplash.png
   copy_bootsplash_static
 }
+
+echo "Make sure your bootsplash is in PNG format!"
+echo "Currently, only static boot splashes are supported. Up to 30 frames of animation (1 second) can be added manually, and through this plugin in the future."
+echo "Select an option:"
+echo " 1. Set custom static bootsplash"
+echo " 2. Restore murkmod default bootsplash"
+read -r -p "> (1-2): " choice
+case "$choice" in
+1) set_custom ;;
+2) restore_murkmod ;;
+*) echo && echo "Invalid option, dipshit." && echo ;;
+esac
