@@ -18,8 +18,8 @@ echo " 2. Restore murkmod default bootsplash"
 read -p '> ' choice
 
 case $choice in
-    1 ) set_custom ;;
-    2 ) restore_murkmod ;;
+    "1" ) set_custom ;;
+    "2" ) restore_murkmod ;;
     * ) echo "Invalid choice." ;;
 esac
 
