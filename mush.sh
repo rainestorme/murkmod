@@ -141,7 +141,7 @@ EOF
         read -r -p "> (1-24): " choice
         case "$choice" in
         1) runjob doas bash ;;
-        2) runjob doas "cd /home/chronos; su chronos" ;;
+        2) runjob doas "cd /home/chronos; sudo -i -u chronos" ;;
         3) runjob /usr/bin/crosh.old ;;
         4) runjob show_plugins ;;
         5) runjob install_plugins ;;
@@ -676,7 +676,7 @@ attempt_restore_backup_backup() {
 }
 
 attempt_install_chromebrew() {
-    doas 'su chronos -s /bin/bash -c "curl -Lsk git.io/vddgY | bash" && exit' # kinda works now with cros_debug
+    doas 'sudo -i -u chronos curl -Ls git.io/vddgY | bash' # kinda works now with cros_debug
     read -p 'Press enter to exit'
 }
 
