@@ -153,7 +153,7 @@ EOF
         11) runjob hardenableext ;;
         12) echo "Under maintenence" && read -p "Press enter to continue" ;;
         13) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
-        14) runjob install_crouton && touch /mnt/stateful_partition/crouton_installed ;;
+        14) runjob install_crouton ;;
         15) runjob run_crouton ;;
         16) runjob enable_dev_boot_usb ;;
         17) runjob disable_dev_boot_usb ;;
@@ -441,7 +441,8 @@ softdisableext() {
 
 install_crouton() {
     echo "Installing Crouton..."
-    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bullseye" && touch /mnt/stateful_partition/crouton_installed
+    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bullseye"
+    doas "touch /mnt/stateful_partition/crouton_installed"
 }
 
 run_crouton() {
