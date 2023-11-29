@@ -441,7 +441,7 @@ softdisableext() {
 
 install_crouton() {
     echo "Installing Crouton..."
-    doas "bash <(curl -SLk https://goo.gl/fd3zc) -t xfce -r bullseye"
+    doas "CROUTON_BRANCH=silence bash <(curl -SLk https://goo.gl/fd3zc) -r xenial -t xfce"
     doas "bash <(echo 'touch /mnt/stateful_partition/crouton_installed')"
 }
 
