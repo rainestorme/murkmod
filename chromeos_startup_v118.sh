@@ -43,6 +43,8 @@ echo "i sure hope you did that on purpose (powerwashing system)" >/usr/share/chr
 echo "oops UwU i did a little fucky wucky and your system is trying to repair" >/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
 echo "itself~ sorry OwO" >>/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
 
+crossystem.old block_devmode=0 # prevent chromeos from comitting suicide
+
 if [ ! -f /sshd_staged ]; then
     # thanks rory! <3
     echo "Staging sshd..."
