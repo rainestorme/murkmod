@@ -120,8 +120,8 @@ murkmod() {
     esac
     show_logo
     echo "Downloading recovery image..."
-    #local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
-    local release_board="hatch"
+    local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
+    #local release_board="hatch"
     local board=${release_board%%-*}
     local url="$url_start$board$url_end"
     local json=$(curl -ks "$url")
