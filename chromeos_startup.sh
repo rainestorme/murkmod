@@ -35,7 +35,7 @@ fi
 # startup plugins are also launched here, for low-level control over 
 
 # funny boot messages
-echo "Oh fuck." >/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
+echo "Oh fuck - ChromeOS is trying to kill itself." >/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
 echo "ChromeOS detected developer mode and is trying to disable it to" >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
 echo "comply with FWMP. This is most likely a bug and should be reported to" >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
 echo "the murkmod GitHub issues page." >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
