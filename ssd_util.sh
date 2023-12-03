@@ -1,8 +1,6 @@
 #!/bin/sh
 # this is a modified version of make_dev_ssd from cros. it allows the script to be run on any linux device and adds extra utility
 
-
-
 #
 # Copyright (c) 2012 The Chromium OS Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
