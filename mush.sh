@@ -101,7 +101,7 @@ EOF
 }
 
 main() {
-    if [ -f /mnt/statful_partition/murkmod/mush_password ]; then
+    if [ -f /mnt/stateful_partition/murkmod/mush_password ]; then
         locked_main
         return
     fi
@@ -712,7 +712,7 @@ attempt_install_chromebrew() {
 }
 
 attempt_dev_install() {
-    doas 'dev_install' # more complicated logic to come later, i'm still working out all the strange quirks with dev_install on older platform versions
+    doas 'dev_install'
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
