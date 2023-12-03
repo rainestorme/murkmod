@@ -439,22 +439,6 @@ softdisableext() {
     done
 }
 
-install_crouton() {
-    echo "Installing Crouton..."
-    doas "CROUTON_BRANCH=silence bash <(curl -SLk https://goo.gl/fd3zc) -r xenial -t xfce"
-    doas "bash <(echo 'touch /mnt/stateful_partition/crouton_installed')"
-}
-
-run_crouton() {
-    if [ -f /mnt/stateful_partition/crouton_installed ] ; then
-        echo "Use Crtl+Shift+Alt+Forward and Ctrl+Shift+Alt+Back to toggle between desktops"
-        doas "startxfce4"
-    else
-        echo "Install Crouton first!"
-        read -p "Press enter to continue."
-    fi
-}
-
 # https://chromium.googlesource.com/chromiumos/docs/+/master/lsb-release.md
 lsbval() {
   local key="$1"
@@ -470,6 +454,52 @@ lsbval() {
       s:[[:space:]]+$::
       p
     }" "${lsbfile}"
+}
+
+
+install_crouton() {
+    # check if crouuton is already installed. if so, prompt the user to delete their old chroot
+    if [ -f /mnt/stateful_partition/crouton_installed ] ; then
+        read -p "Crouton is already installed. Would you like to delete your old chroot and create a new one? (y/N) " yn
+        case $yn in
+            [yY] ) doas "rm -rf /mnt/stateful_partition/crouton/chroots && rm -f /mnt/stateful_partition/crouton_installed";;
+            [nN] ) return;;
+            * ) return;;
+        esac
+    fi
+    echo "Installing Crouton..."
+    # if this is past v107, then we don't want to use the silence branch - audio is still supported
+    local local_version=$(lsbval GOOGLE_RELEASE)
+    if (( ${local_version%%\.*} > 107 )); then
+        doas "bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+    else
+        # theoretically we could copy or link the includes for cras, but im not entirely sure how to do that
+        # CROUTON_BRANCH=longliveaudiotools supports audio at the versions we're looking at, but it's experimental and tends to be broken
+        # ig we can prompt the user?
+        echo "Your version of ChromeOS is too recent to support the current main branch of Crouton. You can either install Crouton without audio support, or install the experimental audio branch. Which would you like to do?"
+        echo "1. Install without audio support"
+        echo "2. Install with experimental audio support (may be extremely broken)"
+        read -r -p "> (1-2): " choice
+        if [ "$choice" == "1" ]; then
+            doas "CROUTON_BRANCH=silence bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+        elif [ "$choice" == "2" ]; then
+            doas "CROUTON_BRANCH=longliveaudiotools bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+        else
+            echo "Invalid option, defaulting to silence branch"
+            doas "CROUTON_BRANCH=silence bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+        fi
+    fi
+    doas "bash <(echo 'touch /mnt/stateful_partition/crouton_installed')" # idfk about the syntax but it seems to work so im not complaining
+}
+
+run_crouton() {
+    if [ -f /mnt/stateful_partition/crouton_installed ] ; then
+        echo "Use Crtl+Shift+Alt+Forward and Ctrl+Shift+Alt+Back to toggle between desktops"
+        doas "startxfce4"
+    else
+        echo "Install Crouton first!"
+        read -p "Press enter to continue."
+    fi
 }
 
 get_booted_kernnum() {
