@@ -359,7 +359,9 @@ install_plugins() {
             # see if the plugin is already installed - get the filename of the plugin from its download url
             filename=$(echo "${download_urls[$i]}" | rev | cut -d/ -f1 | rev)
             if [ -f "/mnt/stateful_partition/murkmod/plugins/$filename" ]; then
-                printf " (installed)"
+                echo " (installed)"
+            else
+                echo
             fi
         done
 
