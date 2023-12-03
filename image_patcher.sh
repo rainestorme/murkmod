@@ -176,7 +176,7 @@ main() {
   echo $SSD_UTIL
 
   if [ -z $1 ] || [ ! -f $1 ]; then
-    echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image."
+    echo "\"$1\" isn't a real file, dipshit! You need to pass the path to the recovery image. Optional args: <path to custom bootsplash: path to a png> <unfuck stateful: int 0 or 1>"
     exit
   fi
   if [ -z $2 ]; then
@@ -188,6 +188,15 @@ main() {
   else
     echo "Using custom bootsplash $2"
     local bootsplash=$2
+  fi
+  if [ -z $3 ]; then
+    local unfuckstateful="1"
+  else 
+    local unfuckstateful=$3
+  fi
+
+  if [ "$unfuckstateful" == "1" ]; then
+    echo "Will unfuck stateful partition upon boot."  
   fi
 
   local bin=$1
@@ -225,6 +234,11 @@ main() {
     done
     cp /tmp/bootsplash.png $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png
     rm /tmp/bootsplash.png
+  fi
+
+  if [ "$unfuckstateful" == "0" ]; then
+    touch $ROOT/stateful_unfucked
+    chmod 777 $ROOT/stateful_unfucked
   fi
 
   sleep 2

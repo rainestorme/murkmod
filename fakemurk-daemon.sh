@@ -162,7 +162,7 @@ EOF
     echo "Waiting for boot on emergency restore (just in case)"
     sleep 60
     echo "Checking for restore flag..."
-    if [ -f /restore-emergency-backup ]; then
+    if [ -f /mnt/stateful_partition/restore-emergency-backup ]; then
         echo "Restore flag found!"
         echo "Looking for backup files..."
         dst=/dev/$(get_largest_nvme_namespace)

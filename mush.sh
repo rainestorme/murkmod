@@ -652,8 +652,8 @@ attempt_chromeos_update(){
         doas dd if=$rootdev of=/mnt/stateful_partition/murkmod/root_backup.img bs=4M status=progress
 
         echo "Creating restore flag..."
-        doas touch /restore-emergency-backup
-        doas chmod 777 /restore-emergency-backup
+        doas touch /mnt/stateful_partition/restore-emergency-backup
+        doas chmod 777 /mnt/stateful_partition/restore-emergency-backup
 
         echo "Backups complete, actually updating now..."
 
