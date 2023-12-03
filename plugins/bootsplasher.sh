@@ -13,8 +13,9 @@ doas() {
 copy_bootsplash_static() {
   echo "Copying bootsplash..."
   for i in $(seq -f "%02g" 0 30); do
-    doas 'cp /tmp/bootsplash.png /usr/share/chromeos-assets/images_100_percent/boot_splash_frame"${i}".png'
+    doas 'rm /usr/share/chromeos-assets/images_100_percent/boot_splash_frame"${i}".png'
   done
+  doas 'cp /tmp/bootsplash.png /usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png'
   rm -f /tmp/bootsplash.png
   echo "Done!"
 }
