@@ -12,11 +12,17 @@ doas() {
 
 copy_bootsplash_static() {
   echo "Copying bootsplash..."
-  for i in $(seq -f "%02g" 0 30); do
-    doas 'rm /usr/share/chromeos-assets/images_100_percent/boot_splash_frame"${i}".png'
-  done
+  doas 'rm /usr/share/chromeos-assets/images_100_percent/boot_splash_frame*.png'
   doas 'cp /tmp/bootsplash.png /usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png'
   rm -f /tmp/bootsplash.png
+  echo "Done!"
+}
+
+copy_bootsplash_animated() {
+  echo "Copying bootsplash..."
+  doas 'rm /usr/share/chromeos-assets/images_100_percent/boot_splash_frame*.png'
+  doas 'cp /tmp/bootsplash/*.png /usr/share/chromeos-assets/images_100_percent/'
+  rm -rf /tmp/bootsplash
   echo "Done!"
 }
 
@@ -43,6 +49,12 @@ set_custom() {
   copy_bootsplash_static
 }
 
+set_custom_animated() {
+  read -p 'Enter folder name (downloads folder) > ' bootsplash
+  cp -r "/home/chronos/user/Downloads/$bootsplash" /tmp/bootsplash
+  copy_bootsplash_animated
+}
+
 restore_murkmod() {
   echo "Grabbing murkmod bootsplash..."
   install "chromeos-bootsplash-v2.png" /tmp/bootsplash.png
@@ -50,13 +62,18 @@ restore_murkmod() {
 }
 
 echo "Make sure your bootsplash is in PNG format!"
-echo "Currently, only static boot splashes are supported. Up to 30 frames of animation (1 second) can be added manually, and through this plugin in the future."
+echo "Animated bootsplashes must be in a folder named 'bootsplash' in your downloads folder!"
 echo "Select an option:"
 echo " 1. Set custom static bootsplash"
-echo " 2. Restore murkmod default bootsplash"
+echo " 2. Set custom animated bootsplash"
+echo " 3. Restore murkmod default bootsplash"
 read -r -p "> (1-2): " choice
 case "$choice" in
 1) set_custom ;;
-2) restore_murkmod ;;
+2) set_custom_animated ;;
+3) restore_murkmod ;;
 *) echo && echo "Invalid option, dipshit." && echo ;;
 esac
+
+sync
+exit
