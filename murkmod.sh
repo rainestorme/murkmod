@@ -78,8 +78,8 @@ lsbval() {
 install_patched_files() {
     install "fakemurk-daemon.sh" /sbin/fakemurk-daemon.sh
     local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
-    if [ "$milestone" -gt "118" ]; then
-        echo "Detected v118 or higher, using new chromeos_startup"
+    if [ "$milestone" -gt "116" ]; then
+        echo "Detected v116 or higher, using new chromeos_startup"
         install "chromeos_startup_v118.sh" /sbin/chromeos_startup
     else
         install "chromeos_startup.sh" /sbin/chromeos_startup.sh
