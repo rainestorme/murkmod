@@ -242,9 +242,7 @@ do_updates() {
     exit
 }
 
-show_plugins() {
-    clear
-    
+show_plugins() {    
     plugins_dir="/mnt/stateful_partition/murkmod/plugins"
     plugin_files=()
 
@@ -260,6 +258,11 @@ show_plugins() {
         PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_script" | cut -d= -f2-)
         PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_script" | cut -d= -f2-)
         PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_script" | cut -d= -f2-)
+        # remove quotes from around each PLUGIN_* variable
+        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
+        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
+        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
+        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
         if grep -q "menu_plugin" "$plugin_script"; then
             plugin_info+=("$PLUGIN_FUNCTION (provided by $PLUGIN_NAME)")
         fi
@@ -299,28 +302,90 @@ show_plugins() {
 
 
 install_plugins() {
-  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
+    clear
+    echo "Fetching plugin information..."
+    json=$(curl -s "https://api.github.com/repos/rainestorme/murkmod/contents/plugins")
+    file_contents=()
+    download_urls=()    
+    for entry in $(echo "$json" | jq -c '.[]'); do
+        # Check if the entry is a file (type equals "file")
+        if [[ $(echo "$entry" | jq -r '.type') == "file" ]]; then
+            # Get the download URL for the file
+            download_url=$(echo "$entry" | jq -r '.download_url')
+            
+            # Fetch the content of the file and append it to the array
+            file_contents+=("$(curl -s "$download_url")")
+            download_urls+=("$download_url")
+        fi
+    done
+    
+    plugin_info=()
+    for content in "${file_contents[@]}"; do
+        # Create a temporary file to hold the content
+        tmp_file=$(mktemp)
+        echo "$content" > "$tmp_file"
+        
+        # Extract information from the file
+        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=.*' "$tmp_file" | cut -d= -f2-)
+        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=.*' "$tmp_file" | cut -d= -f2-)
+        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' "$tmp_file" | cut -d= -f2-)
+        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' "$tmp_file" | cut -d= -f2-)
+        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' "$tmp_file" | cut -d= -f2-)
+        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
+        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
+        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
+        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
+        
+        # Add information to the plugin_info array
+        plugin_info+=(" $PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR) \n       $PLUGIN_DESCRIPTION")
 
-  echo "Find a plugin you want to install here: "
-  echo "  https://github.com/rainestorme/murkmod/tree/main/plugins"
-  echo "Enter the name of a plugin (including the .sh) to install it (or q to quit):"
-  read -r plugin_name
+        
+        # Remove the temporary file
+        rm "$tmp_file"
+    done
+    
+    clear
+    echo "Available plugins (press q to exit):"
+    selected_option=0
 
-  while [[ $plugin_name != "q" ]]; do
-    local plugin_url="$raw_url/$plugin_name"
-    local plugin_info=$(curl -s $plugin_url)
+    while true; do
+        for i in "${!plugin_info[@]}"; do
+            if [ $i -eq $selected_option ]; then
+                printf " -> "
+            else
+                printf "    "
+            fi
+            printf "${plugin_info[$i]}"
+            # see if the plugin is already installed - get the filename of the plugin from its download url
+            filename=$(echo "${download_urls[$i]}" | rev | cut -d/ -f1 | rev)
+            if [ -f "/mnt/stateful_partition/murkmod/plugins/$filename" ]; then
+                printf " (installed)"
+            fi
+        done
 
-    if [[ $plugin_info == *"Not Found"* ]]; then
-      echo "Plugin not found"
-    else      
-      echo "Installing..."
-      doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O && popd" > /dev/null
-      echo "Installed $plugin_name"
-    fi
+        # Read a single character from the user
+        read -s -n 1 key
 
-    echo "Enter the name of a plugin (including the .sh) to install (or q to quit):"
-    read -r plugin_name
-  done
+        # Check the pressed key and update the selected option
+        case "$key" in
+            "q") break ;;  # Exit the loop if the user presses 'q'
+            "A") ((selected_option--)) ;;  # Arrow key up
+            "B") ((selected_option++)) ;;  # Arrow key down
+            "") clear
+                echo "Using URL: ${download_urls[$selected_option]}"
+                echo "Installing plugin..."
+                doas "pushd /mnt/stateful_partition/murkmod/plugins && curl ${download_urls[$selected_option]} -O && popd" > /dev/null
+                echo "Done!"
+                ;;
+        esac
+        # Ensure the selected option stays within bounds
+        ((selected_option = selected_option < 0 ? 0 : selected_option))
+        ((selected_option = selected_option >= ${#plugin_info[@]} ? ${#plugin_info[@]} - 1 : selected_option))
+
+        # Clear the screen for the next iteration
+        clear
+        echo "Available plugins (press q to exit):"
+    done
 }
 
 
@@ -342,11 +407,16 @@ uninstall_plugins() {
         PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' "$plugin_script" | cut -d= -f2-)
         PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' "$plugin_script" | cut -d= -f2-)
         PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
+        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
+        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
+        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
         plugin_info+=("$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)")
     done
 
     if [ ${#plugin_info[@]} -eq 0 ]; then
-        echo "No plugins installed. Select "
+        echo "No plugins installed."
+        read -r -p "Press enter to continue." throwaway
         return
     fi
 
@@ -376,6 +446,11 @@ uninstall_plugins() {
         PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_file" | cut -d= -f2-)
         PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_file" | cut -d= -f2-)
         PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_file" | cut -d= -f2-)
+        # remove quotes
+        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
+        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
+        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
+        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
 
         plugin_name="$PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR)"
 
