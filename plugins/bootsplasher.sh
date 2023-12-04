@@ -6,6 +6,12 @@ PLUGIN_DESCRIPTION="Simple plugin to set a custom boot splash from the user's do
 PLUGIN_AUTHOR="rainestorme"
 PLUGIN_VERSION=1
 
+
+# to create a bootsplash tar.gz:
+# yt-dlp https://www.youtube.com/watch?v=Fnz9ljn1cwE -f mp4
+# ffmpeg -i <video>.mp4 -vf "fps=25" bootsplash/boot_splash_frame%03d.png
+# tar -czvf bootsplash.tar.gz bootsplash/
+
 doas() {
     ssh -t -p 1337 -i /rootkey -oStrictHostKeyChecking=no root@127.0.0.1 "$@"
 }
@@ -61,17 +67,39 @@ restore_murkmod() {
   copy_bootsplash_static
 }
 
+choose_bootsplash() {
+  echo "Select a bootsplash:"
+  echo " 1. Pip-boy"
+  echo " 2. Valve Intro"
+  echo " 3. PS2 Startup"
+  echo " 4. Xbox Startup"
+  echo " 5. Gamecube Startup"
+  read -r -p "> (1-5): " choice
+  case "$choice" in
+  1) install "plugins/bootsplashes/pipboy.tar.gz" /tmp/bootsplash.tar.gz ;;
+  2) install "plugins/bootsplashes/valve.tar.gz" /tmp/bootsplash.tar.gz ;;
+  3) install "plugins/bootsplashes/ps2.tar.gz" /tmp/bootsplash.tar.gz ;;
+  4) install "plugins/bootsplashes/xbox.tar.gz" /tmp/bootsplash.tar.gz ;;
+  5) install "plugins/bootsplashes/gamecube.tar.gz" /tmp/bootsplash.tar.gz ;;
+  *) echo && echo "Invalid option, dipshit." && echo ;;
+  esac
+  tar -xzf /tmp/bootsplash.tar.gz -C /tmp/
+  copy_bootsplash_animated
+}
+
 echo "Make sure your bootsplash is in PNG format!"
 echo "Animated bootsplashes must be in a folder named 'bootsplash' in your downloads folder!"
 echo "Select an option:"
 echo " 1. Set custom static bootsplash"
 echo " 2. Set custom animated bootsplash"
 echo " 3. Restore murkmod default bootsplash"
-read -r -p "> (1-2): " choice
+echo " 4. Choose from pre-made bootsplashes"
+read -r -p "> (1-4): " choice
 case "$choice" in
 1) set_custom ;;
 2) set_custom_animated ;;
 3) restore_murkmod ;;
+4) choose_bootsplash ;;
 *) echo && echo "Invalid option, dipshit." && echo ;;
 esac
 
