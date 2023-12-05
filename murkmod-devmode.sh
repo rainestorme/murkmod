@@ -82,17 +82,10 @@ opposite_num() {
 
 defog() {
     echo "Defogging..."
-    vpd -i RW_VPD -s block_devmode=0
-    crossystem block_devmode=0 > /dev/null
-    res=$(cryptohome --action=get_firmware_management_parameters 2>&1)
-    if [ $? -eq 0 ] && [[ ! $(echo "$res" | grep "Unknown action") ]]; then
-        tpm_manager_client take_ownership
-        # sleeps no longer needed
-        cryptohome --action=remove_firmware_management_parameters
-    fi
     /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
     crossystem block_devmode=0
-    vpd -i RW_VPD block_devmode=0
+    vpd -i RW_VPD -s block_devmode=0
+    vpd -i RW_VPD -s check_enrollment=1
 }
 
 
@@ -178,6 +171,7 @@ n
 EOF
     emerge unzip > /dev/null
 
+    mkdir -p /usr/local/tmp
     pushd /mnt/stateful_partition
         set -e
         echo "Downloading recovery image from '$FINAL_URL'..."
@@ -187,15 +181,17 @@ EOF
         rm recovery.zip
         FILENAME=$(find . -maxdepth 2 -name "chromeos_*.bin") # 2 incase the zip format changes
         echo "Found recovery image from archive at $FILENAME"
-        echo "Fetching latest image_patcher.sh..."
-        install "image_patcher.sh" ./image_patcher.sh
-        chmod 777 ./image_patcher.sh
-        echo "Installing ssd_util.sh..."
-        mkdir -p ./lib
-        install "ssd_util.sh" ./lib/ssd_util.sh
-        chmod 777 ./lib/ssd_util.sh
+        pushd /usr/local/tmp # /usr/local is mounted as exec, so we can run scripts from here
+            echo "Fetching latest image_patcher.sh..."
+            install "image_patcher.sh" ./image_patcher.sh
+            chmod 777 ./image_patcher.sh
+            echo "Installing ssd_util.sh..."
+            mkdir -p ./lib
+            install "ssd_util.sh" ./lib/ssd_util.sh
+            chmod 777 ./lib/ssd_util.sh
+        popd
         echo "Invoking image_patcher.sh..."
-        bash image_patcher.sh "$FILENAME"
+        bash /usr/local/tmp/image_patcher.sh "$FILENAME"
         echo "Patching complete. Determining target partitions..."
         local dst=/dev/$(get_largest_nvme_namespace)
         if [[ $dst == /dev/sd* ]]; then
