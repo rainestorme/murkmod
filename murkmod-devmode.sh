@@ -171,12 +171,12 @@ murkmod() {
         exit
     fi
 
-    echo "Installing unzip..."
-    dev_install --reinstall <<EOF
+    echo "Installing unzip (this may take up to 2 minutes)..."
+    dev_install --reinstall <<EOF > /dev/null
 y
 n
 EOF
-    emerge unzip
+    emerge unzip > /dev/null
 
     pushd /mnt/stateful_partition
         set -e
