@@ -171,7 +171,15 @@ murkmod() {
         exit
     fi
 
+    echo "Installing unzip..."
+    dev_install --reinstall <<EOF
+y
+n
+EOF
+    emerge unzip
+
     pushd /home/chronos/user/Downloads
+        set -e
         echo "Downloading recovery image from '$FINAL_URL'..."
         curl --progress-bar -k "$FINAL_URL" -o recovery.zip
         echo "Unzipping image..."
@@ -183,7 +191,7 @@ murkmod() {
         install "image_patcher.sh" ./image_patcher.sh
         chmod 777 ./image_patcher.sh
         echo "Invoking image_patcher.sh..."
-        ./image_patcher.sh "$FILENAME"
+        bash image_patcher.sh "$FILENAME"
         echo "Patching complete. Determining target partitions..."
         local dst=/dev/$(get_largest_nvme_namespace)
         if [[ $dst == /dev/sd* ]]; then
