@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURRENT_MAJOR=0
-CURRENT_MINOR=0
+CURRENT_MINOR=1
 CURRENT_VERSION=1
 show_logo() {
     clear
