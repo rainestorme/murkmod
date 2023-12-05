@@ -568,9 +568,9 @@ install_crouton() {
         esac
     fi
     echo "Installing Crouton..."
-    # if this is past v107, then we don't want to use the silence branch - audio is still supported
+    # if this is before v107, then we don't want to use the silence branch - audio is still supported
     local local_version=$(lsbval GOOGLE_RELEASE)
-    if (( ${local_version%%\.*} > 107 )); then
+    if (( ${local_version%%\.*} <= 107 )); then
         doas "bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
     else
         # theoretically we could copy or link the includes for cras, but im not entirely sure how to do that
