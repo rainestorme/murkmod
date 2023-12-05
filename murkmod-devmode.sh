@@ -2,7 +2,7 @@
 
 CURRENT_MAJOR=0
 CURRENT_MINOR=1
-CURRENT_VERSION=1
+CURRENT_VERSION=2
 show_logo() {
     clear
     echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
@@ -178,7 +178,7 @@ n
 EOF
     emerge unzip
 
-    pushd /home/chronos/user/Downloads
+    pushd /mnt/stateful_partition
         set -e
         echo "Downloading recovery image from '$FINAL_URL'..."
         curl --progress-bar -k "$FINAL_URL" -o recovery.zip
