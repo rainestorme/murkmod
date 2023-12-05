@@ -185,7 +185,7 @@ EOF
         echo "Unzipping image..."
         unzip -o recovery.zip
         rm recovery.zip
-        FILENAME=$(find . -name "chromeos_*.bin -maxdepth 2") # 2 incase the zip format changes
+        FILENAME=$(find . -maxdepth 2 -name "chromeos_*.bin") # 2 incase the zip format changes
         echo "Found recovery image from archive at $FILENAME"
         echo "Fetching latest image_patcher.sh..."
         install "image_patcher.sh" ./image_patcher.sh
