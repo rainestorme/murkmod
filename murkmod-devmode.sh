@@ -191,8 +191,9 @@ EOF
         install "image_patcher.sh" ./image_patcher.sh
         chmod 777 ./image_patcher.sh
         echo "Installing ssd_util.sh..."
-        install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
-        chmod 777 /usr/share/vboot/bin/ssd_util.sh
+        mkdir -p ./lib
+        install "ssd_util.sh" ./lib/ssd_util.sh
+        chmod 777 ./lib/ssd_util.sh
         echo "Invoking image_patcher.sh..."
         bash image_patcher.sh "$FILENAME"
         echo "Patching complete. Determining target partitions..."
