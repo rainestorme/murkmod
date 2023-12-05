@@ -67,6 +67,13 @@ restore_murkmod() {
   copy_bootsplash_static
 }
 
+get_bootsplash() {
+  echo "Installing bootsplash $1 to $2"
+  pushd /tmp/
+    curl -Lk https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/bootsplashes/$1 -o $2
+  popd
+}
+
 choose_bootsplash() {
   echo "Select a bootsplash:"
   echo " 1. Pip-boy"
@@ -76,11 +83,11 @@ choose_bootsplash() {
   echo " 5. Gamecube Startup"
   read -r -p "> (1-5): " choice
   case "$choice" in
-  1) install "plugins/bootsplashes/pipboy.tar.gz" /tmp/bootsplash.tar.gz ;;
-  2) install "plugins/bootsplashes/valve.tar.gz" /tmp/bootsplash.tar.gz ;;
-  3) install "plugins/bootsplashes/ps2.tar.gz" /tmp/bootsplash.tar.gz ;;
-  4) install "plugins/bootsplashes/xbox.tar.gz" /tmp/bootsplash.tar.gz ;;
-  5) install "plugins/bootsplashes/gamecube.tar.gz" /tmp/bootsplash.tar.gz ;;
+  1) get_bootsplash "pipboy.tar.gz" /tmp/bootsplash.tar.gz ;;
+  2) get_bootsplash "valve.tar.gz" /tmp/bootsplash.tar.gz ;;
+  3) get_bootsplash "ps2.tar.gz" /tmp/bootsplash.tar.gz ;;
+  4) get_bootsplash "xbox.tar.gz" /tmp/bootsplash.tar.gz ;;
+  5) get_bootsplash "gamecube.tar.gz" /tmp/bootsplash.tar.gz ;;
   *) echo && echo "Invalid option, dipshit." && echo ;;
   esac
   tar -xzf /tmp/bootsplash.tar.gz -C /tmp/
