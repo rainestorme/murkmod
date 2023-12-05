@@ -82,7 +82,8 @@ opposite_num() {
 
 defog() {
     echo "Defogging..."
-    /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
+    futility gbb --set --flash --flags=0x8091 # we use futility here instead of the commented out command below because we expect newer chromeos versions and don't want to wait 30 seconds
+    # /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
     crossystem block_devmode=0
     vpd -i RW_VPD -s block_devmode=0
     vpd -i RW_VPD -s check_enrollment=1
