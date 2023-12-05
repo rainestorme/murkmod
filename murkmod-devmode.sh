@@ -182,13 +182,16 @@ EOF
         FILENAME=$(find . -maxdepth 2 -name "chromeos_*.bin") # 2 incase the zip format changes
         echo "Found recovery image from archive at $FILENAME"
         pushd /usr/local/tmp # /usr/local is mounted as exec, so we can run scripts from here
-            echo "Fetching latest image_patcher.sh..."
+            echo "Installing image_patcher.sh..."
             install "image_patcher.sh" ./image_patcher.sh
             chmod 777 ./image_patcher.sh
             echo "Installing ssd_util.sh..."
             mkdir -p ./lib
             install "ssd_util.sh" ./lib/ssd_util.sh
             chmod 777 ./lib/ssd_util.sh
+            echo "Installing common_minimal.sh..."
+            install "common_minimal.sh" ./lib/common_minimal.sh
+            chmod 777 ./lib/common_minimal.sh
         popd
         echo "Invoking image_patcher.sh..."
         bash /usr/local/tmp/image_patcher.sh "$FILENAME"
@@ -228,7 +231,6 @@ EOF
         cgpt add "$dst" -i "$tgt_kern" -P 1
         echo "Defogging... (if write-protect is disabled, this will set GBB flags to 0x8091)"
         defog
-        vpd -i RW_VPD -s check_enrollment=1 # for fakemurk this stays on
         echo "Cleaning up..."
         losetup -d "$loop"
         rm -f "$FILENAME"
