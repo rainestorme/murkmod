@@ -211,5 +211,6 @@ EOF
     ARGS="--frame-interval 25"
     BOOT_IMAGES=/usr/share/chromeos-assets/images_100_percent/boot_splash_frame*.png
     /sbin/frecon --clear "${BACKGROUND}" ${ARGS} ${BOOT_IMAGES}
-    touch 
+    touch /bootsplash-complete
+    echo "Bootsplash complete."
 } &
