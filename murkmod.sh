@@ -1,11 +1,17 @@
 #!/bin/bash
 
 CURRENT_MAJOR=5
-CURRENT_MINOR=3
+CURRENT_MINOR=4
 CURRENT_VERSION=0
 
+if [[ -z "${MURKMOD_BRANCH}" ]]; then
+  BRANCH="main"
+else
+  BRANCH="${MURKMOD_BRANCH}"
+fi
+
 get_asset() {
-    curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
+    curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1?ref=$BRANCH" | jq -r ".content" | base64 -d
 }
 
 get_asset_fakemurk() {
@@ -13,7 +19,7 @@ get_asset_fakemurk() {
 }
 
 get_built_asset_fakemurk() {
-    curl -SLk "https://github.com/MercuryWorkshop/fakemurk/releases/latest/download/$1"
+    curl -SLk "https://github.com/MercuryWorkshop/fakemurk/releases/latest/download/1"
 }
 
 install() {
@@ -53,6 +59,21 @@ install_built_fakemurk() {
     cat "$TMP" >"$2"
     rm -f "$TMP"
 }
+
+if [ "$BRANCH" != "main" ]; then
+    echo "Using branch $BRANCH - Keep in mind any alternate branches can be unstable and are not reccomended!"
+    if [ "$0" != "/usr/local/tmp/murkmod.sh" ]; then
+        echo "Fetching installer on alternate branch..."
+        mkdir -p /usr/local/tmp
+        install "murkmod.sh" /usr/local/tmp/murkmod.sh
+        chmod 755 /usr/local/tmp/murkmod.sh
+        clear
+        echo "Handing over to alternate branch..."
+        MURKMOD_BRANCH=$BRANCH /usr/local/tmp/murkmod.sh
+    else
+        echo "Running installer from branch $BRANCH!"
+    fi
+fi
 
 show_logo() {
     echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
@@ -199,30 +220,32 @@ set_cros_debug() {
 
 murkmod() {
     show_logo
-    if [ ! -f /sbin/fakemurk-daemon.sh ]; then
-        echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
-        exit
-    fi
-    echo "Checking for emergency shell..."
-    check_for_emergencyshell
-    echo "Installing patched files..."
-    install_patched_files
-    echo "Creating stateful partition files..."
-    create_stateful_files
-    echo "Patching policy..."
-    do_policy_patch
-    echo "Setting chronos user password..."
-    set_chronos_password
-    echo "Checking sudo perms..."
-    set_sudo_perms
-    echo "Setting crossystem cros_debug..."
-    set_cros_debug
-    if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_in ]; then
-        if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_out ]; then
-            get_analytics_permission
+    if [ "$1" != "--dryrun" ]; then
+        if [ ! -f /sbin/fakemurk-daemon.sh ]; then
+            echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
+            exit
         fi
-    else
-        collect_analytics
+        echo "Checking for emergency shell..."
+        check_for_emergencyshell
+        echo "Installing patched files..."
+        install_patched_files
+        echo "Creating stateful partition files..."
+        create_stateful_files
+        echo "Patching policy..."
+        do_policy_patch
+        echo "Setting chronos user password..."
+        set_chronos_password
+        echo "Checking sudo perms..."
+        set_sudo_perms
+        echo "Setting crossystem cros_debug..."
+        set_cros_debug
+        if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_in ]; then
+            if [ ! -f /mnt/stateful_partition/murkmod/analytics_opted_out ]; then
+                get_analytics_permission
+            fi
+        else
+            collect_analytics
+        fi
     fi
     read -n 1 -s -r -p "Done. If cros_debug was enabled for the first time, a reboot may be required. Press any key to exit."
     exit
