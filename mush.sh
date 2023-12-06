@@ -165,11 +165,21 @@ EOF
         23) runjob attempt_chromebrew_install ;;
         24) runjob attempt_dev_install ;;
         25) runjob do_updates && exit 0 ;;
+        26) runjob do_dev_updates && exit 0 ;;
 
 
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+do_dev_updates() {
+    echo "Welcome to the secret murkmod developer update menu!"
+    echo "This utility allows you to install murkmod from a specific branch on the git repo."
+    echo "If you were trying to update murkmod normally, then don't panic! Just enter 'main' at the prompt and everything will work normally."
+    read -p "> (branch name, eg. main): " branch
+    doas "MURKMOD_BRANCH=$branch bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
+    exit
 }
 
 disable_ext() {
