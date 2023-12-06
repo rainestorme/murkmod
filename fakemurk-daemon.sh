@@ -194,7 +194,7 @@ EOF
 } &
 
 {
-    echo "Waiting for boot on daemon plugins (also just in case)"
+    echo "Witing for boot on daemon plugins (also just in case)"
     sleep 60
     echo "Finding daemon plugins..."
     for file in /mnt/stateful_partition/murkmod/plugins/*.sh; do
@@ -203,14 +203,4 @@ EOF
             run_plugin $file
         fi
     done
-} &
-
-{
-    echo "Running bootsplash..."
-    BACKGROUND=0xfffefefe
-    ARGS="--frame-interval 25"
-    BOOT_IMAGES=/usr/share/chromeos-assets/images_100_percent/boot_splash_frame*.png
-    /sbin/frecon --clear "${BACKGROUND}" ${ARGS} ${BOOT_IMAGES}
-    touch /bootsplash-complete
-    echo "Bootsplash complete."
 } &
