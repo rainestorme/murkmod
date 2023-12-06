@@ -130,5 +130,6 @@ else
         ((i++))
     done
     echo "Boot splash finished. Handing over to real startup."
+    rm -f /bootsplash-complete
     exec /sbin/chromeos_startup.sh.old
 fi
