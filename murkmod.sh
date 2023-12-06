@@ -70,6 +70,7 @@ if [ "$BRANCH" != "main" ]; then
         clear
         echo "Handing over to alternate branch..."
         MURKMOD_BRANCH=$BRANCH /usr/local/tmp/murkmod.sh
+        exit 0
     else
         echo "Running installer from branch $BRANCH!"
     fi
