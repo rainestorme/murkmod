@@ -122,6 +122,7 @@ patch_root() {
     echo "Installing startup services..."
     install "pre-startup.conf" $ROOT/etc/init/pre-startup.conf
     install "cr50-update.conf" $ROOT/etc/init/cr50-update.conf
+    install "boot-splash.conf" $ROOT/etc/init/boot-splash.conf
     echo "Installing other utilities..."
     install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
     install "image_patcher.sh" $ROOT/sbin/image_patcher.sh

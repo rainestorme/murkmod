@@ -87,8 +87,10 @@ install_patched_files() {
     install "mush.sh" /usr/bin/crosh
     install "pre-startup.conf" /etc/init/pre-startup.conf
     install "cr50-update.conf" /etc/init/cr50-update.conf
+    install "boot-splash.conf" /etc/init/boot-splash.conf
     install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
     install "image_patcher.sh" /sbin/image_patcher.sh
+    install "crossystem_boot_populator.sh" /sbin/crossystem_boot_populator.sh
     chmod 777 /sbin/fakemurk-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
 }
 

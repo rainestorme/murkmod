@@ -39,7 +39,9 @@ echo "Oh fuck - ChromeOS is trying to kill itself." >/usr/share/chromeos-assets/
 echo "ChromeOS detected developer mode and is trying to disable it to" >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
 echo "comply with FWMP. This is most likely a bug and should be reported to" >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
 echo "the murkmod GitHub issues page." >>/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
+
 echo "i sure hope you did that on purpose (powerwashing system)" >/usr/share/chromeos-assets/text/boot_messages/en/power_wash.txt
+
 echo "oops UwU i did a little fucky wucky and your system is trying to repair" >/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
 echo "itself~ sorry OwO" >>/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
 
@@ -121,6 +123,18 @@ else
         fi
     done
 
-    echo "Plugins run. Handing over to real startup..."
+    echo "Plugins run. Waiting for boot splash to finish..."
+    i=0
+    while ! test -f "/bootsplash-complete"; do
+        sleep 0.1
+        if [ ! -f /disable-bootsplash-failsafe ]; then # allow disabling failsafe if, say, i don't know, you wanted to set the entire bee movie as your boot splash
+            if [[ "$i" -gt 600 ]]; then # 1 minute failsafe
+                echo "Boot splash reached 1 minute failsafe. Exiting..."
+                break
+            fi
+        fi
+        ((i++))
+    done
+    echo "Boot splash finished. Handing over to real startup."
     exec /sbin/chromeos_startup.old
 fi
