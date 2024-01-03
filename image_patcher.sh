@@ -96,8 +96,6 @@ configure_binaries(){
 }
 
 patch_root() {
-    echo "Dropping boot populator..."
-    drop_boot_populator
     echo "Staging populator..."
     >$ROOT/population_required
     >$ROOT/reco_patched
