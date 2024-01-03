@@ -110,8 +110,10 @@ patch_root() {
         echo "Detected newer version of CrOS, using new chromeos_startup"
         move_bin "$ROOT/sbin/chromeos_startup"
         install "chromeos_startup_v118.sh" $ROOT/sbin/chromeos_startup
+        chmod 755 $ROOT/sbin/chromeos_startup # whoops
     else
         install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
+        chmod 755 $ROOT/sbin/chromeos_startup.sh
     fi
     echo "Installing murkmod components..."
     install "fakemurk-daemon.sh" $ROOT/sbin/fakemurk-daemon.sh
@@ -128,8 +130,7 @@ patch_root() {
     mkdir -p "$ROOT/etc/opt/chrome/policies/managed"
     install "pollen.json" $ROOT/etc/opt/chrome/policies/managed/policy.json
     echo "Chmod-ing everything..."
-    chmod 777 $ROOT/sbin/fakemurk-daemon.sh $ROOT/sbin/chromeos_startup.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh $ROOT/etc/opt/chrome/policies/managed/policy.json $ROOT/sbin/crossystem_boot_populator.sh $ROOT/usr/share/vboot/bin/ssd_util.sh
-    chmod 755 $ROOT/sbin/chromeos_startup # whoops
+    chmod 777 $ROOT/sbin/fakemurk-daemon.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh $ROOT/etc/opt/chrome/policies/managed/policy.json $ROOT/sbin/crossystem_boot_populator.sh $ROOT/usr/share/vboot/bin/ssd_util.sh    
     echo "Done."
 }
 
