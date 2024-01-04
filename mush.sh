@@ -195,8 +195,23 @@ disable_ext_nokill() {
     echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" || "Extension ID $extid is invalid."
 }
 
+enable_ext_nokill() {
+    local extid="$1"
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 777 "/home/chronos/user/Extensions/$extid" || "Invalid extension id."
+}
+
 ext_purge() {
     kill -9 $(pgrep -f "\-\-extension\-process")
+}
+
+hard_disable_nokill() {
+    read -r -p "Enter extension ID > " extid
+    disable_ext_nokill $extid
+}
+
+hard_enable_nokill() {
+    read -r -p "Enter extension ID > " extid
+    enable_ext_nokill $extid
 }
 
 autodisableexts() {
@@ -258,6 +273,8 @@ enable_dev_boot_usb() {
   echo "Enabling dev_boot_usb"
   sed -i 's/\(dev_boot_usb=\).*/\11/' /usr/bin/crossystem
 }
+
+
 
 do_updates() {
     doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
