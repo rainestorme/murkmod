@@ -19,7 +19,7 @@ get_largest_nvme_namespace() {
 traps() {
     set +e
     trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-    trap 'echo \"${last_command}\" command failed with exit code $?' EXIT
+    trap 'echo \"${last_command}\" command failed with exit code $? - press a key to exit.' EXIT
     trap '' INT
 }
 
