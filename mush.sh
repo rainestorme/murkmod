@@ -169,11 +169,50 @@ EOF
         101) runjob hard_disable_nokill ;;
         111) runjob hard_enable_nokill ;;
         112) runjob ext_purge ;;
-
-
+        113) runjob list_plugins ;;
+        114) runjob install_plugin_legacy ;;
+        115) runjob uninstall_plugin_legacy ;;
+        116) runjob run_plugin_legacy ;;
+    
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+list_plugins() {
+    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
+    plugin_files=()
+
+    while IFS= read -r -d '' file; do
+        plugin_files+=("$file")
+    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
+
+    plugin_info=()
+    for file in "${plugin_files[@]}"; do
+        plugin_script=$file
+        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_script" | cut -d= -f2-)
+        # remove quotes from around each PLUGIN_* variable
+        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
+        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
+        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
+        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
+        if grep -q "menu_plugin" "$plugin_script"; then
+            plugin_info+=("$PLUGIN_FUNCTION,$PLUGIN_NAME,$PLUGIN_DESCRIPTION,$PLUGIN_AUTHOR,$PLUGIN_VERSION")
+        fi
+    done
+
+    to_print=""
+
+    # Print menu options
+    for i in "${!plugin_info[@]}"; do
+        to_print="$to_print ${plugin_info[$i]}"
+    done
+
+    echo "$to_print"
 }
 
 do_dev_updates() {
