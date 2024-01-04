@@ -209,7 +209,7 @@ list_plugins() {
 
     # Print menu options
     for i in "${!plugin_info[@]}"; do
-        to_print="$to_print ${plugin_info[$i]}"
+        to_print="$to_print[][]${plugin_info[$i]}"
     done
 
     echo "$to_print"
