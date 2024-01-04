@@ -166,6 +166,9 @@ EOF
         24) runjob attempt_dev_install ;;
         25) runjob do_updates && exit 0 ;;
         26) runjob do_dev_updates && exit 0 ;;
+        101) runjob hard_disable_nokill ;;
+        111) runjob hard_enable_nokill ;;
+        112) runjob ext_purge ;;
 
 
         *) echo && echo "Invalid option, dipshit." && echo ;;
@@ -187,28 +190,37 @@ disable_ext() {
     echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Extension ID $extid is invalid."
 }
 
+disable_ext_nokill() {
+    local extid="$1"
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" || "Extension ID $extid is invalid."
+}
+
+ext_purge() {
+    kill -9 $(pgrep -f "\-\-extension\-process")
+}
+
 autodisableexts() {
     echo "Disabling extensions..."
-    disable_ext "haldlgldplgnggkjaafhelgiaglafanh" # GoGuardian
-    disable_ext "dikiaagfielfbnbbopidjjagldjopbpa" # Clever Plus
-    disable_ext "cgbbbjmgdpnifijconhamggjehlamcif" # Gopher Buddy
-    disable_ext "inoeonmfapjbbkmdafoankkfajkcphgd" # Read and Write for Google Chrome
-    disable_ext "enfolipbjmnmleonhhebhalojdpcpdoo" # Screenshot reader
-    disable_ext "joflmkccibkooplaeoinecjbmdebglab" # Securly
-    disable_ext "iheobagjkfklnlikgihanlhcddjoihkg" # Securly again
-    disable_ext "adkcpkpghahmbopkjchobieckeoaoeem" # LightSpeed
-    disable_ext "jcdhmojfecjfmbdpchihbeilohgnbdci" # Cisco Umbrella
-    disable_ext "jdogphakondfdmcanpapfahkdomaicfa" # ContentKeeper Authenticator
-    disable_ext "aceopacgaepdcelohobicpffbbejnfac" # Hapara
-    disable_ext "kmffehbidlalibfeklaefnckpidbodff" # iBoss
-    disable_ext "jaoebcikabjppaclpgbodmmnfjihdngk" # LightSpeed Classroom
-    disable_ext "ghlpmldmjjhmdgmneoaibbegkjjbonbk" # Blocksi
-    disable_ext "ddfbkhpmcdbciejenfcolaaiebnjcbfc" # Linewize
-    disable_ext "jfbecfmiegcjddenjhlbhlikcbfmnafd" # Securly Classroom
-    disable_ext "jjpmjccpemllnmgiaojaocgnakpmfgjg" # Impero
-    disable_ext "feepmdlmhplaojabeoecaobfmibooaid" # OrbitNote
-    disable_ext "dmhpekdihnngbkinliefnclgmgkpjeoo" # GoGuardian License
-    disable_ext "modkadcjnbamppdpdkfoackjnhnfiogi" # MyMPS Chrome SSO
+    disable_ext_nokill "haldlgldplgnggkjaafhelgiaglafanh" # GoGuardian
+    disable_ext_nokill "dikiaagfielfbnbbopidjjagldjopbpa" # Clever Plus
+    disable_ext_nokill "cgbbbjmgdpnifijconhamggjehlamcif" # Gopher Buddy
+    disable_ext_nokill "inoeonmfapjbbkmdafoankkfajkcphgd" # Read and Write for Google Chrome
+    disable_ext_nokill "enfolipbjmnmleonhhebhalojdpcpdoo" # Screenshot reader
+    disable_ext_nokill "joflmkccibkooplaeoinecjbmdebglab" # Securly
+    disable_ext_nokill "iheobagjkfklnlikgihanlhcddjoihkg" # Securly again
+    disable_ext_nokill "adkcpkpghahmbopkjchobieckeoaoeem" # LightSpeed
+    disable_ext_nokill "jcdhmojfecjfmbdpchihbeilohgnbdci" # Cisco Umbrella
+    disable_ext_nokill "jdogphakondfdmcanpapfahkdomaicfa" # ContentKeeper Authenticator
+    disable_ext_nokill "aceopacgaepdcelohobicpffbbejnfac" # Hapara
+    disable_ext_nokill "kmffehbidlalibfeklaefnckpidbodff" # iBoss
+    disable_ext_nokill "jaoebcikabjppaclpgbodmmnfjihdngk" # LightSpeed Classroom
+    disable_ext_nokill "ghlpmldmjjhmdgmneoaibbegkjjbonbk" # Blocksi
+    disable_ext_nokill "ddfbkhpmcdbciejenfcolaaiebnjcbfc" # Linewize
+    disable_ext_nokill "jfbecfmiegcjddenjhlbhlikcbfmnafd" # Securly Classroom
+    disable_ext_nokill "jjpmjccpemllnmgiaojaocgnakpmfgjg" # Impero
+    disable_ext_nokill "feepmdlmhplaojabeoecaobfmibooaid" # OrbitNote
+    disable_ext_nokill "dmhpekdihnngbkinliefnclgmgkpjeoo" # GoGuardian License
+    disable_ext_nokill "modkadcjnbamppdpdkfoackjnhnfiogi" # MyMPS Chrome SSO
     echo "Done."
 }
 
