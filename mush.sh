@@ -172,11 +172,37 @@ EOF
         113) runjob list_plugins ;;
         114) runjob install_plugin_legacy ;;
         115) runjob uninstall_plugin_legacy ;;
-        116) runjob run_plugin_legacy ;;
     
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+install_plugin_legacy() {
+  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
+
+  echo "Find a plugin you want to install here: "
+  echo "  https://github.com/rainestorme/murkmod/tree/main/plugins"
+  echo "Enter the name of a plugin (including the .sh) to install it (or q to quit):"
+  read -r plugin_name
+
+  local plugin_url="$raw_url/$plugin_name"
+  local plugin_info=$(curl -s $plugin_url)
+
+  if [[ $plugin_info == *"Not Found"* ]]; then
+    echo "Plugin not found"
+  else      
+    echo "Installing..."
+    doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O && popd" > /dev/null
+    echo "Installed $plugin_name"
+  fi
+}
+
+uninstall_plugin_legacy() {
+  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
+  echo "Enter the name of a plugin (including the .sh) to uninstall it (or q to quit):"
+  read -r plugin_name
+  doas "rm -rf /mnt/stateful_partition/murkmod/plugins/$plugin_name"
 }
 
 list_plugins() {
