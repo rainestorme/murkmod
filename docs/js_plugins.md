@@ -36,6 +36,7 @@ Otherwise, publishing of a JS plugin is identical to that of a bash plugin - for
 Any code in a JS plugin runs directly through an `eval()` statement on an extension page with privileged access to `chrome.terminalPrivate`, as well as the murkmod helper API, which contains helper methods to allow for easier scripting. The `terminalPrivate` API will not be documented here, but reading the source of the helper extension should yield the necessary basic information if you wish to use it on other projects.
 
 Additionally, the tab that your plugin is run on has the following utilities accessible to your script:
+
 - [Xterm.js](https://xtermjs.org/)
 - [Sweetalert2](https://sweetalert2.com/download)
 - [jQuery](https://jquery.com/) v3.7.1
@@ -60,7 +61,7 @@ Shit, that's a lot! Let's break it down a bit:
 
 - `input`: A string of the raw input (once again accepting escape sequences) to be sent to the primary mush session
 - `title`: The title to be shown on the terminal popup
--  `finished`: If this string is present in the output from the terminal, the task is considered completed. 99% of the time this should be `> (1-`, but depending on your use case it can differ.
+- `finished`: If this string is present in the output from the terminal, the task is considered completed. 99% of the time this should be `> (1-`, but depending on your use case it can differ.
 - `output_handler`: A function that takes a single string as a parameter, being the output from the terminal. Called every time output is received from the running task.
 - `once_done`: A callback that is executed once the task is completed.
 - `allow_exit`: A bool determining whether or not the user should be able to exit the running task.
@@ -69,6 +70,7 @@ Shit, that's a lot! Let's break it down a bit:
 `window.run_task_silent` is similar, but with a lot less parameters:
 
 `window.run_task_silent(input, finished, output_handler, once_done)`
+
 - `input`: Raw input to be sent to the primary mush session
 - `finished`: If this string is present in the output from the terminal, the task is considered completed. 99% of the time this should be `> (1-`, but depending on your use case ift can differ.
 - `output_handler`: A function that takes a single string as a parameter, being the output from the terminal. Called every time output is received from the running task.

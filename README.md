@@ -15,13 +15,13 @@ bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murk
 
 Select the chromeOS milestone you want to install with murkmod. The script will then automatically download the correct recovery image, patch it, and install it to your device. Once the installation is complete, the system will reboot into a murkmod-patched rootfs.
 
-If initial enrollment after installation fails after a long wait with an error about enrollment certificates, DON'T PANIC! This is normal. Perform an EC reset (`Refresh+Power`) and press space and then enter to *disable developer mode*. As soon as the screen backlight turns off, perform another EC reset and wait for the "ChromeOS is missing or damaged" screen to appear. Enter recovery mode (`Esc+Refresh+Power`) and press Ctrl+D and enter to enable developer mode, then enroll again. This time it should succeed. 
+If initial enrollment after installation fails after a long wait with an error about enrollment certificates, DON'T PANIC! This is normal. Perform an EC reset (`Refresh+Power`) and press space and then enter to *disable developer mode*. As soon as the screen backlight turns off, perform another EC reset and wait for the "ChromeOS is missing or damaged" screen to appear. Enter recovery mode (`Esc+Refresh+Power`) and press Ctrl+D and enter to enable developer mode, then enroll again. This time it should succeed.
 
 It is also highly reccomended to install the murkmod helper extension. To do so:
+
 - Download the repo from [here](https://codeload.github.com/rainestorme/murkmod/zip/refs/heads/main).
 - Unzip the `helper` folder and place it in your Downloads folder on your Chromebook. Do not rename it.
 - Go to `chrome://extensions` and enable developer mode, then select "Load unpacked" and select the `helper` folder.
-
 
 For more information on installation of murkmod, including alternate instructions, see [`docs/installation.md`](docs/installation.md)
 
