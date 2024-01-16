@@ -1,7 +1,6 @@
 #!/bin/bash
 # fakemurk.sh v1
 # by coolelectronics with help from r58
-
 # sets up all required scripts for spoofing os verification in devmode
 # this script bundles crossystem.sh and vpd.sh
 
@@ -15,8 +14,11 @@
 # v1.1.0 - implemented <var>?<value> functionality (searches for value in var)
 # v1.0.0 - basic functionality implemented
 
-CURRENT_MAJOR=5
-CURRENT_MINOR=3
+# image_patcher.sh
+# written based on the original by coolelectronics and r58, modified heavily for murkmod
+
+CURRENT_MAJOR=6
+CURRENT_MINOR=0
 CURRENT_VERSION=0
 
 # God damn, there are a lot of unused functions in here!
@@ -238,6 +240,7 @@ main() {
   if [ "$unfuckstateful" == "0" ]; then
     touch $ROOT/stateful_unfucked
     chmod 777 $ROOT/stateful_unfucked
+    # by creating the flag in advance we can prevent running mkfs.ext4 on stateful upon next boot, thus retaining user data
   fi
 
   sleep 2
