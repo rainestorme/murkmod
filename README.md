@@ -10,7 +10,7 @@ murkmod is a utility script that patches fakemurk and mush to include additional
 Enter developer mode while enrolled and boot into ChromeOS. Connect to WiFi, but don't log in. Open VT2 by pressing `Ctrl+Alt+F2 (Forward)` and log in as `root`. Run the following command:
 
 ```sh
-bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod-devmode.sh)
+bash <(curl -SLk https://bit.ly/murkmod)
 ```
 
 Select the chromeOS milestone you want to install with murkmod. The script will then automatically download the correct recovery image, patch it, and install it to your device. Once the installation is complete, the system will reboot into a murkmod-patched rootfs.
