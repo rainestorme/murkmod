@@ -1,8 +1,8 @@
 #!/bin/bash
 
-CURRENT_MAJOR=0
-CURRENT_MINOR=2
-CURRENT_VERSION=3
+CURRENT_MAJOR=6
+CURRENT_MINOR=0
+CURRENT_VERSION=0
 show_logo() {
     clear
     echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
@@ -82,7 +82,8 @@ opposite_num() {
 
 defog() {
     echo "Defogging..."
-    /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
+    futility gbb --set --flash --flags=0x8091 # we use futility here instead of the commented out command below because we expect newer chromeos versions and don't want to wait 30 seconds
+    # /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
     crossystem block_devmode=0
     vpd -i RW_VPD -s block_devmode=0
     vpd -i RW_VPD -s check_enrollment=1
@@ -182,13 +183,16 @@ EOF
         FILENAME=$(find . -maxdepth 2 -name "chromeos_*.bin") # 2 incase the zip format changes
         echo "Found recovery image from archive at $FILENAME"
         pushd /usr/local/tmp # /usr/local is mounted as exec, so we can run scripts from here
-            echo "Fetching latest image_patcher.sh..."
+            echo "Installing image_patcher.sh..."
             install "image_patcher.sh" ./image_patcher.sh
             chmod 777 ./image_patcher.sh
             echo "Installing ssd_util.sh..."
             mkdir -p ./lib
             install "ssd_util.sh" ./lib/ssd_util.sh
             chmod 777 ./lib/ssd_util.sh
+            echo "Installing common_minimal.sh..."
+            install "common_minimal.sh" ./lib/common_minimal.sh
+            chmod 777 ./lib/common_minimal.sh
         popd
         echo "Invoking image_patcher.sh..."
         bash /usr/local/tmp/image_patcher.sh "$FILENAME"
@@ -228,7 +232,6 @@ EOF
         cgpt add "$dst" -i "$tgt_kern" -P 1
         echo "Defogging... (if write-protect is disabled, this will set GBB flags to 0x8091)"
         defog
-        vpd -i RW_VPD -s check_enrollment=1 # for fakemurk this stays on
         echo "Cleaning up..."
         losetup -d "$loop"
         rm -f "$FILENAME"

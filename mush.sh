@@ -19,12 +19,12 @@ get_largest_nvme_namespace() {
 traps() {
     set +e
     trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-    trap 'echo \"${last_command}\" command failed with exit code $?' EXIT
+    trap 'echo \"${last_command}\" command failed with exit code $? - press a key to exit.' EXIT
     trap '' INT
 }
 
 mush_info() {
-    echo -ne "\033]0;Welcome to mush! \007" & sleep 1 && echo -ne "\033]0;mush\007"
+    echo -ne "\033]0;mush\007"
     if [ ! -f /mnt/stateful_partition/custom_greeting ]; then
         cat <<-EOF
 Welcome to mush, the murkmod developer shell.
@@ -138,7 +138,7 @@ main() {
 EOF
         
         swallow_stdin
-        read -r -p "> (1-24): " choice
+        read -r -p "> (1-25): " choice
         case "$choice" in
         1) runjob doas bash ;;
         2) runjob doas "cd /home/chronos; sudo -i -u chronos" ;;
@@ -165,11 +165,89 @@ EOF
         23) runjob attempt_chromebrew_install ;;
         24) runjob attempt_dev_install ;;
         25) runjob do_updates && exit 0 ;;
-
-
+        26) runjob do_dev_updates && exit 0 ;;
+        101) runjob hard_disable_nokill ;;
+        111) runjob hard_enable_nokill ;;
+        112) runjob ext_purge ;;
+        113) runjob list_plugins ;;
+        114) runjob install_plugin_legacy ;;
+        115) runjob uninstall_plugin_legacy ;;
+    
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+install_plugin_legacy() {
+  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
+
+  echo "Find a plugin you want to install here: "
+  echo "  https://github.com/rainestorme/murkmod/tree/main/plugins"
+  echo "Enter the name of a plugin (including the .sh) to install it (or q to quit):"
+  read -r plugin_name
+
+  local plugin_url="$raw_url/$plugin_name"
+  local plugin_info=$(curl -s $plugin_url)
+
+  if [[ $plugin_info == *"Not Found"* ]]; then
+    echo "Plugin not found"
+  else      
+    echo "Installing..."
+    doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O && popd" > /dev/null
+    echo "Installed $plugin_name"
+  fi
+}
+
+uninstall_plugin_legacy() {
+  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
+  echo "Enter the name of a plugin (including the .sh) to uninstall it (or q to quit):"
+  read -r plugin_name
+  doas "rm -rf /mnt/stateful_partition/murkmod/plugins/$plugin_name"
+}
+
+list_plugins() {
+    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
+    plugin_files=()
+
+    while IFS= read -r -d '' file; do
+        plugin_files+=("$file")
+    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
+
+    plugin_info=()
+    for file in "${plugin_files[@]}"; do
+        plugin_script=$file
+        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_script" | cut -d= -f2-)
+        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_script" | cut -d= -f2-)
+        # remove quotes from around each PLUGIN_* variable
+        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
+        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
+        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
+        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
+        if grep -q "menu_plugin" "$plugin_script"; then
+            plugin_info+=("$PLUGIN_FUNCTION,$PLUGIN_NAME,$PLUGIN_DESCRIPTION,$PLUGIN_AUTHOR,$PLUGIN_VERSION")
+        fi
+    done
+
+    to_print=""
+
+    # Print menu options
+    for i in "${!plugin_info[@]}"; do
+        to_print="$to_print[][]${plugin_info[$i]}"
+    done
+
+    echo "$to_print"
+}
+
+do_dev_updates() {
+    echo "Welcome to the secret murkmod developer update menu!"
+    echo "This utility allows you to install murkmod from a specific branch on the git repo."
+    echo "If you were trying to update murkmod normally, then don't panic! Just enter 'main' at the prompt and everything will work normally."
+    read -p "> (branch name, eg. main): " branch
+    doas "MURKMOD_BRANCH=$branch bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
+    exit
 }
 
 disable_ext() {
@@ -177,28 +255,52 @@ disable_ext() {
     echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" && kill -9 $(pgrep -f "\-\-extension\-process") || "Extension ID $extid is invalid."
 }
 
+disable_ext_nokill() {
+    local extid="$1"
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 000 "/home/chronos/user/Extensions/$extid" || "Extension ID $extid is invalid."
+}
+
+enable_ext_nokill() {
+    local extid="$1"
+    echo "$extid" | grep -qE '^[a-z]{32}$' && chmod 777 "/home/chronos/user/Extensions/$extid" || "Invalid extension id."
+}
+
+ext_purge() {
+    kill -9 $(pgrep -f "\-\-extension\-process")
+}
+
+hard_disable_nokill() {
+    read -r -p "Enter extension ID > " extid
+    disable_ext_nokill $extid
+}
+
+hard_enable_nokill() {
+    read -r -p "Enter extension ID > " extid
+    enable_ext_nokill $extid
+}
+
 autodisableexts() {
     echo "Disabling extensions..."
-    disable_ext "haldlgldplgnggkjaafhelgiaglafanh" # GoGuardian
-    disable_ext "dikiaagfielfbnbbopidjjagldjopbpa" # Clever Plus
-    disable_ext "cgbbbjmgdpnifijconhamggjehlamcif" # Gopher Buddy
-    disable_ext "inoeonmfapjbbkmdafoankkfajkcphgd" # Read and Write for Google Chrome
-    disable_ext "enfolipbjmnmleonhhebhalojdpcpdoo" # Screenshot reader
-    disable_ext "joflmkccibkooplaeoinecjbmdebglab" # Securly
-    disable_ext "iheobagjkfklnlikgihanlhcddjoihkg" # Securly again
-    disable_ext "adkcpkpghahmbopkjchobieckeoaoeem" # LightSpeed
-    disable_ext "jcdhmojfecjfmbdpchihbeilohgnbdci" # Cisco Umbrella
-    disable_ext "jdogphakondfdmcanpapfahkdomaicfa" # ContentKeeper Authenticator
-    disable_ext "aceopacgaepdcelohobicpffbbejnfac" # Hapara
-    disable_ext "kmffehbidlalibfeklaefnckpidbodff" # iBoss
-    disable_ext "jaoebcikabjppaclpgbodmmnfjihdngk" # LightSpeed Classroom
-    disable_ext "ghlpmldmjjhmdgmneoaibbegkjjbonbk" # Blocksi
-    disable_ext "ddfbkhpmcdbciejenfcolaaiebnjcbfc" # Linewize
-    disable_ext "jfbecfmiegcjddenjhlbhlikcbfmnafd" # Securly Classroom
-    disable_ext "jjpmjccpemllnmgiaojaocgnakpmfgjg" # Impero
-    disable_ext "feepmdlmhplaojabeoecaobfmibooaid" # OrbitNote
-    disable_ext "dmhpekdihnngbkinliefnclgmgkpjeoo" # GoGuardian License
-    disable_ext "modkadcjnbamppdpdkfoackjnhnfiogi" # MyMPS Chrome SSO
+    disable_ext_nokill "haldlgldplgnggkjaafhelgiaglafanh" # GoGuardian
+    disable_ext_nokill "dikiaagfielfbnbbopidjjagldjopbpa" # Clever Plus
+    disable_ext_nokill "cgbbbjmgdpnifijconhamggjehlamcif" # Gopher Buddy
+    disable_ext_nokill "inoeonmfapjbbkmdafoankkfajkcphgd" # Read and Write for Google Chrome
+    disable_ext_nokill "enfolipbjmnmleonhhebhalojdpcpdoo" # Screenshot reader
+    disable_ext_nokill "joflmkccibkooplaeoinecjbmdebglab" # Securly
+    disable_ext_nokill "iheobagjkfklnlikgihanlhcddjoihkg" # Securly again
+    disable_ext_nokill "adkcpkpghahmbopkjchobieckeoaoeem" # LightSpeed
+    disable_ext_nokill "jcdhmojfecjfmbdpchihbeilohgnbdci" # Cisco Umbrella
+    disable_ext_nokill "jdogphakondfdmcanpapfahkdomaicfa" # ContentKeeper Authenticator
+    disable_ext_nokill "aceopacgaepdcelohobicpffbbejnfac" # Hapara
+    disable_ext_nokill "kmffehbidlalibfeklaefnckpidbodff" # iBoss
+    disable_ext_nokill "jaoebcikabjppaclpgbodmmnfjihdngk" # LightSpeed Classroom
+    disable_ext_nokill "ghlpmldmjjhmdgmneoaibbegkjjbonbk" # Blocksi
+    disable_ext_nokill "ddfbkhpmcdbciejenfcolaaiebnjcbfc" # Linewize
+    disable_ext_nokill "jfbecfmiegcjddenjhlbhlikcbfmnafd" # Securly Classroom
+    disable_ext_nokill "jjpmjccpemllnmgiaojaocgnakpmfgjg" # Impero
+    disable_ext_nokill "feepmdlmhplaojabeoecaobfmibooaid" # OrbitNote
+    disable_ext_nokill "dmhpekdihnngbkinliefnclgmgkpjeoo" # GoGuardian License
+    disable_ext_nokill "modkadcjnbamppdpdkfoackjnhnfiogi" # MyMPS Chrome SSO
     echo "Done."
 }
 
@@ -236,6 +338,8 @@ enable_dev_boot_usb() {
   echo "Enabling dev_boot_usb"
   sed -i 's/\(dev_boot_usb=\).*/\11/' /usr/bin/crossystem
 }
+
+
 
 do_updates() {
     doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
@@ -568,9 +672,9 @@ install_crouton() {
         esac
     fi
     echo "Installing Crouton..."
-    # if this is past v107, then we don't want to use the silence branch - audio is still supported
+    # if this is before v107, then we don't want to use the silence branch - audio is still supported
     local local_version=$(lsbval GOOGLE_RELEASE)
-    if (( ${local_version%%\.*} > 107 )); then
+    if (( ${local_version%%\.*} <= 107 )); then
         doas "bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
     else
         # theoretically we could copy or link the includes for cras, but im not entirely sure how to do that

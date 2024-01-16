@@ -1,0 +1,176 @@
+#terminal-container {
+  display: none;
+  position: fixed;
+  /* Stay in place */
+  z-index: 2;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+}
+
+#terminal-holder {
+  margin: 15% auto;
+  /* 15% from the top and centered */
+  padding: 20px;
+  width: 60%;
+  /* Could be more or less, depending on screen size */
+  background-color: #1f1f1f;
+  border-radius: 10px;
+}
+
+#close {
+  position: relative;
+  top: 0;
+  right: 0;
+  color: #cccccc;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#terminal-bash-container {
+  display: none;
+  position: fixed;
+  /* Stay in place */
+  z-index: 2;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+}
+
+#terminal-bash-holder {
+  margin: 15% auto;
+  /* 15% from the top and centered */
+  padding: 20px;
+  width: 60%;
+  /* Could be more or less, depending on screen size */
+  background-color: #1f1f1f;
+  border-radius: 10px;
+}
+
+#close-bash {
+  position: relative;
+  top: 0;
+  right: 0;
+  color: #cccccc;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #242424;
+  margin: 15% auto;
+  /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  border-radius: 10px;
+  width: 80%;
+  /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #cccccc;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: rgb(252, 252, 252);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ext {
+  background-color: rgb(27, 27, 27);
+  border-radius: 15px;
+  padding: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+#store-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.card {
+  flex: 0 0 calc(33.33% - 16px); /* Adjust the width based on the number of cards per row */
+  box-sizing: border-box;
+  border: 1px solid #2c3e50; /* Dark border color */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Darker box shadow */
+  padding: 16px;
+  margin: 5px;
+  background-color: #34495e; /* Dark background color */
+  color: #ecf0f1; /* Light text color */
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.card-description {
+  font-size: 14px;
+  color: #bdc3c7; /* Lighter text color for description */
+  margin-bottom: 12px;
+}
+
+.card-author,
+.card-version {
+  font-size: 12px;
+  color: #95a5a6; /* Lighter text color for author and version */
+}
+
+#swal2-html-container {
+  color: white;
+}
