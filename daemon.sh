@@ -194,7 +194,7 @@ EOF
 } &
 
 {
-    echo "Witing for boot on daemon plugins (also just in case)"
+    echo "Waiting for boot on daemon plugins (also just in case)"
     sleep 60
     echo "Finding daemon plugins..."
     for file in /mnt/stateful_partition/murkmod/plugins/*.sh; do

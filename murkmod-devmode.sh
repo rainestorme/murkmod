@@ -93,7 +93,10 @@ defog() {
 murkmod() {
     show_logo
     if [ -f /sbin/fakemurk-daemon.sh ]; then
-        echo "!!! Your system already has a murkmod/fakemurk installation! Continuing anyway, but emergency revert will not work correctly. !!!"
+        echo "!!! Your system already has a fakemurk installation! Continuing anyway, but emergency revert will not work correctly. !!!"
+    fi
+    if [ -f /sbin/murkmod-daemon.sh ]; then
+        echo "!!! Your system already has a murkmod installation! Continuing anyway, but emergency revert will not work correctly. !!!"
     fi
     echo "What version of murkmod do you want to install?"
     echo " 1) og      (chromeOS v105)"

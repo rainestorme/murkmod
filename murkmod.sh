@@ -98,7 +98,7 @@ lsbval() {
 }
 
 install_patched_files() {
-    install "fakemurk-daemon.sh" /sbin/fakemurk-daemon.sh
+    install "daemon.sh" /sbin/murkmod-daemon.sh
     local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
     if [ "$milestone" -gt "116" ]; then
         echo "Detected v116 or higher, using new chromeos_startup"
@@ -111,7 +111,7 @@ install_patched_files() {
     install "cr50-update.conf" /etc/init/cr50-update.conf
     install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
     install "image_patcher.sh" /sbin/image_patcher.sh
-    chmod 777 /sbin/fakemurk-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
+    chmod 777 /sbin/murkmod-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
 }
 
 create_stateful_files() {
@@ -208,7 +208,9 @@ collect_analytics() {
 }
 
 get_analytics_permission() {
-    read -r -p "Opt-in to analytics? This will only send basic information about your device. [y/N] " choice
+    echo "Analytics are completely anonymous - based on HWID only. It only collects basic information about your device and requires only minimal information on your part."
+    echo "Although I would greatly appreciate it if you opt in, this is completely optional and you can opt out at any time by deleting /mnt/stateful_partition/murkmod/analytics_opted_in."
+    read -r -p "Opt-in to analytics? [y/N] " choice
     case "$choice" in
         y | Y) collect_analytics && touch /mnt/stateful_partition/murkmod/analytics_opted_in ;;
         *) echo "Opting out of analytics." && touch /mnt/stateful_partition/murkmod/analytics_opted_out ;;
@@ -219,17 +221,32 @@ set_cros_debug() {
     sed -i "s/\(cros_debug=\).*/\11/" /usr/bin/crossystem
 }
 
+check_legacy_daemon() {
+    if [ -f /sbin/fakemurk-daemon.sh ]; then
+        echo "Found legacy fakemurk daemon, removing..."
+        killall fakemurk-daemon.sh
+        rm -f /sbin/fakemurk-daemon.sh
+        mkdir -p /var/murkmod
+        echo "Restarting daemon..."
+        /sbin/murkmod-daemon.sh >/var/murkmod/daemon-log 2>&1 &
+    fi
+}
+
 murkmod() {
     show_logo
     if [ "$1" != "--dryrun" ]; then
         if [ ! -f /sbin/fakemurk-daemon.sh ]; then
-            echo "Either your system has a broken fakemurk installation or your system doesn't have a fakemurk installation at all. (Re)install fakemurk, then re-run this script."
-            exit
+            if [ ! -f /sbin/murkmod-daemon.sh ]; then
+                echo "Either your system has a broken fakemurk/murkmod installation or your system doesn't have a fakemurk or murkmod installation at all. (Re)install fakemurk/murkmod, then re-run this script."
+                exit
+            fi
         fi
         echo "Checking for emergency shell..."
         check_for_emergencyshell
         echo "Installing patched files..."
         install_patched_files
+        echo "Checking for legacy fakemurk daemon..."
+        check_legacy_daemon
         echo "Creating stateful partition files..."
         create_stateful_files
         echo "Patching policy..."

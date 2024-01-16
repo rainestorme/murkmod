@@ -1,7 +1,8 @@
 #!/bin/bash
 
 rm -f /fakemurk_startup_log
-rm -r /fakemurk_startup_err
+rm -f /fakemurk_startup_err
+rm -f /fakemurk-log
 mkdir -p /var/murkmod
 exec >/var/murkmod/startup_log
 exec 2>/var/murkmod/startup_err

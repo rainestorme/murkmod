@@ -118,7 +118,7 @@ patch_root() {
         chmod 755 $ROOT/sbin/chromeos_startup.sh
     fi
     echo "Installing murkmod components..."
-    install "fakemurk-daemon.sh" $ROOT/sbin/fakemurk-daemon.sh
+    install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
     move_bin "$ROOT/usr/bin/crosh"
     install "mush.sh" $ROOT/usr/bin/crosh
     echo "Installing startup services..."
@@ -132,7 +132,7 @@ patch_root() {
     mkdir -p "$ROOT/etc/opt/chrome/policies/managed"
     install "pollen.json" $ROOT/etc/opt/chrome/policies/managed/policy.json
     echo "Chmod-ing everything..."
-    chmod 777 $ROOT/sbin/fakemurk-daemon.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh $ROOT/etc/opt/chrome/policies/managed/policy.json $ROOT/sbin/crossystem_boot_populator.sh $ROOT/usr/share/vboot/bin/ssd_util.sh    
+    chmod 777 $ROOT/sbin/murkmod-daemon.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh $ROOT/etc/opt/chrome/policies/managed/policy.json $ROOT/sbin/crossystem_boot_populator.sh $ROOT/usr/share/vboot/bin/ssd_util.sh    
     echo "Done."
 }
 
