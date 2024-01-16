@@ -1,0 +1,34 @@
+{
+    "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZCwLaKu+2OIwztgyHw3pNGbOTokLV2Kb4MGnZGnxKTozx87Wf7aQZWzBtGBi4iys1HE5BTsuOY8jFNfuChncl/bzIGT4J6J0FjxpF+gv9czMVyb6o+4VK9fB5BgL+arlZsuS07rylTLPimN1LzVMi/v1F3IcqgXXnsQvdIxoXFQIDAQAB",
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ],
+        "persistent": false
+    },
+    "default_locale": "en",
+    "description": "A helper for murkmod tasks - the visual successor to mush",
+    "icons": {
+        "128": "images/stable/icon-128.png"
+    },
+    "manifest_version": 2,
+    "minimum_chrome_version": "1",
+    "name": "murkmod helper",
+    "permissions": [
+        "clipboardRead",
+        "clipboardWrite",
+        "idle",
+        "terminalPrivate",
+        "accessibilityFeatures.read",
+        "management"
+    ],
+    "version": "0.2",
+    "update_url": "https://clients2.google.com/service/update2/crx",
+    "author": {
+        "email": "rainest0rme@proton.me"
+    },
+    "browser_action": {
+        "default_icon": "images/stable/icon-128.png"
+    },
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';"
+}

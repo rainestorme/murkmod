@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>murkmod helper webui</title>
+    <link rel="stylesheet" href="../css/xterm.css" />
+    <script src="../js/xterm.js"></script>
+    <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
+    <link rel="stylesheet" href="../css/murkmod.css">
+    <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
+    <script src="../js/swal2.js"></script>
+</head>
+<body>
+    <h1>murkmod helper</h1>
+    <button id="update_murkmod">Update murkmod</button>
+    <br><br>
+    <details open>
+        <summary>Shells</summary>
+        <button id="root_shell">Root shell</button>
+        <button id="chronos_shell">Chronos shell</button>
+        <button id="crosh">Crosh</button>
+    </details>
+    <details>
+        <summary>Crouton</summary>
+        <button id="install_crouton">Install</button>
+        <p></p>
+        <button id="start_crouton">Start</button>
+        <button id="stop_crouton" style="display: none;">Stop</button>
+        <p></p>
+        <p>Press <kbd>Ctrl+Shift+Alt+Forward (F2)</kbd> and <kbd>Ctrl+Shift+Alt+Back (F1)</kbd> to toggle between desktops once Crouton is running.</p>
+    </details>
+    <details>
+        <summary>System Management</summary>
+        <label for="fans">Fan speed:</label>
+        <input type="range" name="fans" id="fans" min="0" max="100" value="35">
+        <span id="fanprecent">0%</span>
+        <p></p>
+        <button id="reboot">Reboot</button>
+    </details>
+    <details>
+        <summary>Powerwash and Revert</summary>
+        <button id="emergency_revert">Emergency revert & re-enroll</button>
+        <button id="powerwash">Powerwash</button>
+    </details>
+    <details>
+        <summary>Plugins</summary>
+        <div id="plugins"></div>
+        <p></p>
+        <p>Legacy (terminal-based) plugins</p>
+        <div id="legacy_plugins"></div>
+        <hr>
+        <button id="store">Plugin Store</button>
+        <!-- <button id="builder">Create new plugin</button> -->
+    </details>
+    <details>
+        <summary>Extension Controls</summary>
+        <button id="manage_exts">Manage (enable and disable) extensions</button>
+        <button id="automagically">Automagically disable extensions</button>
+        <p></p>
+        <button id="purge_exts">Purge extension processes</button>
+    </details>
+    <details>
+        <summary>Experiments</summary>
+        These experiments have been known to cause issues and may brick your murkmod install. Here be dragons!
+        <br>
+        <button id="update_chromeos">Update ChromeOS</button>
+        <button id="update_backup">Update emergency backup</button>
+        <button id="restore_backup_backup">Restore emergency backup backup</button>
+        <p></p>
+        <button id="chromebrew">Install Chromebrew</button>
+        <button id="dev_install">Install Gentoo bootstrap (dev_install)</button>
+        <p></p>
+        <button id="boot_usb_on">Enable dev_boot_usb</button>
+        <button id="boot_usb_off">Disable dev_boot_usb</button>
+    </details>
+    <details id="debug" style="display: none;">
+        <summary>Debug</summary>
+        This section contains some debug utilities intended primarily for 1337 hax0rs and you probably don't need to worry about them.
+        <br>
+        <button id="show_mush">Show xterm/puppeteered mush</button>
+        <button id="show_bash">Show bash</button>
+        <p></p>
+        <button id="no_term_autoclose">Disallow xterm task-running autoclose</button>
+        <p></p>
+        <button id="do-xss">xss vulnerability!!!!1!</button>
+        <p></p>
+        <button id="disable_debug">Disable pro hacker mode</button>
+        <p></p>
+        <button id="point_blank">Point blank</button>
+    </details>
+    <div id="ext-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeexts">&times;</span>
+            <div id="ext-content"></div>
+        </div>
+    </div>
+    <div id="store-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closestore">&times;</span>
+            <div id="store-content"></div>
+        </div>
+    </div>
+    <div id="terminal-container"><div id="terminal-holder"><span id="title">xterm</span><span id="close">&times;</span><br><br><div id="terminal"></div></div></div>
+    <div id="terminal-bash-container"><div id="terminal-bash-holder"><span id="title-bash">murkmod helper terminal</span><span id="close-bash">&times;</span><br><br><div id="terminal-bash"></div></div></div>
+    <script src="../js/murkmod.js"></script>
+</body>
+</html>

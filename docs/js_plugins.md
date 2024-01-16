@@ -70,6 +70,6 @@ Shit, that's a lot! Let's break it down a bit:
 
 `window.run_task_silent(input, finished, output_handler, once_done)`
 - `input`: Raw input to be sent to the primary mush session
-- `finished`: If this string is present in the output from the terminal, the task is considered completed. 99% of the time this should be `> (1-`, but depending on your use case it can differ.
+- `finished`: If this string is present in the output from the terminal, the task is considered completed. 99% of the time this should be `> (1-`, but depending on your use case ift can differ.
 - `output_handler`: A function that takes a single string as a parameter, being the output from the terminal. Called every time output is received from the running task.
 - `once_done`: A callback that is executed once the task is completed.
