@@ -129,7 +129,7 @@ murkmod() {
         local hwid=$(jq "(.builds.$board[] | keys)[0]" <<<"$builds")
         local hwid=${hwid:1:-1}
         local milestones=$(jq ".builds.$board[].$hwid.pushRecoveries | keys | .[]" <<<"$builds")
-        local VERSION=$(echo "$milestones" | tail -n 1)
+        local VERSION=$(echo "$milestones" | tail -n 1 | tr -d '"')
         echo "Latest version is $VERSION"
     fi
     local url="https://chrome100.dev/_next/data/$build_id/board/$board.json"
