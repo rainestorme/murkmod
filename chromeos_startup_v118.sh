@@ -1,8 +1,11 @@
 #!/bin/bash
 
-exec >/fakemurk_startup_log
-exec 2>/fakemurk_startup_err
-chmod 644 /fakemurk_startup_log /fakemurk_startup_err
+rm -f /fakemurk_startup_log
+rm -r /fakemurk_startup_err
+mkdir -p /var/murkmod
+exec >/var/murkmod/startup_log
+exec 2>/var/murkmod/startup_err
+chmod 644 /var/murkmod/startup_log /var/murkmod/startup_err
 
 run_plugin() {
     bash "$1" # i know this seems redundant, but this is just here incase something changes in the future
