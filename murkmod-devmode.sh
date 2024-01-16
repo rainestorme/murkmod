@@ -99,28 +99,40 @@ murkmod() {
         echo "!!! Your system already has a murkmod installation! Continuing anyway, but emergency revert will not work correctly. !!!"
     fi
     echo "What version of murkmod do you want to install?"
+    echo "If you're not sure, choose pheonix (v118) or the latest version. If you know what your original enterprise version was, specify that manually."
     echo " 1) og      (chromeOS v105)"
     echo " 2) mercury (chromeOS v107)"
     echo " 3) john    (chromeOS v117)"
     echo " 4) pheonix (chromeOS v118)"
-    echo " 5) custom milestone"
-    read -p "(1-5) > " choice
-    local url_start="https://chrome100.dev/_next/data/nXvQHtPzwNmwX3v4JwDk3/board/"
-    local url_end=".json"
+    echo " 5) latest version"
+    echo " 6) custom milestone"
+    read -p "(1-6) > " choice
+
     case $choice in
         1) VERSION="105" ;;
         2) VERSION="107" ;;
         3) VERSION="117" ;;
         4) VERSION="118" ;;
-        5) read -p "Enter milestone to target (e.g. 105, 107, 117, 118): " VERSION ;;
+        5) VERSION="latest" ;;
+        6) read -p "Enter milestone to target (e.g. 105, 107, 117, 118): " VERSION ;;
         *) echo "Invalid choice, exiting." && exit ;;
     esac
     show_logo
-    echo "Downloading recovery image..."
+    echo "Finding latest Chrome100 build ID..."
+    local build_id=$(curl -s "https://chrome100.dev" | grep -o '"buildId":"[^"]*"' | cut -d':' -f2 | tr -d '"')
+    echo "Finding recovery image..."
     local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
     #local release_board="hatch"
     local board=${release_board%%-*}
-    local url="$url_start$board$url_end"
+    if [ $VERSION == "latest" ]; then
+        local builds=$(curl -ks "https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS\\")
+        local hwid=$(jq "(.builds.$board[] | keys)[0]" <<<"$builds")
+        local hwid=${hwid:1:-1}
+        local milestones=$(jq ".builds.$board[].$hwid.pushRecoveries | keys | .[]" <<<"$builds")
+        local VERSION=$(echo "$milestones" | tail -n 1)
+        echo "Latest version is $VERSION"
+    fi
+    local url="https://chrome100.dev/_next/data/$build_id/board/$board.json"
     local json=$(curl -ks "$url")
     chrome_versions=$(echo "$json" | jq -r '.pageProps.images[].chrome')
     echo "Found $(echo "$chrome_versions" | wc -l) versions of chromeOS for your board on chrome100."
