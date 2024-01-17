@@ -112,7 +112,7 @@ patch_root() {
         move_bin "$ROOT/sbin/chromeos_startup"
         install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup
         chmod 755 $ROOT/sbin/chromeos_startup # whoops
-        touch /new-startup
+        touch $ROOT/new-startup
     else
         move_bin "$ROOT/sbin/chromeos_startup.sh"
         install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
