@@ -102,7 +102,6 @@ patch_root() {
     >$ROOT/population_required
     >$ROOT/reco_patched
     echo "Murkmod-ing root..."
-    # check if lsb-release CHROMEOS_RELEASE_CHROME_MILESTONE is 118 for compat
     echo "Disabling autoupdates..."
     disable_autoupdates
     local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
@@ -111,9 +110,11 @@ patch_root() {
     if [ "$milestone" -gt "116" ]; then
         echo "Detected newer version of CrOS, using new chromeos_startup"
         move_bin "$ROOT/sbin/chromeos_startup"
-        install "chromeos_startup_v118.sh" $ROOT/sbin/chromeos_startup
+        install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup
         chmod 755 $ROOT/sbin/chromeos_startup # whoops
+        touch /new-startup
     else
+        move_bin "$ROOT/sbin/chromeos_startup.sh"
         install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
         chmod 755 $ROOT/sbin/chromeos_startup.sh
     fi
