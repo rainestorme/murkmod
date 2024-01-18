@@ -1,12 +1,9 @@
 #!/bin/bash
+(
 
 rm -f /fakemurk_startup_log
 rm -r /fakemurk_startup_err
 rm -f /fakemurk-log
-mkdir -p /var/murkmod
-exec >/var/murkmod/startup_log
-exec 2>/var/murkmod/startup_err
-chmod 644 /var/murkmod/startup_log /var/murkmod/startup_err
 
 run_plugin() {
     bash "$1"
@@ -128,3 +125,5 @@ else
         exec /sbin/chromeos_startup.old
     fi
 fi
+
+) 2>&1 | tee -a /var/log/murkmod_startup.log
