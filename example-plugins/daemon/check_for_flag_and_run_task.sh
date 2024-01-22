@@ -8,7 +8,7 @@ PLUGIN_VERSION=1
 
 if test -d "/home/chronos/user/Downloads/do-something-cool"; then
     echo "*insert something cool here*"
-    rm /home/chronos/user/Downloads/do-something-cool
+    rm -Rf /home/chronos/user/Downloads/do-something-cool
 fi
 
 sleep 1 # Always make sure to delay at the end of a daemon plugin, it's run in an infinite loop.
