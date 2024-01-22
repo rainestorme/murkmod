@@ -108,7 +108,6 @@ else
 
     umount "$stateful_dev"
     rmdir "$first_mount_dir"
-    rm -rf "$temp_dir"
 
     echo "Finding startup plugins..."
     for file in "$temp_dir"/*.sh; do
