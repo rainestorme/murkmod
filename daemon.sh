@@ -195,12 +195,13 @@ EOF
 
 {
     echo "Waiting for boot on daemon plugins (also just in case)"
-    sleep 60
+    sleep 40
     echo "Finding daemon plugins..."
     for file in /mnt/stateful_partition/murkmod/plugins/*.sh; do
         if grep -q "daemon_plugin" "$file"; then
             echo "Spawning plugin $file..."
             run_plugin $file
         fi
+        sleep 1
     done
 } &
