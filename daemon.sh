@@ -7,6 +7,17 @@ run_plugin() {
     done & disown
 }
 
+wait_for_startup() {
+    while true; do
+        result=$(find /home/chronos -maxdepth 1 -type d -name 'u-*' -print -quit 2>/dev/null)
+        if [ -n "$result" ]; then
+            echo "User directory found: $result"
+            break
+        fi
+        sleep 1
+    done
+}
+
 get_largest_nvme_namespace() {
     # this function doesn't exist if the version is old enough, so we redefine it
     local largest size tmp_size dev
@@ -159,8 +170,8 @@ EOF
 
 {
     # technically this should go in chromeos_startup.sh but it would slow down the boot process
-    echo "Waiting for boot on emergency restore (just in case)"
-    sleep 60
+    echo "Waiting for boot on emergency restore..."
+    wait_for_startup
     echo "Checking for restore flag..."
     if [ -f /mnt/stateful_partition/restore-emergency-backup ]; then
         echo "Restore flag found!"
@@ -195,7 +206,7 @@ EOF
 
 {
     echo "Waiting for boot on daemon plugins (also just in case)"
-    sleep 40
+    wait_for_startup
     echo "Finding daemon plugins..."
     for file in /mnt/stateful_partition/murkmod/plugins/*.sh; do
         if grep -q "daemon_plugin" "$file"; then
