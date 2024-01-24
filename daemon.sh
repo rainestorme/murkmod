@@ -9,9 +9,7 @@ run_plugin() {
 
 wait_for_startup() {
     while true; do
-        result=$(find /home/chronos -maxdepth 1 -type d -name 'u-*' -print -quit 2>/dev/null)
-        if [ -n "$result" ]; then
-            echo "User directory found: $result"
+        if [ "$(cryptohome --action=is_mounted)" == "true" ]; then
             break
         fi
         sleep 1
