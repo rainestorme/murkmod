@@ -513,6 +513,34 @@ document.addEventListener("DOMContentLoaded", function () {
         const match = script.match(regex);
         return match ? match[1] : null;
     };
+    const extractValueUnquoted = (variable, script) => {
+        const regex = new RegExp(`${variable}=(.*?)\n`);
+        const match = script.match(regex);
+        return match ? match[1] : null;
+    };
+
+    function handle_js_dep(plugin) {
+        fetch(`https://api.github.com/repos/rainestorme/murkmod/contents/plugins/${plugin}`)
+            .then(response => {return response.json()})
+            .then(file => {
+                var file_content = atob(file.content);
+                var trimmed = {
+                    "name": file.name,
+                    "path": file.path,
+                    "sha": file.sha,
+                    "size": file.size,
+                    "url": file.url,
+                    "download_url": file.download_url,
+                    "type": file.type,
+                };
+                installed_plugins.push({
+                    file: trimmed,
+                    text: file_content
+                });
+                localStorage.setItem("plugins", JSON.stringify(installed_plugins));
+            });
+    }
+
     document.querySelector("#store").addEventListener("click", function() {
         Swal.fire({
             title: 'Loading plugin store...',
@@ -554,7 +582,15 @@ document.addEventListener("DOMContentLoaded", function () {
                                     const PLUGIN_FUNCTION = extractValue("PLUGIN_FUNCTION", text);
                                     const PLUGIN_DESCRIPTION = extractValue("PLUGIN_DESCRIPTION", text);
                                     const PLUGIN_AUTHOR = extractValue("PLUGIN_AUTHOR", text);
-                                    console.log(PLUGIN_NAME, PLUGIN_FUNCTION, PLUGIN_DESCRIPTION, PLUGIN_AUTHOR);
+                                    const PLUGIN_VERSION = extractValueUnquoted("PLUGIN_VERSION", text);
+                                    var _PLUGIN_DEPENDENCIES = extractValueUnquoted("PLUGIN_DEPENDENCIES", text);
+                                    if (!_PLUGIN_DEPENDENCIES){
+                                        _PLUGIN_DEPENDENCIES = "[]"
+                                    } else {
+                                        _PLUGIN_DEPENDENCIES = _PLUGIN_DEPENDENCIES.replace("(", "[").replace(")", "]").replace(" ", ", ")
+                                    }
+                                    const PLUGIN_DEPENDENCIES = JSON.parse(_PLUGIN_DEPENDENCIES);
+                                    console.log(PLUGIN_NAME, PLUGIN_FUNCTION, PLUGIN_DESCRIPTION, PLUGIN_AUTHOR, PLUGIN_DEPENDENCIES);
                                     var install_btn = "Install";
                                     var installed = false;
                                     for (let i in window.legacy_plugins) {
@@ -564,7 +600,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                         }
                                     }
                                     card.innerHTML = `<div class="card-title">${PLUGIN_NAME}<div>
-                                                      <div class="card-author">By ${PLUGIN_AUTHOR} - Bash</div>
+                                                      <div class="card-author">By ${PLUGIN_AUTHOR} - v${PLUGIN_VERSION} - Bash</div>
                                                       <div class="card-description">${PLUGIN_DESCRIPTION}</div>
                                                       <button id="card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-installbtn">${install_btn}</button>`;
                                     document.querySelector(`#card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-installbtn`).addEventListener("click", function(){
@@ -578,6 +614,13 @@ document.addEventListener("DOMContentLoaded", function () {
                                             }, false, "");
                                             return;
                                         }
+                                        PLUGIN_DEPENDENCIES.forEach(plugin=>{
+                                            window.run_task("114\n", "", "> (1-", function (output) {
+                                                if (output.includes("Enter the name of a plugin (including the .sh) to install it (or q to quit):")) {
+                                                    window.send(`${plugin}\n`);
+                                                }
+                                            }, function () {}, false, "");
+                                        });
                                         window.run_task("114\n", "", "> (1-", function (output) {
                                             if (output.includes("Enter the name of a plugin (including the .sh) to install it (or q to quit):")) {
                                                 window.send(`${file.name}\n`);
@@ -604,6 +647,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                     var install_btn = "Install";
                                     if (already_installed) {
                                         install_btn = "Uninstall";
+                                    }
+                                    if (typeof PLUGIN_DEPENDENCIES !== 'undefined') {
+                                        PLUGIN_DEPENDENCIES.forEach(plugin => {
+                                            handle_js_dep(plugin);
+                                        });
                                     }
                                     card.innerHTML = `<div class="card-title">${PLUGIN_NAME}<div>
                                                       <div class="card-author">By ${PLUGIN_AUTHOR} - JavaScript</div>

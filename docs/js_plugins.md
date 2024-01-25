@@ -16,6 +16,8 @@ var PLUGIN_FUNCTION = "Click me!!!";
 var PLUGIN_DESCRIPTION = "An example JS plugin"
 var PLUGIN_AUTHOR = "Me!";
 var PLUGIN_VERSION = 1;
+// optionally:
+var PLUGIN_DEPENDENCIES = [];
 
 function plugin_init() {
   // this is run on plugin initialization, when a helper tab is opened
@@ -28,6 +30,8 @@ function plugin_main() {
   alert("You clicked the button!");
 }
 ```
+
+Optionally, you can add an array of strings, `PLUGIN_DEPENDENCIES`, to provide a list of plugins published in murkmod that your plugin requires to run correctly. Plugin dependencies are resolved recursively, so be careful about creating deep dependency trees that may increase installation times.
 
 Otherwise, publishing of a JS plugin is identical to that of a bash plugin - fork the murkmod repo, add the file to `/plugins`, and make a PR.
 
