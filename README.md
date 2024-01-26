@@ -1,6 +1,6 @@
 # murkmod
 
-murkmod is a utility script that patches fakemurk and mush to include additional useful utilities, with the most prominent being a plugin manager. At this point, it's basically a continuation of what fakemurk tried to be, since MercuryWorkshop ghosted me after asking me to make a PR.
+murkmod is a continuation of fakemurk and mush that includes additional useful utilities, with the most prominent being a plugin manager.
 
 ## Installation
 
@@ -25,18 +25,30 @@ It is also highly reccomended to install the murkmod helper extension. To do so:
 
 For more information on installation of murkmod, including alternate instructions, see [`docs/installation.md`](docs/installation.md)
 
-## Plugin Management
+## Features
 
-Once murkmod is installed, refresh your mush tab or open a new one with `Ctrl+Alt+T`. You'll see a bunch of new options, but the important ones for this guide are `Install plugins`, `Uninstall plugins` and `Plugins`.
+- Plugin manager
+   - Multiple supported languages: Bash and JavaScript (Python support is in the works)
+   - Easy system development: Plugins can run as daemons in the background, upon startup, or when a user triggers them
+   - Simple API: Read the docs [here](https://github.com/rainestorme/murkmod/blob/main/docs/plugin_dev.md)
+- Support for newer versions of ChromeOS (R116 and up)
+   - Experimental Crouton audio support on newer versions
+- Improved privacy (*[Opt-in, anonymous analytics](https://murkmod-analytics.besthaxer.repl.co/)*\*\* and no automatic updates)
+- Multiple versatile [installation methods](https://github.com/rainestorme/murkmod/blob/main/docs/installation.md)
+   - Direct flashing to system storage via [SH1mmer-SMUT](https://github.com/cognito-inc-real/SH1mmer-SMUT)
+   - Installation from VT2 via the devmode installer
+   - Or upgrade *any pre-existing fakemurk installation*\* to murkmod with a single command
+- Graphical helper extension
+- Password-protection for mush to prevent unauthorized tampering by inexperienced invidividuals
+- Automatic extension disabling to save time during repeated installations
+- Alliterated name that sounds pretty cool
+- And all base fakemurk features:
+   - crossystem spoofing with crossystem.sh
+   - Convenient shell access
+   - Enabling and disabling extensions
+   - User policy modification with Pollen
+   - Built-in Crouton support
 
-To install a plugin, head over to [this link](https://github.com/rainestorme/murkmod/tree/main/plugins). Find the plugin you want and remember its filename. Select `Install plugins` and enter said filename. The plugin should be fetched from Github, and then you can enter `q` to quit.
+\*fakemurk v1.1.0 has been the most tested with murkmod, but v1.2.1 is the latest version and is reccomended if you wish to install murkmod in this way
 
-You can go to `Plugins` to use your installed plugins. Once you select an option, it should execute the plugin's contents.
-
-## Plugin Development
-
-See [`docs/plugin_dev.md`](docs/plugin_dev.md)
-
-## About Analytics
-
-Analytics are completely anonymous - based on HWID only. You can view the collected data publicly [here](https://murkmod-analytics.besthaxer.repl.co/).
+\*\*Analytics are completely anonymous - based on HWID only. You can view the collected data publicly [here](https://murkmod-analytics.besthaxer.repl.co/).
