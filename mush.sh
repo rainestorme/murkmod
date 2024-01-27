@@ -181,7 +181,7 @@ EOF
 do_install_plugin() {
   local url=$1
   local filename="$(echo "${url}" | rev | cut -d/ -f1 | rev)"
-  if [! -f /mnt/stateful_partition/murkmod/plugins/$filename ]; then
+  if [ ! -f /mnt/stateful_partition/murkmod/plugins/$filename ]; then
     doas "pushd /mnt/stateful_partition/murkmod/plugins
     curl $url -O
     chmod 775 /mnt/stateful_partition/murkmod/plugins/$filename
