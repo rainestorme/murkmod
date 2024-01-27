@@ -186,7 +186,7 @@ do_install_plugin() {
     curl $url -O
     chmod 775 /mnt/stateful_partition/murkmod/plugins/$filename
     popd" > /dev/null
-    local dependencies=($(grep -oP '(?<=PLUGIN_DEPENDENCIES\+=\()[^)]*' "$filename"))
+    local dependencies=($(grep -o '(PLUGIN_DEPENDENCIES\+=\()[^)]*' "$filename"))
     for dep in "${dependencies[@]}"; do
       do_install_plugin "$dep"
     done
