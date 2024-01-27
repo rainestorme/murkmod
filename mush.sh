@@ -188,7 +188,10 @@ do_install_plugin() {
     popd" > /dev/null
     local dependencies=($(grep -o 'PLUGIN_DEPENDENCIES\+=([^)]*)' "/mnt/stateful_partition/murkmod/plugins/$filename" | sed 's/PLUGIN_DEPENDENCIES\+=//; s/[()]//g'))   
     for dep in "${dependencies[@]}"; do
-      do_install_plugin "$dep"
+      echo "$dep"
+      local dep_fixed=$(echo "$dep" | tr -d '"')
+      echo "$dep_fixed"
+      do_install_plugin "$dep_fixed"
     done
   fi
   read -r -p "Press enter to continue." throwaway
