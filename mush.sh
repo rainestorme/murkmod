@@ -191,6 +191,7 @@ do_install_plugin() {
       do_install_plugin "$dep"
     done
   fi
+  read -r -p "Press enter to continue." throwaway
 }
 
 install_plugin_legacy() {
