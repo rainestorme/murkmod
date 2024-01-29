@@ -1,4 +1,4 @@
-# Installations
+# Installation
 
 murkmod has seen many iterations, and due to this, there are many methods available to install it. All previously functional methods of installation are still fully maintained.
 
