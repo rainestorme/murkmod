@@ -81,6 +81,7 @@ choose_bootsplash() {
   echo " 3. PS2 Startup"
   echo " 4. Xbox Startup"
   echo " 5. Gamecube Startup"
+  echo " 6. Apple Logo"
   read -r -p "> (1-5): " choice
   case "$choice" in
   1) get_bootsplash "pipboy.tar.gz" /tmp/bootsplash.tar.gz ;;
@@ -88,6 +89,7 @@ choose_bootsplash() {
   3) get_bootsplash "ps2.tar.gz" /tmp/bootsplash.tar.gz ;;
   4) get_bootsplash "xbox.tar.gz" /tmp/bootsplash.tar.gz ;;
   5) get_bootsplash "gamecube.tar.gz" /tmp/bootsplash.tar.gz ;;
+  6) get_bootsplash "apple.tar.gz" /tmp/bootsplash.tar.gz ;;
   *) echo && echo "Invalid option, dipshit." && echo ;;
   esac
   tar -xzf /tmp/bootsplash.tar.gz -C /tmp/
