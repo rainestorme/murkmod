@@ -17,6 +17,12 @@ echo "Hello, World!"
 
 Of course, you should change this to match your plugin. Every time you update your plugin, you should increment `PLUGIN_VERSION`. Everything below the initial variables, though, is what is executed when you run the plugin from the mush menu.
 
+Optionally, you can specify a array of plugin names, `PLUGIN_DEPENDENCIES`. These plugins will be installed automatically when this plugin is installed.
+
+```sh
+PLUGIN_DEPENDENCIES=("plugin_1.sh" "plugin_2.sh")
+```
+
 To add a plugin to this repository (for easy download from mush), just fork the repo, add the file in `/plugins/` and make a PR. I'll review it and merge it if it doesn't do anything malicious.
 
 The second comment at the top defines the type of the plugin. There are threeplugin types:
