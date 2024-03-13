@@ -520,7 +520,8 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     function handle_js_dep(plugin) {
-        fetch(`https://api.github.com/repos/rainestorme/murkmod/contents/plugins/${plugin}`)
+        if (plugin.endsWith(".js")){
+            fetch(`https://api.github.com/repos/rainestorme/murkmod/contents/plugins/${plugin}`)
             .then(response => {return response.json()})
             .then(file => {
                 var file_content = atob(file.content);
@@ -539,6 +540,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
                 localStorage.setItem("plugins", JSON.stringify(installed_plugins));
             });
+        } else {
+            window.run_task("114\n", "", "> (1-", function (output) {
+                if (output.includes("Enter the name of a plugin (including the .sh) to install it (or q to quit):")) {
+                    window.send(`${plugin}\n`);
+                }
+            }, function () {}, false, "");
+        }
     }
 
     document.querySelector("#store").addEventListener("click", function() {
