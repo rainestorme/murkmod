@@ -255,8 +255,8 @@ EOF
     read -n 1 -s -r -p "Done! Press any key to continue and your system will reboot automatically."
     reboot
     echo "Bye!"
-    sleep 20
-    echo "Your system should have rebooted. If it didn't please perform an EC reset (Refresh+Power)."
+    sleep 10
+    echo "Your system should have rebooted. If it didn't, please perform an EC reset (Refresh+Power)."
     sleep 1d
     exit
 }
