@@ -567,6 +567,24 @@ document.addEventListener("DOMContentLoaded", function () {
                                                       <div class="card-author">By ${PLUGIN_AUTHOR} - Bash</div>
                                                       <div class="card-description">${PLUGIN_DESCRIPTION}</div>
                                                       <button id="card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-installbtn">${install_btn}</button>`;
+                                    if (installed) {
+                                        card.innerHTML = card.innerHTML + `<button id="card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-updatebtn">Update</button>`
+                                        document.querySelector(`#card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-updatebtn`).addEventListener("click", function(){
+                                            window.run_task("115\n", "", "> (1-", function (output) {
+                                                if (output.includes("Enter the name of a plugin (including the .sh) to uninstall it (or q to quit):")) {
+                                                    window.send(`${file.name}\n`);
+                                                }
+                                            }, function () {
+                                                window.run_task("114\n", "", "> (1-", function (output) {
+                                                    if (output.includes("Enter the name of a plugin (including the .sh) to install it (or q to quit):")) {
+                                                        window.send(`${file.name}\n`);
+                                                    }
+                                                }, function () {
+                                                    window.location.reload();
+                                                }, false, "");
+                                            }, false, "");
+                                        });
+                                    }
                                     document.querySelector(`#card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-installbtn`).addEventListener("click", function(){
                                         if (document.querySelector(`#card-${file.name.split(".")[0]}-${file.name.split(".")[1]}-installbtn`).innerHTML === "Uninstall") {
                                             window.run_task("115\n", "", "> (1-", function (output) {
