@@ -30,4 +30,4 @@ Menu plugins aren't run as root - all other plugins are. Startup plugins run onc
 Make sure that your startup plugin runs quickly - or, at least, as quickly as possible. It'll hold up the boot process until it exits.
 
 > [!IMPORTANT]
-> If your startup plugin tries to use /mnt/stateful_partition, it will fail! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see [`example-plugins/startup/read_file_from_stateful.sh`](/example-plugins/startup/read_file_from_stateful.sh) for an example.
+> If your startup plugin tries to use /mnt/stateful_partition, it will fail! Startup plugins are run before stateful is mounted. If your startup plugin needs to access stateful, see [`docs/example-plugins/startup/read_file_from_stateful.sh`](/docs/example-plugins/startup/read_file_from_stateful.sh) for an example.
