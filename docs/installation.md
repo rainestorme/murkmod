@@ -5,15 +5,15 @@ murkmod has seen many iterations, and due to this, there are many methods availa
 ## Developer Mode Installer (recommended)
 
 > [!WARNING]
-> You should have unblocked developer mode in some capacity before following the instructions below, most likely by setting your GBB flags to `0x8000`, `0x8090`, or `0x8091`.
+> You should have unblocked developer mode in some capacity before following the instructions below, most likely by setting your GBB flags to `0x8000`, `0x8090`, or `0x8091`, or by being on a low enough firmware version for it to not matter.
 
-Enter developer mode while enrolled and boot into ChromeOS. Connect to WiFi, but don't log in. Open VT2 by pressing `Ctrl+Alt+F2 (Forward)` and log in as `root`. Run the following command:
+Enter developer mode while unenrolled and boot into ChromeOS. Connect to WiFi, but don't log in. Open VT2 by pressing `Ctrl+Alt+F2 (Forward)` and log in as `root`. Run the following command:
 
 ```sh
 bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod-devmode.sh)
 ```
 
-Select the chromeOS milestone you want to install with murkmod. The script will then automatically download the correct recovery image, patch it, and install it to your device. Once the installation is complete, the system will reboot into a murkmod-patched rootfs. Continue to [Common Installation Steps](#common-installation-steps).
+Select the chromeOS milestone you want to install with murkmod. The script will then automatically download the correct recovery image, patch it, and install it to your device. Once the installation is complete, the system will reboot into an enrolled, murkmod-patched rootfs. Continue to [Common Installation Steps](#common-installation-steps).
 
 ## SH1mmer-SMUT
 
