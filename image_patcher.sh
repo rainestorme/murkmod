@@ -184,8 +184,11 @@ main() {
   if [ -z $2 ]; then
     echo "Not using a custom bootsplash."
     local bootsplash="0"
+  elif [ "$2" == "cros" ]; then
+    echo "Using cros bootsplash."
+    local bootsplash="cros"
   elif [ ! -f $2 ]; then
-    echo "file $2 not found for custom bootsplash"
+    echo "File $2 not found for custom bootsplash"
     local bootsplash="0"
   else
     echo "Using custom bootsplash $2"
@@ -222,20 +225,22 @@ main() {
   ROOT=/tmp/mnt
   patch_root
 
-  if [ "$bootsplash" != "0" ]; then
-    echo "Adding custom bootsplash..."
-    for i in $(seq -f "%02g" 0 30); do
-      rm $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
-    done
-    cp $bootsplash $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png
-  else
-    echo "Adding murkmod bootsplash..."
-    install "chromeos-bootsplash-v2.png" /tmp/bootsplash.png
-    for i in $(seq -f "%02g" 0 30); do
-      rm $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
-    done
-    cp /tmp/bootsplash.png $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png
-    rm /tmp/bootsplash.png
+  if [ "$bootsplash" != "cros" ]; then
+    if [ "$bootsplash" != "0" ]; then
+      echo "Adding custom bootsplash..."
+      for i in $(seq -f "%02g" 0 30); do
+        rm $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
+      done
+      cp $bootsplash $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png
+    else
+      echo "Adding murkmod bootsplash..."
+      install "chromeos-bootsplash-v2.png" /tmp/bootsplash.png
+      for i in $(seq -f "%02g" 0 30); do
+        rm $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame${i}.png
+      done
+      cp /tmp/bootsplash.png $ROOT/usr/share/chromeos-assets/images_100_percent/boot_splash_frame00.png
+      rm /tmp/bootsplash.png
+    fi
   fi
 
   if [ "$unfuckstateful" == "0" ]; then
