@@ -301,6 +301,7 @@ autodisableexts() {
     disable_ext_nokill "feepmdlmhplaojabeoecaobfmibooaid" # OrbitNote
     disable_ext_nokill "dmhpekdihnngbkinliefnclgmgkpjeoo" # GoGuardian License
     disable_ext_nokill "modkadcjnbamppdpdkfoackjnhnfiogi" # MyMPS Chrome SSO
+    ext_purge
     echo "Done."
 }
 
