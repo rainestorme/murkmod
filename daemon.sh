@@ -188,14 +188,14 @@ EOF
             echo "Restoring rootfs..."
             dd if=/mnt/stateful_partition/murkmod/root_backup.img of=$rootdev bs=4M status=progress
             echo "Removing restore flag..."
-            rm /restore-emergency-backup
+            rm /mnt/stateful_partition/restore-emergency-backup
             echo "Removing backup files..."
-            rm /mnt/stateful_partition/murkmod/kern_backup.img
-            rm /mnt/stateful_partition/murkmod/root_backup.img
+            rm -f /mnt/stateful_partition/murkmod/kern_backup.img
+            rm -f /mnt/stateful_partition/murkmod/root_backup.img
             echo "Restored successfully!"
         else
             echo "Missing backup image, removing restore flag and aborting!"
-            rm /restore-emergency-backup
+            rm /mnt/stateful_partition/restore-emergency-backup
         fi
     else 
         echo "No need to restore."
