@@ -730,6 +730,15 @@ opposite_num() {
 }
 
 attempt_chromeos_update(){
+    read -p "Do you want to use the default ChromeOS bootsplash? [y/N] " use_orig_bootsplash
+    case "$use_orig_bootsplash" in
+        [yY][eE][sS]|[yY]) 
+            USE_ORIG_SPLASH="1"
+            ;;
+        *)
+            USE_ORIG_SPLASH="0"
+            ;;
+    esac
     local builds=$(curl https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
     local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
     local board=${release_board%%-*}
@@ -774,7 +783,12 @@ attempt_chromeos_update(){
         cat $tmpdir/image.zip | gunzip | doas "dd of=$tmpdir/image.bin status=progress"
         doas rm -f $tmpdir/image.zip
         echo "Invoking image patcher..."
-        doas image_patcher.sh "$tmpdir/image.bin"
+        if [ "$USE_ORIG_SPLASH" == 0 ]; then
+            doas image_patcher.sh "$tmpdir/image.bin"
+        else
+            doas image_patcher.sh "$tmpdir/image.bin" cros
+        fi
+        
 
         local loop=$(doas losetup -f | tr -d '\r')
         doas losetup -P "$loop" "$tmpdir/image.bin"

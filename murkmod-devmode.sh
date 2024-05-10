@@ -118,6 +118,16 @@ murkmod() {
         *) echo "Invalid choice, exiting." && exit ;;
     esac
     show_logo
+    read -p "Do you want to use the default ChromeOS bootsplash? [y/N] " use_orig_bootsplash
+    case "$use_orig_bootsplash" in
+        [yY][eE][sS]|[yY]) 
+            USE_ORIG_SPLASH="1"
+            ;;
+        *)
+            USE_ORIG_SPLASH="0"
+            ;;
+    esac
+    show_logo
     echo "Finding latest Chrome100 build ID..."
     local build_id=$(curl -s "https://chrome100.dev" | grep -o '"buildId":"[^"]*"' | cut -d':' -f2 | tr -d '"')
     echo "Finding recovery image..."
@@ -192,7 +202,7 @@ EOF
         set -e
         echo "Downloading recovery image from '$FINAL_URL'..."
         curl --progress-bar -k "$FINAL_URL" -o recovery.zip
-        echo "Unzipping image..."
+        echo "Unzipping image... (this may take a while)"
         unzip -o recovery.zip
         rm recovery.zip
         FILENAME=$(find . -maxdepth 2 -name "chromeos_*.bin") # 2 incase the zip format changes
@@ -210,7 +220,11 @@ EOF
             chmod 777 ./lib/common_minimal.sh
         popd
         echo "Invoking image_patcher.sh..."
-        bash /usr/local/tmp/image_patcher.sh "$FILENAME"
+        if [ "$USE_ORIG_SPLASH" == 0 ]; then
+            bash /usr/local/tmp/image_patcher.sh "$FILENAME"
+        else
+            bash /usr/local/tmp/image_patcher.sh "$FILENAME" cros
+        fi
         echo "Patching complete. Determining target partitions..."
         local dst=/dev/$(get_largest_nvme_namespace)
         if [[ $dst == /dev/sd* ]]; then
