@@ -137,7 +137,7 @@ patch_root() {
     echo "Done."
 }
 
-# https://chromium.googlesource.com/chromiumos/docs/+/main/lsb-release.md
+# https://www.chromium.org/chromium-os/developer-library/reference/infrastructure/lsb-release/
 lsbval() {
   local key="$1"
   local lsbfile="${2:-/etc/lsb-release}"
