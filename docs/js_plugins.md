@@ -97,3 +97,14 @@ The methods available in `MurkmodFsAccess` are as follows:
 - `read(string file)`: Reads the contents of a given file.
 
 All of these functions return a `Promise` which resolves differently according to each function.
+
+For instance:
+
+```js
+var fs = new MurkmodFsAccess();
+fs.cd("/").then(function(){
+    fs.read("startup_log").then(log => {
+      console.log("Startup log:", log);
+    });
+});
+```
