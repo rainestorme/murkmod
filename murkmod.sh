@@ -225,7 +225,7 @@ set_cros_debug() {
 check_legacy_daemon() {
     if [ -f /sbin/fakemurk-daemon.sh ]; then
         echo "Found legacy fakemurk daemon, removing..."
-        kill $(pgrep fakemurk)
+        kill -9 $(pgrep fakemurk)
         rm -f /sbin/fakemurk-daemon.sh
         mkdir -p /var/murkmod
         echo "Restarting daemon..."

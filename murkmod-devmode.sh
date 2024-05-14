@@ -94,6 +94,7 @@ murkmod() {
     show_logo
     if [ -f /sbin/fakemurk-daemon.sh ]; then
         echo "!!! Your system already has a fakemurk installation! Continuing anyway, but emergency revert will not work correctly. !!!"
+        echo "Instead, consider upgrading your fakemurk installation to murkmod or reinstalling CrOS from scratch."
     fi
     if [ -f /sbin/murkmod-daemon.sh ]; then
         echo "!!! Your system already has a murkmod installation! Continuing anyway, but emergency revert will not work correctly. !!!"

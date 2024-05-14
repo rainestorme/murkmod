@@ -172,10 +172,78 @@ EOF
         113) runjob list_plugins ;;
         114) runjob install_plugin_legacy ;;
         115) runjob uninstall_plugin_legacy ;;
+        201) runjob api_read_file ;;
+        202) runjob api_write_file ;;
+        203) runjob api_append_file ;;
+        204) runjob api_touch_file ;;
+        205) runjob api_create_dir ;;
+        206) runjob api_rm_file ;;
+        207) runjob api_rm_dir ;;
+        208) runjob api_ls_dir ;;
+        209) runjob api_cd ;;
     
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+api_read_file() {
+    echo "file to read?"
+    read -r filename
+    local contents=$( base64 $filename )
+    echo "start content: $contents end content"
+}
+
+api_write_file() {
+    echo "file to write to?"
+    read -r filename
+    echo "base64 contents?"
+    read -r contents
+    base64 -d <<< "$contents" > $filename
+}
+
+api_append_file() {
+    echo "file to write to?"
+    read -r filename
+    echo "base64 contents to append?"
+    read -r contents
+    base64 -d <<< "$contents" >> $filename
+}
+
+api_touch_file() {
+    echo "filename?"
+    read -r filename
+    touch $filename
+}
+
+api_create_dir() {
+    echo "dirname?"
+    read -r dirname
+    mkdir -p $dirname
+}
+
+api_rm_file() {
+    echo "filename?"
+    read -r filename
+    rm -f $filename
+}
+
+api_rm_dir() {
+    echo "dirname?"
+    read -r dirname
+    rm -Rf $dirname
+}
+
+api_ls_dir() {
+    echo "dirname? (or . for current dir)"
+    read -r dirname
+    ls $dirname
+}
+
+api_cd() {
+    echo "dir?"
+    read -r dirname
+    cd $dirname
 }
 
 install_plugin_legacy() {

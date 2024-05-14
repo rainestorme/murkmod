@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>murkmod helper webui</title>
-    <link rel="stylesheet" href="../css/xterm.css" />
-    <script src="../js/xterm.js"></script>
+    <link rel="stylesheet" href="../css/lib/xterm.css" />
+    <script src="../js/lib/xterm.js"></script>
     <link rel="stylesheet" href="https://fonts.xz.style/serve/inter.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css">
     <link rel="stylesheet" href="../css/murkmod.css">
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@4/dark.css" rel="stylesheet">
-    <script src="../js/swal2.js"></script>
+    <script src="../js/lib/swal2.js"></script>
 </head>
 <body>
     <h1>murkmod helper</h1>
@@ -104,6 +104,10 @@
     </div>
     <div id="terminal-container"><div id="terminal-holder"><span id="title">xterm</span><span id="close">&times;</span><br><br><div id="terminal"></div></div></div>
     <div id="terminal-bash-container"><div id="terminal-bash-holder"><span id="title-bash">murkmod helper terminal</span><span id="close-bash">&times;</span><br><br><div id="terminal-bash"></div></div></div>
-    <script src="../js/murkmod.js"></script>
+    
+    <script src="../js/api/murkmod.js"></script>
+    <script src="../js/page/store.js"></script>
+    <script src="../js/page/interactivity.js"></script>
+    <script src="../js/api/fs.js"></script>
 </body>
 </html>
