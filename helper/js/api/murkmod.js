@@ -304,5 +304,4 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log(v);
         tp.sendInput(window.bash_id, v.key);
     });
-
 });
