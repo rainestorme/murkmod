@@ -166,7 +166,7 @@ EOF
         24) runjob attempt_dev_install ;;
         25) runjob do_updates && exit 0 ;;
         26) runjob do_dev_updates && exit 0 ;;
-        101) runjob hard_disable_nokill ;;
+        101) runjob hard_disable_nokill ;; # anything prefixed with a 1 is for the helper extension, you can safely ignore these as a user
         111) runjob hard_enable_nokill ;;
         112) runjob ext_purge ;;
         113) runjob list_plugins ;;
@@ -176,6 +176,24 @@ EOF
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+do_install_plugin() {
+  local url=$1
+  local filename="$(echo "${url}" | rev | cut -d/ -f1 | rev)"
+  if [ ! -f /mnt/stateful_partition/murkmod/plugins/$filename ]; then
+    doas "pushd /mnt/stateful_partition/murkmod/plugins
+    curl $url -O
+    chmod 775 /mnt/stateful_partition/murkmod/plugins/$filename
+    popd" > /dev/null
+    local dependencies=($(grep -o 'PLUGIN_DEPENDENCIES\+=([^)]*)' "/mnt/stateful_partition/murkmod/plugins/$filename" | sed 's/PLUGIN_DEPENDENCIES\+=//; s/[()]//g'))   
+    for dep in "${dependencies[@]}"; do
+      local dep_fixed=$(echo "$dep" | tr -d '"')
+      echo "Installing $dep_fixed..."
+      do_install_plugin "https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$dep_fixed"
+    done
+  fi
+  read -r -p "Press enter to continue." throwaway
 }
 
 install_plugin_legacy() {
@@ -193,7 +211,7 @@ install_plugin_legacy() {
     echo "Plugin not found"
   else      
     echo "Installing..."
-    doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O && popd" > /dev/null
+    do_install_plugin "https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name"
     echo "Installed $plugin_name"
   fi
 }
@@ -481,7 +499,7 @@ install_plugins() {
             "") clear
                 echo "Using URL: ${download_urls[$selected_option]}"
                 echo "Installing plugin..."
-                doas "pushd /mnt/stateful_partition/murkmod/plugins && curl ${download_urls[$selected_option]} -O && popd" > /dev/null
+                do_install_plugin "${download_urls[$selected_option]}"
                 echo "Done!"
                 ;;
         esac
