@@ -33,10 +33,7 @@ fi
 # this is because ssh-keygen was introduced somewhere around R80, where many shims are still stuck on R73
 # filesystem unfuck can only be done before stateful is mounted, which is perfectly fine in a shim but not if you run it while booted
 # because mkfs is mean and refuses to let us format
-
 # note that this will lead to confusing behaviour, since it will appear as if it crashed as a result of fakemurk
-
-# startup plugins are also launched here, for low-level control over 
 
 # funny boot messages
 echo "Oh fuck - ChromeOS is trying to kill itself." >/usr/share/chromeos-assets/text/boot_messages/en/block_devmode_virtual.txt
