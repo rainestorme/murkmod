@@ -1,18 +1,4 @@
 #!/bin/bash
-# fakemurk.sh v1
-# by coolelectronics with help from r58
-# sets up all required scripts for spoofing os verification in devmode
-# this script bundles crossystem.sh and vpd.sh
-
-# crossystem.sh v3.0.0
-# made by r58Playz and stackoverflow
-# emulates crossystem but with static values to trick chromeos and google
-# version history:
-# v3.0.0 - implemented mutable crossystem values
-# v2.0.0 - implemented all functionality
-# v1.1.1 - hotfix for stupid crossystem
-# v1.1.0 - implemented <var>?<value> functionality (searches for value in var)
-# v1.0.0 - basic functionality implemented
 
 # image_patcher.sh
 # written based on the original by coolelectronics and r58, modified heavily for murkmod
@@ -130,6 +116,7 @@ patch_root() {
     install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
     install "crossystem_boot_populator.sh" $ROOT/sbin/crossystem_boot_populator.sh
     install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
+    install "plugin_common.sh" $ROOT/usr/bin/murkmod_plugin_common.sh
     mkdir -p "$ROOT/etc/opt/chrome/policies/managed"
     install "pollen.json" $ROOT/etc/opt/chrome/policies/managed/policy.json
     echo "Chmod-ing everything..."
@@ -137,7 +124,7 @@ patch_root() {
     echo "Done."
 }
 
-# https://chromium.googlesource.com/chromiumos/docs/+/main/lsb-release.md
+# https://www.chromium.org/chromium-os/developer-library/reference/infrastructure/lsb-release/
 lsbval() {
   local key="$1"
   local lsbfile="${2:-/etc/lsb-release}"
