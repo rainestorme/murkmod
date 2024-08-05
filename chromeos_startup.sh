@@ -36,7 +36,9 @@ fi
 
 # note that this will lead to confusing behaviour, since it will appear as if it crashed as a result of fakemurk
 
-# startup plugins are also launched here, for low-level control over 
+# startup plugins are also launched here, for low-level control over the system
+# /path/to/example_plugin.sh
+
 
 # funny boot messages
 # multi-liners
