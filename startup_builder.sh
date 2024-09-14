@@ -12,7 +12,7 @@ TGZ_URL="https://chromium.googlesource.com/chromiumos/platform2/+archive/$BRANCH
 SDK_VERSION="2024.05.07.65861"
 SDK_FILENAME="cros-sdk-$SDK_VERSION.tar.xz"
 SDK_URL="https://storage.googleapis.com/chromiumos-sdk/$SDK_FILENAME"
-SDK_FOLDER="/media/nerd/43c9276a-f961-4294-91e3-56e545ca5964"
+SDK_FOLDER="./sdk"
 
 pushd (){
     command pushd "$@" > /dev/null 
