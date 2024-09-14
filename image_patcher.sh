@@ -4,7 +4,7 @@
 # written based on the original by coolelectronics and r58, modified heavily for murkmod
 
 CURRENT_MAJOR=6
-CURRENT_MINOR=0
+CURRENT_MINOR=1
 CURRENT_VERSION=0
 
 # God damn, there are a lot of unused functions in here!

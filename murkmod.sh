@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURRENT_MAJOR=6
-CURRENT_MINOR=0
+CURRENT_MINOR=1
 CURRENT_VERSION=0
 
 if [[ -z "${MURKMOD_BRANCH}" ]]; then
