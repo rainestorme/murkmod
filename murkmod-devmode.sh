@@ -128,8 +128,6 @@ murkmod() {
             ;;
     esac
     show_logo
-    echo "Finding latest Chrome100 build ID..."
-    local build_id=$(curl -s "https://chrome100.dev" | grep -o '"buildId":"[^"]*"' | cut -d':' -f2 | tr -d '"')
     echo "Finding recovery image..."
     local release_board=$(lsbval CHROMEOS_RELEASE_BOARD)
     #local release_board="hatch"
@@ -142,7 +140,7 @@ murkmod() {
         local VERSION=$(echo "$milestones" | tail -n 1 | tr -d '"')
         echo "Latest version is $VERSION"
     fi
-    local url="https://chrome100.dev/_next/data/$build_id/board/$board.json"
+    local url="https://raw.githubusercontent.com/rainestorme/chrome100-json/main/boards/$board.json"
     local json=$(curl -ks "$url")
     chrome_versions=$(echo "$json" | jq -r '.pageProps.images[].chrome')
     echo "Found $(echo "$chrome_versions" | wc -l) versions of chromeOS for your board on chrome100."
