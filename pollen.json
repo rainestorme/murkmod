@@ -86,5 +86,6 @@
   "WebAppInstallForceList": null,
   "UserAvatarCustomizationSelectorsEnabled": true,
   "DnsOverHttpsMode": null,
-  "EditBookmarksEnabled": true
+  "EditBookmarksEnabled": true,
+  "JavaScriptBlockedForUrls": []
 }
