@@ -13,6 +13,7 @@ At the main menu, you have the option to enter a number corresponding to a menu 
 - `112`: Purge extension processes - Kills all extension processes.
 - `113`: Prints a list of installed plugins and their individual metadata.
 - `114` and `115`: Legacy install/uninstall plugin - Readline-based plugin management for easier interface from the helper extension.
+- `2**`: Interface for the JS plugin filesystem access API (see `class MurkmodFsAccess`)
 
 The murkmod installation script (murkmod.sh, **not** the VT2 installer!) reads an environment variable called `MURKMOD_BRANCH` - it is normally set by option `26`, but it can be set by hand by using the following command:
 

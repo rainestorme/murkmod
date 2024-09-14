@@ -75,3 +75,36 @@ Shit, that's a lot! Let's break it down a bit:
 - `finished`: If this string is present in the output from the terminal, the task is considered completed. 99% of the time this should be `> (1-`, but depending on your use case ift can differ.
 - `output_handler`: A function that takes a single string as a parameter, being the output from the terminal. Called every time output is received from the running task.
 - `once_done`: A callback that is executed once the task is completed.
+
+## Filesystem API
+
+In order to asynchronously access the filesystem from a JS plugin, you can use `MurkmodFsAccess`:
+
+```js
+var fs = new MurkmodFsAccess();
+```
+
+The methods available in `MurkmodFsAccess` are as follows:
+
+- `cd(string dir)`: Changes to a given directory.
+- `ls()` or `ls(string dir)`: Lists contents of a directory as a string, delimited with spaces.
+- `rm_dir(string dir)`: Deletes a directory recursively.
+- `rm_file(string file)`: Deletes a single file.
+- `mkdir(string dir)`: Creates a directory, recursively if neccesary.
+- `touch(string file)`: Creates a file or updates its date last modified.
+- `append(string file, string|array content)`: Appends a string or binary data to a given file.
+- `write(string file, string|array content)`: Overwrites the contents of a file with the given string or binary data.
+- `read(string file)`: Reads the contents of a given file.
+
+All of these functions return a `Promise` which resolves differently according to each function.
+
+For instance:
+
+```js
+var fs = new MurkmodFsAccess();
+fs.cd("/").then(function(){
+    fs.read("startup_log").then(log => {
+      console.log("Startup log:", log);
+    });
+});
+```

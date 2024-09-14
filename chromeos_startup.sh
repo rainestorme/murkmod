@@ -29,15 +29,6 @@ if [ -z $DST ]; then
     DST=/dev/mmcblk0
 fi
 
-# we stage sshd and mkfs as a one time operation in startup instead of in the bootstrap script
-# this is because ssh-keygen was introduced somewhere around R80, where many shims are still stuck on R73
-# filesystem unfuck can only be done before stateful is mounted, which is perfectly fine in a shim but not if you run it while booted
-# because mkfs is mean and refuses to let us format
-
-# note that this will lead to confusing behaviour, since it will appear as if it crashed as a result of fakemurk
-
-# startup plugins are also launched here, for low-level control over the system
-# /path/to/example_plugin.sh
 
 
 # funny boot messages
@@ -59,6 +50,11 @@ echo "i sure hope you did that on purpose (powerwashing system)" >/usr/share/chr
 
 crossystem.old block_devmode=0 # prevent chromeos from comitting suicide
 
+# we stage sshd and mkfs as a one time operation in startup instead of in the bootstrap script
+# this is because ssh-keygen was introduced somewhere around R80, where many shims are still stuck on R73
+# filesystem unfuck can only be done before stateful is mounted, which is perfectly fine in a shim but not if you run it while booted
+# because mkfs is mean and refuses to let us format
+# note that this will lead to confusing behaviour, since it will appear as if it crashed as a result of fakemurk
 if [ ! -f /sshd_staged ]; then
     # thanks rory! <3
     echo "Staging sshd..."
