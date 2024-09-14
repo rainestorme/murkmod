@@ -1,0 +1,111 @@
+--- chromeos_startup.cc	2024-05-10 09:40:26.333021034 -0500
++++ chromeos_startup.cc	2024-05-10 09:51:09.829638009 -0500
+@@ -223,34 +223,8 @@
+ 
+ // Returns if device needs to clobber even though there's no devmode file
+ // present and boot is in verified mode.
++// murkmod note: stubbed
+ bool ChromeosStartup::NeedsClobberWithoutDevModeFile() {
+-  base::FilePath preservation_request =
+-      stateful_.Append(kPreservationRequestFile);
+-  base::FilePath cryptohome_key = stateful_.Append(kCryptohomeKeyFile);
+-  base::FilePath need_finalization =
+-      stateful_.Append(kEncStatefulNeedFinalizationFile);
+-
+-  if (IsTPMOwned()) {
+-    return false;
+-  }
+-
+-  if (platform_->FileExists(need_finalization)) {
+-    return true;
+-  }
+-
+-  // This should only be supported on the non-TPM2 device.
+-  if (!USE_TPM2) {
+-    uid_t uid;
+-    if (platform_->GetOwnership(preservation_request, &uid, nullptr,
+-                                false /* follow_links */) &&
+-        (uid == getuid()))
+-      return false;
+-  }
+-
+-  if (platform_->FileExists(cryptohome_key)) {
+-    return true;
+-  }
+-
+   return false;
+ }
+ 
+@@ -818,6 +792,8 @@
+   }
+ 
+   // Checks if developer mode is blocked.
++  // murkmod note: the calls are all left here because i'm not sure what would happen
++  // if i removed them. DevCheckBlockDevMode() is stubbed out lower in the file.
+   dev_mode_allowed_file_ = stateful_.Append(kDevModeFile);
+   DevCheckBlockDevMode(dev_mode_allowed_file_);
+ 
+@@ -832,7 +808,7 @@
+ 
+   MountHome();
+ 
+-  StartTpm2Simulator();
++  StartTpm2Simulator(); // murkmod note: can this be used for something?
+ 
+   CleanupTpm();
+ 
+@@ -967,52 +943,10 @@
+ // 2. According to recovery mode only boot with signed images, the block_devmode
+ //    could be ignored here -- otherwise factory shim will be blocked especially
+ //    that RMA center can't reset this device.
++// murkmod note: stubbed
+ void ChromeosStartup::DevCheckBlockDevMode(
+     const base::FilePath& dev_mode_file) const {
+-  if (!dev_mode_) {
+-    return;
+-  }
+-  crossystem::Crossystem* crossystem = platform_->GetCrosssystem();
+-  std::optional<int> devsw = crossystem->VbGetSystemPropertyInt(
+-      crossystem::Crossystem::kDevSwitchBoot);
+-  std::optional<int> debug =
+-      crossystem->VbGetSystemPropertyInt(crossystem::Crossystem::kDebugBuild);
+-  std::optional<int> rec_reason = crossystem->VbGetSystemPropertyInt(
+-      crossystem::Crossystem::kRecoveryReason);
+-  if (!devsw || !debug || !rec_reason) {
+-    LOG(WARNING) << "Failed to get boot information from crossystem";
+-    return;
+-  }
+-  if (!(devsw == 1 && debug == 0 && rec_reason == 0)) {
+-    DLOG(INFO) << "Debug build is already installed, ignore block_devmode";
+-    return;
+-  }
+-
+-  bool block_devmode = false;
+-  // Checks ordered by run time.
+-  // 1. Try reading VPD through vpd library.
+-  // 2. Try crossystem.
+-  std::optional<std::string> val =
+-      vpd_->GetValue(vpd::VpdRw, crossystem::Crossystem::kBlockDevmode);
+-  if (val == "1") {
+-    block_devmode = true;
+-  } else {
+-    std::optional<int> crossys_block = crossystem->VbGetSystemPropertyInt(
+-        crossystem::Crossystem::kBlockDevmode);
+-    if (crossys_block == 1) {
+-      block_devmode = true;
+-    }
+-  }
+-
+-  if (block_devmode) {
+-    // Put a flag file into place that will trigger a stateful partition wipe
+-    // after reboot in verified mode.
+-    if (!platform_->FileExists(dev_mode_file)) {
+-      platform_->TouchFileDurable(dev_mode_file);
+-    }
+-
+-    startup_dep_->BootAlert("block_devmode");
+-  }
++  return;
+ }
+ 
+ // Set dev_mode_ for tests.
