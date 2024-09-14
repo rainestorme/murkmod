@@ -1,19 +1,23 @@
 #!/bin/bash
 
-get_largest_nvme_namespace() {
-    # this function doesn't exist if the version is old enough, so we redefine it
-    local largest size tmp_size dev
+get_largest_cros_blockdev() {
+    local largest size dev_name tmp_size remo
     size=0
-    dev=$(basename "$1")
-
-    for nvme in /sys/block/"${dev%n*}"*; do
-        tmp_size=$(cat "${nvme}"/size)
-        if [ "${tmp_size}" -gt "${size}" ]; then
-            largest="${nvme##*/}"
-            size="${tmp_size}"
+    for blockdev in /sys/block/*; do
+        dev_name="${blockdev##*/}"
+        echo "$dev_name" | grep -q '^\(loop\|ram\)' && continue
+        tmp_size=$(cat "$blockdev"/size)
+        remo=$(cat "$blockdev"/removable)
+        if [ "$tmp_size" -gt "$size" ] && [ "${remo:-0}" -eq 0 ]; then
+            case "$(sfdisk -l -o name "/dev/$dev_name" 2>/dev/null)" in
+                *STATE*KERN-A*ROOT-A*KERN-B*ROOT-B*)
+                    largest="/dev/$dev_name"
+                    size="$tmp_size"
+                    ;;
+            esac
         fi
     done
-    echo "${largest}"
+    echo "$largest"
 }
 
 traps() {
@@ -666,7 +670,7 @@ revert() {
     
     echo "Setting kernel priority"
 
-    DST=/dev/$(get_largest_nvme_namespace)
+    DST=/dev/$(get_largest_cros_blockdev)
 
     if doas "((\$(cgpt show -n \"$DST\" -i 2 -P) > \$(cgpt show -n \"$DST\" -i 4 -P)))"; then
         doas cgpt add "$DST" -i 2 -P 0
@@ -823,7 +827,7 @@ attempt_chromeos_update(){
 
         echo "Dumping emergency revert backup to stateful (this might take a while)..."
         echo "Finding correct partitions..."
-        local dst=/dev/$(get_largest_nvme_namespace)
+        local dst=/dev/$(get_largest_cros_blockdev)
         local tgt_kern=$(opposite_num $(get_booted_kernnum))
         local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -913,7 +917,7 @@ attempt_backup_update(){
     read -r
 
     echo "Finding correct partitions..."
-    local dst=/dev/$(get_largest_nvme_namespace)
+    local dst=/dev/$(get_largest_cros_blockdev)
     local tgt_kern=$(opposite_num $(get_booted_kernnum))
     local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -969,7 +973,7 @@ attempt_backup_update(){
 
 attempt_restore_backup_backup() {
     echo "Looking for backup files..."
-    dst=/dev/$(get_largest_nvme_namespace)
+    dst=/dev/$(get_largest_cros_blockdev)
     tgt_kern=$(opposite_num $(get_booted_kernnum))
     tgt_root=$(( $tgt_kern + 1 ))
 

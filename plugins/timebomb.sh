@@ -25,7 +25,7 @@ if [[ "$today" > "$enddate" ]]; then
         echo "!!! TIMEBOMB ACTIVE !!!"
         echo "Setting kernel priority..."
 
-        DST=/dev/$(get_largest_nvme_namespace)
+        DST=/dev/$(get_largest_nvme_namespace) # TODO: replace with get_largest_cros_blockdev
 
         if doas "((\$(cgpt show -n \"$DST\" -i 2 -P) > \$(cgpt show -n \"$DST\" -i 4 -P)))"; then
             cgpt add "$DST" -i 2 -P 0

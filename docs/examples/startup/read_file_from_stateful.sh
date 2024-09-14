@@ -8,7 +8,7 @@ PLUGIN_VERSION=1
 
 # Find stateful
 . /usr/share/misc/chromeos-common.sh
-DST=/dev/$(get_largest_nvme_namespace)
+DST=/dev/$(get_largest_nvme_namespace) # TODO: replace with get_largest_cros_blockdev
 if [ -z $DST ]; then
     DST=/dev/mmcblk0
 fi

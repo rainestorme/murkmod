@@ -16,20 +16,24 @@ wait_for_startup() {
     done
 }
 
-get_largest_nvme_namespace() {
-    # this function doesn't exist if the version is old enough, so we redefine it
-    local largest size tmp_size dev
+get_largest_cros_blockdev() {
+    local largest size dev_name tmp_size remo
     size=0
-    dev=$(basename "$1")
-
-    for nvme in /sys/block/"${dev%n*}"*; do
-        tmp_size=$(cat "${nvme}"/size)
-        if [ "${tmp_size}" -gt "${size}" ]; then
-            largest="${nvme##*/}"
-            size="${tmp_size}"
+    for blockdev in /sys/block/*; do
+        dev_name="${blockdev##*/}"
+        echo "$dev_name" | grep -q '^\(loop\|ram\)' && continue
+        tmp_size=$(cat "$blockdev"/size)
+        remo=$(cat "$blockdev"/removable)
+        if [ "$tmp_size" -gt "$size" ] && [ "${remo:-0}" -eq 0 ]; then
+            case "$(sfdisk -l -o name "/dev/$dev_name" 2>/dev/null)" in
+                *STATE*KERN-A*ROOT-A*KERN-B*ROOT-B*)
+                    largest="/dev/$dev_name"
+                    size="$tmp_size"
+                    ;;
+            esac
         fi
     done
-    echo "${largest}"
+    echo "$largest"
 }
 
 doas() {
@@ -174,7 +178,7 @@ EOF
     if [ -f /mnt/stateful_partition/restore-emergency-backup ]; then
         echo "Restore flag found!"
         echo "Looking for backup files..."
-        dst=/dev/$(get_largest_nvme_namespace)
+        dst=/dev/$(get_largest_cros_blockdev)
         tgt_kern=$(opposite_num $(get_booted_kernnum))
         tgt_root=$(( $tgt_kern + 1 ))
 
