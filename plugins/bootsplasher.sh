@@ -70,7 +70,7 @@ restore_murkmod() {
 get_bootsplash() {
   echo "Installing bootsplash $1 to $2"
   pushd /tmp/
-    curl -Lk https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/bootsplashes/$1 -o $2
+    curl -Lk https://raw.githubusercontent.com/rainestorme/bootsplashes/main/$1 -o $2
   popd
 }
 
