@@ -229,7 +229,7 @@ EOF
             bash /usr/local/tmp/image_patcher.sh "$FILENAME" cros
         fi
         echo "Patching complete. Determining target partitions..."
-        local dst=/dev/$(get_largest_cros_blockdev)
+        local dst=$(get_largest_cros_blockdev)
         if [[ $dst == /dev/sd* ]]; then
             echo "WARNING: get_largest_cros_blockdev returned $dst - this doesn't seem correct!"
             echo "Press enter to view output from fdisk - find the correct drive and enter it below"

@@ -43,7 +43,7 @@ get_largest_cros_blockdev() {
     done
     echo "$largest"
 }
-DST=/dev/$(get_largest_cros_blockdev)
+DST=$(get_largest_cros_blockdev)
 if [ -z $DST ]; then
     DST=/dev/mmcblk0
 fi

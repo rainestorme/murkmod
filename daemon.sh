@@ -178,7 +178,7 @@ EOF
     if [ -f /mnt/stateful_partition/restore-emergency-backup ]; then
         echo "Restore flag found!"
         echo "Looking for backup files..."
-        dst=/dev/$(get_largest_cros_blockdev)
+        dst=$(get_largest_cros_blockdev)
         tgt_kern=$(opposite_num $(get_booted_kernnum))
         tgt_root=$(( $tgt_kern + 1 ))
 

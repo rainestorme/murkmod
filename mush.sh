@@ -670,7 +670,7 @@ revert() {
     
     echo "Setting kernel priority"
 
-    DST=/dev/$(get_largest_cros_blockdev)
+    DST=$(get_largest_cros_blockdev)
 
     if doas "((\$(cgpt show -n \"$DST\" -i 2 -P) > \$(cgpt show -n \"$DST\" -i 4 -P)))"; then
         doas cgpt add "$DST" -i 2 -P 0
@@ -827,7 +827,7 @@ attempt_chromeos_update(){
 
         echo "Dumping emergency revert backup to stateful (this might take a while)..."
         echo "Finding correct partitions..."
-        local dst=/dev/$(get_largest_cros_blockdev)
+        local dst=$(get_largest_cros_blockdev)
         local tgt_kern=$(opposite_num $(get_booted_kernnum))
         local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -917,7 +917,7 @@ attempt_backup_update(){
     read -r
 
     echo "Finding correct partitions..."
-    local dst=/dev/$(get_largest_cros_blockdev)
+    local dst=$(get_largest_cros_blockdev)
     local tgt_kern=$(opposite_num $(get_booted_kernnum))
     local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -973,7 +973,7 @@ attempt_backup_update(){
 
 attempt_restore_backup_backup() {
     echo "Looking for backup files..."
-    dst=/dev/$(get_largest_cros_blockdev)
+    dst=$(get_largest_cros_blockdev)
     tgt_kern=$(opposite_num $(get_booted_kernnum))
     tgt_root=$(( $tgt_kern + 1 ))
 
