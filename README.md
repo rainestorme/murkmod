@@ -49,6 +49,6 @@ For more information on installation of murkmod, including alternate instruction
    - User policy modification with Pollen
    - Built-in Crouton support
 
-\*fakemurk v1.1.0 has been the most tested with murkmod, but v1.2.1 is the latest version and is reccomended if you wish to install murkmod in this way
+\*fakemurk v1.1.0 has been the most tested with murkmod, but v1.2.1 is the latest version and is recommended if you wish to install murkmod in this way
 
 \*\*Analytics are completely anonymous - based on HWID only. You can view the collected data publicly [here](https://murkmod-analytics.besthaxer.repl.co/).
