@@ -2,7 +2,7 @@
 
 CURRENT_MAJOR=6
 CURRENT_MINOR=1
-CURRENT_VERSION=0
+CURRENT_VERSION=1
 show_logo() {
     clear
     echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"

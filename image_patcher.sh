@@ -5,7 +5,7 @@
 
 CURRENT_MAJOR=6
 CURRENT_MINOR=1
-CURRENT_VERSION=0
+CURRENT_VERSION=1
 
 # God damn, there are a lot of unused functions in here!
 # future rainestorme: finally cleaned it up! :D
