@@ -105,10 +105,6 @@ EOF
 }
 
 main() {
-    if [ -f /mnt/stateful_partition/murkmod/mush_password ]; then
-        locked_main
-        return
-    fi
     traps
     mush_info
     while true; do
@@ -1008,5 +1004,9 @@ attempt_dev_install() {
 
 if [ "$0" = "$BASH_SOURCE" ]; then
     stty sane
-    main
+    if [ -f /mnt/stateful_partition/murkmod/mush_password ]; then
+        locked_main
+    else
+        main
+    fi
 fi
