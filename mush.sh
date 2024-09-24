@@ -181,10 +181,29 @@ EOF
         207) runjob api_rm_dir ;;
         208) runjob api_ls_dir ;;
         209) runjob api_cd ;;
+        301) runjob stack_push ;;
+        302) runjob stack_pop ;;
     
         *) echo && echo "Invalid option, dipshit." && echo ;;
         esac
     done
+}
+
+stack_push() {
+    echo "stack name?"
+    read -r name
+    echo "text to push?"
+    read -r text
+    echo "$text" >> "/mnt/stateful_partition/murkmod/stacks/$name"
+}
+
+stack_pop() {
+    echo "stack name?"
+    read -r name
+    echo "start"
+    echo $(head -n 1 "/mnt/stateful_partition/murkmod/stacks/$STACK_NAME")
+    echo "end"
+    sed -i 1d "/mnt/stateful_partition/murkmod/stacks/$STACK_NAME" # delete first line
 }
 
 api_read_file() {
