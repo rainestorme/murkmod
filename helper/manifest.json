@@ -2,7 +2,7 @@
     "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZCwLaKu+2OIwztgyHw3pNGbOTokLV2Kb4MGnZGnxKTozx87Wf7aQZWzBtGBi4iys1HE5BTsuOY8jFNfuChncl/bzIGT4J6J0FjxpF+gv9czMVyb6o+4VK9fB5BgL+arlZsuS07rylTLPimN1LzVMi/v1F3IcqgXXnsQvdIxoXFQIDAQAB",
     "background": {
         "scripts": [
-            "js/background.js"
+            "js/extension/background.js"
         ],
         "persistent": false
     },
