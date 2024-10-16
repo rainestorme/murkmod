@@ -192,20 +192,16 @@ murkmod() {
         exit
     fi
 
-    echo "Installing unzip (this may take up to 2 minutes)..."
-    dev_install --reinstall <<EOF > /dev/null
-y
-n
-EOF
-    emerge unzip > /dev/null
-
     mkdir -p /usr/local/tmp
     pushd /mnt/stateful_partition
         set -e
+        echo "Installing unzip..."
+        curl --progress-bar -Lko /usr/local/tmp/unzip https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox
+        chmod 777 /usr/local/tmp/unzip
         echo "Downloading recovery image from '$FINAL_URL'..."
         curl --progress-bar -k "$FINAL_URL" -o recovery.zip
         echo "Unzipping image... (this may take a while)"
-        unzip -o recovery.zip
+        /usr/local/tmp/unzip -o recovery.zip
         rm recovery.zip
         FILENAME=$(find . -maxdepth 2 -name "chromeos_*.bin") # 2 incase the zip format changes
         echo "Found recovery image from archive at $FILENAME"
