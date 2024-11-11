@@ -11,66 +11,65 @@ CURRENT_VERSION=1
 # future rainestorme: finally cleaned it up! :D
 
 ascii_info() {
-    echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
-    echo "        The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION"
+  echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
+  echo "        The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION"
 
-    # spaces get mangled by makefile, so this must be separate
+  # spaces get mangled by makefile, so this must be separate
 }
 nullify_bin() {
-    cat <<-EOF >$1
+  cat <<-EOF >$1
 #!/bin/bash
 exit
 EOF
-    chmod 777 $1
-    # shebangs crash makefile
+  chmod 777 $1
+  # shebangs crash makefile
 }
 
 . /usr/share/misc/chromeos-common.sh || :
 
 traps() {
-    set -e
-    trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
-    trap 'echo "\"${last_command}\" command failed with exit code $?. THIS IS A BUG, REPORT IT HERE https://github.com/MercuryWorkshop/fakemurk"' EXIT
+  set -e
+  trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
+  trap 'echo "\"${last_command}\" command failed with exit code $?. THIS IS A BUG, REPORT IT HERE https://github.com/MercuryWorkshop/fakemurk"' EXIT
 }
 
 leave() {
-    trap - EXIT
-    echo "exiting successfully"
-    exit
+  trap - EXIT
+  echo "exiting successfully"
+  exit
 }
 
-
 sed_escape() {
-    echo -n "$1" | while read -n1 ch; do
-        if [[ "$ch" == "" ]]; then
-            echo -n "\n"
-            # dumbass shellcheck not expanding is the entire point
-        fi
-        echo -n "\\x$(printf %x \'"$ch")"
-    done
+  echo -n "$1" | while read -n1 ch; do
+    if [[ "$ch" == "" ]]; then
+      echo -n "\n"
+      # dumbass shellcheck not expanding is the entire point
+    fi
+    echo -n "\\x$(printf %x \'"$ch")"
+  done
 }
 
 move_bin() {
-    if test -f "$1"; then
-        mv "$1" "$1.old"
-    fi
+  if test -f "$1"; then
+    mv "$1" "$1.old"
+  fi
 }
 
 disable_autoupdates() {
-    # thanks phene i guess?
-    # this is an intentionally broken url so it 404s, but doesn't trip up network logging
-    sed -i "$ROOT/etc/lsb-release" -e "s/CHROMEOS_AUSERVER=.*/CHROMEOS_AUSERVER=$(sed_escape "https://updates.gooole.com/update")/"
+  # thanks phene i guess?
+  # this is an intentionally broken url so it 404s, but doesn't trip up network logging
+  sed -i "$ROOT/etc/lsb-release" -e "s/CHROMEOS_AUSERVER=.*/CHROMEOS_AUSERVER=$(sed_escape "https://updates.gooole.com/update")/"
 
-    # we don't want to take ANY chances
-    move_bin "$ROOT/usr/sbin/chromeos-firmwareupdate"
-    nullify_bin "$ROOT/usr/sbin/chromeos-firmwareupdate"
+  # we don't want to take ANY chances
+  move_bin "$ROOT/usr/sbin/chromeos-firmwareupdate"
+  nullify_bin "$ROOT/usr/sbin/chromeos-firmwareupdate"
 
-    # bye bye trollers! (trollers being cros devs)
-    rm -rf "$ROOT/opt/google/cr50/firmware/" || :
+  # bye bye trollers! (trollers being cros devs)
+  rm -rf "$ROOT/opt/google/cr50/firmware/" || :
 }
 
 SCRIPT_DIR=$(dirname "$0")
-configure_binaries(){
+configure_binaries() {
   if [ -f /sbin/ssd_util.sh ]; then
     SSD_UTIL=/sbin/ssd_util.sh
   elif [ -f /usr/share/vboot/bin/ssd_util.sh ]; then
@@ -84,43 +83,43 @@ configure_binaries(){
 }
 
 patch_root() {
-    echo "Staging populator..."
-    >$ROOT/population_required
-    >$ROOT/reco_patched
-    echo "Murkmod-ing root..."
-    echo "Disabling autoupdates..."
-    disable_autoupdates
-    local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
-    echo "Installing startup scripts..."
+  echo "Staging populator..."
+  >$ROOT/population_required
+  >$ROOT/reco_patched
+  echo "Murkmod-ing root..."
+  echo "Disabling autoupdates..."
+  disable_autoupdates
+  local milestone=$(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE $ROOT/etc/lsb-release)
+  echo "Installing startup scripts..."
+  move_bin "$ROOT/sbin/chromeos_startup.sh"
+  if [ "$milestone" -gt "116" ]; then
+    echo "Detected newer version of CrOS, using new chromeos_startup"
+    move_bin "$ROOT/sbin/chromeos_startup"
+    install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup
+    chmod 755 $ROOT/sbin/chromeos_startup # whoops
+    touch $ROOT/new-startup
+  else
     move_bin "$ROOT/sbin/chromeos_startup.sh"
-    if [ "$milestone" -gt "116" ]; then
-        echo "Detected newer version of CrOS, using new chromeos_startup"
-        move_bin "$ROOT/sbin/chromeos_startup"
-        install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup
-        chmod 755 $ROOT/sbin/chromeos_startup # whoops
-        touch $ROOT/new-startup
-    else
-        move_bin "$ROOT/sbin/chromeos_startup.sh"
-        install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
-        chmod 755 $ROOT/sbin/chromeos_startup.sh
-    fi
-    echo "Installing murkmod components..."
-    install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
-    move_bin "$ROOT/usr/bin/crosh"
-    install "mush.sh" $ROOT/usr/bin/crosh
-    echo "Installing startup services..."
-    install "pre-startup.conf" $ROOT/etc/init/pre-startup.conf
-    install "cr50-update.conf" $ROOT/etc/init/cr50-update.conf
-    echo "Installing other utilities..."
-    install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
-    install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
-    install "crossystem_boot_populator.sh" $ROOT/sbin/crossystem_boot_populator.sh
-    install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
-    mkdir -p "$ROOT/etc/opt/chrome/policies/managed"
-    install "pollen.json" $ROOT/etc/opt/chrome/policies/managed/policy.json
-    echo "Chmod-ing everything..."
-    chmod 777 $ROOT/sbin/murkmod-daemon.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh $ROOT/etc/opt/chrome/policies/managed/policy.json $ROOT/sbin/crossystem_boot_populator.sh $ROOT/usr/share/vboot/bin/ssd_util.sh    
-    echo "Done."
+    install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
+    chmod 755 $ROOT/sbin/chromeos_startup.sh
+  fi
+  echo "Installing murkmod components..."
+  install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
+  move_bin "$ROOT/usr/bin/crosh"
+  install "mush.sh" $ROOT/usr/bin/crosh
+  echo "Installing startup services..."
+  install "pre-startup.conf" $ROOT/etc/init/pre-startup.conf
+  install "cr50-update.conf" $ROOT/etc/init/cr50-update.conf
+  echo "Installing other utilities..."
+  install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
+  install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
+  install "crossystem_boot_populator.sh" $ROOT/sbin/crossystem_boot_populator.sh
+  install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
+  mkdir -p "$ROOT/etc/opt/chrome/policies/managed"
+  install "pollen.json" $ROOT/etc/opt/chrome/policies/managed/policy.json
+  echo "Chmod-ing everything..."
+  chmod 777 $ROOT/sbin/murkmod-daemon.sh $ROOT/usr/bin/crosh $ROOT/usr/share/vboot/bin/ssd_util.sh $ROOT/sbin/image_patcher.sh $ROOT/etc/opt/chrome/policies/managed/policy.json $ROOT/sbin/crossystem_boot_populator.sh $ROOT/usr/share/vboot/bin/ssd_util.sh
+  echo "Done."
 }
 
 # https://www.chromium.org/chromium-os/developer-library/reference/infrastructure/lsb-release/
@@ -141,20 +140,20 @@ lsbval() {
 }
 
 get_asset() {
-    curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
+  curl -s -f "https://api.github.com/repos/rainestorme/murkmod/contents/$1" | jq -r ".content" | base64 -d
 }
 
 install() {
-    TMP=$(mktemp)
-    get_asset "$1" >"$TMP"
-    if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
-        echo "Failed to install $1 to $2"
-        rm -f "$TMP"
-        exit
-    fi
-    # Don't mv, that would break permissions
-    cat "$TMP" >"$2"
+  TMP=$(mktemp)
+  get_asset "$1" >"$TMP"
+  if [ "$?" == "1" ] || ! grep -q '[^[:space:]]' "$TMP"; then
+    echo "Failed to install $1 to $2"
     rm -f "$TMP"
+    exit
+  fi
+  # Don't mv, that would break permissions
+  cat "$TMP" >"$2"
+  rm -f "$TMP"
 }
 
 main() {
@@ -182,18 +181,25 @@ main() {
   fi
   if [ -z $3 ]; then
     local unfuckstateful="1"
-  else 
+  else
     local unfuckstateful=$3
   fi
 
   if [ "$unfuckstateful" == "1" ]; then
-    echo "Will unfuck stateful partition upon boot."  
+    echo "Will unfuck stateful partition upon boot."
   fi
 
   local bin=$1
-  
+
   echo "Creating loop device..."
   local loop=$(losetup -f)
+  if [[ -z "$loop" ]]; then
+    echo "No free loop device. Exiting..."
+    exit 1
+  else
+    echo $loop
+  fi
+  echo "Setting up loop with $loop and $bin"
   losetup -P "$loop" "$bin"
 
   echo "Disabling kernel verity..."
@@ -203,7 +209,7 @@ main() {
 
   # for good measure
   sync
-  
+
   echo "Mounting target..."
   mkdir /tmp/mnt || :
   mount "${loop}p3" /tmp/mnt
@@ -249,10 +255,10 @@ main() {
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then
-    stty sane
-    if [ "$EUID" -ne 0 ]; then
-        echo "Please run as root"
-        exit
-    fi
-    main "$@"
+  stty sane
+  if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root"
+    exit
+  fi
+  main "$@"
 fi
