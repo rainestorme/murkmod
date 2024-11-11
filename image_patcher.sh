@@ -193,7 +193,14 @@ main() {
   local bin=$1
   
   echo "Creating loop device..."
-  local loop=$(losetup -f)
+  local loop=$(losetup -f | tail -1)
+  if [[ -z "$loop" ]]; then
+    echo "No free loop device. Exiting..."
+    exit 1
+  else
+    echo $loop
+  fi
+  echo "Setting up loop with $loop and $bin"
   losetup -P "$loop" "$bin"
 
   echo "Disabling kernel verity..."
