@@ -238,7 +238,14 @@ murkmod() {
         local kerndev=${dst}p${tgt_kern}
         local rootdev=${dst}p${tgt_root}
         echo "Targeting $kerndev and $rootdev"
-        local loop=$(losetup -f | tr -d '\r')
+        local loop=$(losetup -f | tail -1)
+        if [[ -z "$loop" ]]; then
+          echo "No free loop device. Exiting..."
+          exit 1
+        else
+          echo $loop
+        fi
+        echo "Setting up loop with $loop and $bin"
         losetup -P "$loop" "$FILENAME"
         echo "Press enter if nothing broke, otherwise press Ctrl+C"
         read -r
