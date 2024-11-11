@@ -137,7 +137,7 @@ murkmod() {
     #local release_board="hatch"
     local board=${release_board%%-*}
     if [ $VERSION == "latest" ]; then
-        local builds=$(curl https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
+        local builds=$(curl -ks https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
         local hwid=$(jq "(.builds.$board[] | keys)[0]" <<<"$builds")
         local hwid=${hwid:1:-1}
         local milestones=$(jq ".builds.$board[].$hwid.pushRecoveries | keys | .[]" <<<"$builds")
@@ -167,7 +167,7 @@ murkmod() {
     done
     if [ $MATCH_FOUND -eq 0 ]; then
         echo "No match found on chrome100. Falling back to Chromium Dash."
-        local builds=$(curl https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
+        local builds=$(curl -ks https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
         local hwid=$(jq "(.builds.$board[] | keys)[0]" <<<"$builds")
         local hwid=${hwid:1:-1}
 
