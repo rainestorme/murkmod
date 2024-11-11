@@ -19,7 +19,7 @@ Of course, you should change this to match your plugin. Every time you update yo
 
 To add a plugin to this repository (for easy download from mush), just fork the repo, add the file in `/plugins/` and make a PR. I'll review it and merge it if it doesn't do anything malicious.
 
-The second comment at the top defines the type of the plugin. There are threeplugin types:
+The second comment at the top defines the type of the plugin. There are three plugin types:
 
 - `menu_plugin`
 - `daemon_plugin`
