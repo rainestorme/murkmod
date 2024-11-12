@@ -388,8 +388,9 @@ remove_passwd() {
 prompt_passwd() {
   echo "Enter your password:"
   read -r -p " > " password
-  if grep "$password" /mnt/stateful_partition/murkmod/mush_password >/dev/null
-  then
+  stored_password=$(cat /mnt/stateful_partition/murkmod/mush_password)
+  
+  if [ "$password" == "$stored_password" ]; then
     main
     return
   else
