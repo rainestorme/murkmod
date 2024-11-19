@@ -859,7 +859,7 @@ attempt_chromeos_update(){
         fi
         
 
-        local loop=$(doas losetup -f | tr -d '\r')
+        local loop=$(doas losetup -f | tr -d '\r' | tail -1)
         doas losetup -P "$loop" "$tmpdir/image.bin"
 
         echo "Performing update..."
