@@ -17,7 +17,11 @@ get_largest_cros_blockdev() {
             esac
         fi
     done
-    echo "$largest"
+    if [ -n "$largest" ]; then
+        echo "$largest"
+    else
+        echo "/dev/mmcblk1"
+    fi
 }
 
 traps() {
@@ -667,7 +671,7 @@ revert() {
     
     echo "Setting kernel priority"
 
-    DST=$(get_largest_cros_blockdev)
+    DST=$(get_largest_nvme_namespace)
 
     if doas "((\$(cgpt show -n \"$DST\" -i 2 -P) > \$(cgpt show -n \"$DST\" -i 4 -P)))"; then
         doas cgpt add "$DST" -i 2 -P 0
@@ -824,7 +828,7 @@ attempt_chromeos_update(){
 
         echo "Dumping emergency revert backup to stateful (this might take a while)..."
         echo "Finding correct partitions..."
-        local dst=$(get_largest_cros_blockdev)
+        local dst=$(get_largest_nvme_namespace)
         local tgt_kern=$(opposite_num $(get_booted_kernnum))
         local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -914,7 +918,7 @@ attempt_backup_update(){
     read -r
 
     echo "Finding correct partitions..."
-    local dst=$(get_largest_cros_blockdev)
+    local dst=$(get_largest_nvme_namespace)
     local tgt_kern=$(opposite_num $(get_booted_kernnum))
     local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -970,7 +974,7 @@ attempt_backup_update(){
 
 attempt_restore_backup_backup() {
     echo "Looking for backup files..."
-    dst=$(get_largest_cros_blockdev)
+    dst=$(get_largest_nvme_namespace)
     tgt_kern=$(opposite_num $(get_booted_kernnum))
     tgt_root=$(( $tgt_kern + 1 ))
 
