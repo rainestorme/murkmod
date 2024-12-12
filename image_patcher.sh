@@ -116,6 +116,7 @@ patch_root() {
     install "image_patcher.sh" $ROOT/sbin/image_patcher.sh
     install "crossystem_boot_populator.sh" $ROOT/sbin/crossystem_boot_populator.sh
     install "ssd_util.sh" $ROOT/usr/share/vboot/bin/ssd_util.sh
+    install "plugin_common.sh" $ROOT/usr/bin/murkmod_plugin_common.sh
     mkdir -p "$ROOT/etc/opt/chrome/policies/managed"
     install "pollen.json" $ROOT/etc/opt/chrome/policies/managed/policy.json
     echo "Chmod-ing everything..."
