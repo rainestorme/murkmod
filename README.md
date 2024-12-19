@@ -33,7 +33,7 @@ For more information on installation of murkmod, including alternate instruction
    - Simple API: Read the docs [here](https://github.com/rainestorme/murkmod/blob/main/docs/plugin_dev.md)
 - Support for newer versions of ChromeOS (R116 and up)
    - Experimental Crouton audio support on newer versions
-- Improved privacy (*[Opt-in, anonymous analytics](https://murkmod-analytics.besthaxer.repl.co/)*\*\* and no automatic updates)
+- Improved privacy (Analytics completely removed and no automatic updates)
 - Multiple versatile [installation methods](https://github.com/rainestorme/murkmod/blob/main/docs/installation.md)
    - Direct flashing to system storage via [SH1mmer-SMUT](https://github.com/cognito-inc-real/SH1mmer-SMUT)
    - Installation from VT2 via the devmode installer
@@ -50,5 +50,3 @@ For more information on installation of murkmod, including alternate instruction
    - Built-in Crouton support
 
 \*fakemurk v1.1.0 has been the most tested with murkmod, but v1.2.1 is the latest version and is recommended if you wish to install murkmod in this way
-
-\*\*Analytics are completely anonymous - based on HWID only. You can view the collected data publicly [here](https://murkmod-analytics.besthaxer.repl.co/).
