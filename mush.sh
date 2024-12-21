@@ -67,7 +67,7 @@ swallow_stdin() {
 }
 
 edit() {
-    if which nano 2>/dev/null; then
+    if doas which nano 2>/dev/null; then
         doas nano "$@"
     else
         doas vi "$@"
