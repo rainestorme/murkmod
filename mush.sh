@@ -9,7 +9,7 @@ get_largest_cros_blockdev() {
         tmp_size=$(cat "$blockdev"/size)
         remo=$(cat "$blockdev"/removable)
         if [ "$tmp_size" -gt "$size" ] && [ "${remo:-0}" -eq 0 ]; then
-            case "$(sfdisk -l -o name "/dev/$dev_name" 2>/dev/null)" in
+            case "$(doas sfdisk -l -o name "/dev/$dev_name" 2>/dev/null)" in
                 *STATE*KERN-A*ROOT-A*KERN-B*ROOT-B*)
                     largest="/dev/$dev_name"
                     size="$tmp_size"
@@ -67,7 +67,7 @@ swallow_stdin() {
 }
 
 edit() {
-    if which nano 2>/dev/null; then
+    if doas which nano 2>/dev/null; then
         doas nano "$@"
     else
         doas vi "$@"
@@ -667,7 +667,7 @@ revert() {
     
     echo "Setting kernel priority"
 
-    DST=$(get_largest_cros_blockdev)
+    DST=$(get_largest_nvme_namespace)
 
     if doas "((\$(cgpt show -n \"$DST\" -i 2 -P) > \$(cgpt show -n \"$DST\" -i 4 -P)))"; then
         doas cgpt add "$DST" -i 2 -P 0
@@ -824,7 +824,7 @@ attempt_chromeos_update(){
 
         echo "Dumping emergency revert backup to stateful (this might take a while)..."
         echo "Finding correct partitions..."
-        local dst=$(get_largest_cros_blockdev)
+        local dst=$(get_largest_nvme_namespace)
         local tgt_kern=$(opposite_num $(get_booted_kernnum))
         local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -914,7 +914,7 @@ attempt_backup_update(){
     read -r
 
     echo "Finding correct partitions..."
-    local dst=$(get_largest_cros_blockdev)
+    local dst=$(get_largest_nvme_namespace)
     local tgt_kern=$(opposite_num $(get_booted_kernnum))
     local tgt_root=$(( $tgt_kern + 1 ))
 
@@ -970,7 +970,7 @@ attempt_backup_update(){
 
 attempt_restore_backup_backup() {
     echo "Looking for backup files..."
-    dst=$(get_largest_cros_blockdev)
+    dst=$(get_largest_nvme_namespace)
     tgt_kern=$(opposite_num $(get_booted_kernnum))
     tgt_root=$(( $tgt_kern + 1 ))
 
