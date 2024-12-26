@@ -9,7 +9,7 @@ get_largest_cros_blockdev() {
         tmp_size=$(cat "$blockdev"/size)
         remo=$(cat "$blockdev"/removable)
         if [ "$tmp_size" -gt "$size" ] && [ "${remo:-0}" -eq 0 ]; then
-            case "$(sfdisk -l -o name "/dev/$dev_name" 2>/dev/null)" in
+            case "$(doas sfdisk -l -o name "/dev/$dev_name" 2>/dev/null)" in
                 *STATE*KERN-A*ROOT-A*KERN-B*ROOT-B*)
                     largest="/dev/$dev_name"
                     size="$tmp_size"
@@ -67,7 +67,7 @@ swallow_stdin() {
 }
 
 edit() {
-    if which nano 2>/dev/null; then
+    if doas which nano 2>/dev/null; then
         doas nano "$@"
     else
         doas vi "$@"
