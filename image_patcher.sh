@@ -106,6 +106,12 @@ patch_root() {
     fi
     echo "Installing murkmod components..."
     install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
+    if [ "$milestone" -gt "119" ]; then
+        echo "Detected newer version of CrOS, using new murkmod-daemon"
+        install "daemon_v2.sh" $ROOT/sbin/murkmod-daemon.sh
+    else
+        install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
+    fi
     move_bin "$ROOT/usr/bin/crosh"
     install "mush.sh" $ROOT/usr/bin/crosh
     echo "Installing startup services..."
