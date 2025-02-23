@@ -105,12 +105,7 @@ patch_root() {
         chmod 755 $ROOT/sbin/chromeos_startup.sh
     fi
     echo "Installing murkmod components..."
-    if [ "$milestone" -gt "119" ]; then
-        echo "Detected newer version of CrOS, using new murkmod-daemon"
-        install "daemon_v2.sh" $ROOT/sbin/murkmod-daemon.sh
-    else
-        install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
-    fi
+    install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
     move_bin "$ROOT/usr/bin/crosh"
     install "mush.sh" $ROOT/usr/bin/crosh
     echo "Installing startup services..."
