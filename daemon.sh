@@ -88,9 +88,15 @@ opposite_num() {
         launch_racer(){
             echo launching racer at "$(date)"
             {
-                while true; do
-                    cryptohome --action=remove_firmware_management_parameters >/dev/null 2>&1
-                done
+                if [ $(lsbval CHROMEOS_RELEASE_CHROME_MILESTONE) -ge "120" ] && which device_management_client >/dev/null 2>&1; then
+                    while true; do
+                        device_management_client --action=remove_firmware_management_parameters >/dev/null 2>&1
+                    done
+                else
+                    while true; do
+                        cryptohome --action=remove_firmware_management_parameters >/dev/null 2>&1
+                    done
+                fi
             } &
             RACERPID=$!
         }
