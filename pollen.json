@@ -42,6 +42,7 @@
   "ExtensionInstallAllowlist": null,
   "ExtensionInstallBlocklist": null,
   "ExtensionSettings": null,
+  "CloudExtensionRequestEnabled": null,
   "PinnedLauncherApps": null,
   "BookmarkBarEnabled": null,
   "LidCloseAction": null,
