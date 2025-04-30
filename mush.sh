@@ -745,7 +745,7 @@ install_crouton() {
     # if this is before v107, then we don't want to use the silence branch - audio is still supported
     local local_version=$(lsbval GOOGLE_RELEASE)
     if (( ${local_version%%\.*} <= 107 )); then
-        doas "bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+        doas "bash <(curl -SLk https://git.io/JZEs0) -r bullseye -t xfce"
     else
         # theoretically we could copy or link the includes for cras, but im not entirely sure how to do that
         # CROUTON_BRANCH=longliveaudiotools supports audio at the versions we're looking at, but it's experimental and tends to be broken
@@ -755,12 +755,12 @@ install_crouton() {
         echo "2. Install with experimental audio support (may be extremely broken)"
         read -r -p "> (1-2): " choice
         if [ "$choice" == "1" ]; then
-            doas "CROUTON_BRANCH=silence bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+            doas "CROUTON_BRANCH=silence bash <(curl -SLk https://git.io/JZEs0) -r bullseye -t xfce"
         elif [ "$choice" == "2" ]; then
-            doas "CROUTON_BRANCH=longliveaudiotools bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+            doas "CROUTON_BRANCH=longliveaudiotools bash <(curl -SLk https://git.io/JZEs0) -r bullseye -t xfce"
         else
             echo "Invalid option, defaulting to silence branch"
-            doas "CROUTON_BRANCH=silence bash <(curl -SLk https://goo.gl/fd3zc) -r bullseye -t xfce"
+            doas "CROUTON_BRANCH=silence bash <(curl -SLk https://git.io/JZEs0) -r bullseye -t xfce"
         fi
     fi
     doas "bash <(echo 'touch /mnt/stateful_partition/crouton_installed')" # idfk about the syntax but it seems to work so im not complaining
