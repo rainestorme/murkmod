@@ -8,7 +8,7 @@ class MurkmodFsAccess {
         var self = this;
         tp.openTerminalProcess("crosh", id => {
             self.mush_id = id;
-            window.fs_accessers.push(self);
+            window.secondary_classes.push(self);
         });
     }
 
