@@ -73,7 +73,7 @@
   "DownloadDirectory": null,
   "DownloadBubbleEnabled": null,
   "OsColorMode": "dark",
-  "ArcPolicy": "{\"applications\":null,\"availableAppSetPolicy\":\"BLACKLIST\",\"playLocalPolicyEnabled\":true,\",\"playDeviceLocalPolicyDisabled\":true,\"playStoreMode\":\"BLACKLIST\",\"statusReportingSettings\":{\"applicationReportsEnabled\":false,\"profileSettingsEnabled\":true,\"softwareInfoEnabled\":true}}",
+  "ArcPolicy": "{\"applications\":null,\"availableAppSetPolicy\":\"BLACKLIST\",\"playLocalPolicyEnabled\":true,\",\"playDeviceLocalPolicyDisabled\":true,\"playStoreMode\":\"BLACKLIST\",\"statusReportingSettings\":{\"applicationReportsEnabled\":false,\"profileSettingsEnabled\":false,\"softwareInfoEnabled\":false}}",
   "ReportArcStatusEnabled": false,
   "InstantTetheringAllowed": true,
   "SmartLockSigninAllowed": true,
