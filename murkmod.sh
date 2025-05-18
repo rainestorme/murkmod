@@ -116,7 +116,6 @@ install_patched_files() {
     install "image_patcher.sh" /sbin/image_patcher.sh
     if [ "$milestone" -gt "78" ]; then
         echo "Detected v78 or higher, patching chromeos-boot-alert to prevent blocking devmode virtually"
-        mv /sbin/chromeos-boot-alert /sbin/chromeos-boot-alert.old
         install "chromeos-boot-alert" /sbin/chromeos-boot-alert
         chmod 755 /sbin/chromeos-boot-alert
     fi
