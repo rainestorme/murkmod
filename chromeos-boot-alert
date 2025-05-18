@@ -164,7 +164,7 @@ mode_self_repair() {
 # boot mode automatically, and reboots.
 mode_block_devmode() {
   show_assets_message "anti_block_devmode_virtual"
-  echo "murkmod auto-fix is in progress..." >>"${TTY}"
+  echo "murkmod Auto-Repair is in progress..." >>"${TTY}"
   echo "Performing deprovision device..." >>"${TTY}"
   # from SH1mmer
   vpd -i RW_VPD -s check_enrollment=0 >>"${TTY}"
@@ -186,7 +186,7 @@ mode_block_devmode() {
       cryptohome --action=remove_firmware_management_parameters >>"${TTY}"
     fi
   fi
-  echo "murkmod auto-fix is done, booting to system in 3 seconds..." >>"${TTY}"
+  echo "murkmod Auto-Repair is done, booting to system in 3 seconds..." >>"${TTY}"
   
   sleep 3
   echo "Booting..." >>"${TTY}"
