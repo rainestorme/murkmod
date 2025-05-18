@@ -112,7 +112,12 @@ install_patched_files() {
     install "cr50-update.conf" /etc/init/cr50-update.conf
     install "ssd_util.sh" /usr/share/vboot/bin/ssd_util.sh
     install "image_patcher.sh" /sbin/image_patcher.sh
-    chmod 777 /sbin/murkmod-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
+    if [ "$milestone" -gt "78" ]; then
+        echo "Detected v78 or higher, patching chromeos-boot-alert to prevent blocking devmode virtually"
+        mv /sbin/chromeos-boot-alert /sbin/chromeos-boot-alert.old
+        install "chromeos-boot-alert" /sbin/chromeos-boot-alert
+    fi
+    chmod 777 /sbin/murkmod-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh /sbin/chromeos-boot-alert
 }
 
 create_stateful_files() {
@@ -198,8 +203,12 @@ murkmod() {
         check_legacy_daemon
         echo "Creating stateful partition files..."
         create_stateful_files
-        echo "Patching policy..."
-        do_policy_patch
+        read -r -p "Would you like to update pollen config? This will overwrite your pollen edits. [Y/n] " choice
+        case "$choice" in
+            n | N) echo "Skipping patching policy..." ;;
+            *) echo "Patching policy..."
+            do_policy_patch ;;
+        esac
         echo "Setting chronos user password..."
         set_chronos_password
         echo "Checking sudo perms..."
