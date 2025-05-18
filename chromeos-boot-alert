@@ -159,33 +159,33 @@ mode_self_repair() {
 # boot mode automatically, and reboots.
 mode_block_devmode() {
   show_assets_message "anti_block_devmode_virtual"
-  echo "murkmod auto-fix is in progress..."
-  echo "Performing deprovision device..."
+  echo "murkmod auto-fix is in progress..." >>"${TTY}"
+  echo "Performing deprovision device..." >>"${TTY}"
   # from SH1mmer
   vpd -i RW_VPD -s check_enrollment=0
-  echo "Unblocking devmode..."
+  echo "Unblocking devmode..." >>"${TTY}"
   local res
-	vpd -i RW_VPD -s block_devmode=0
-	crossystem block_devmode=0
-	if [ -e /etc/init/tcsd.conf ]; then
-		initctl stop tcsd || :
-		if tpmc getp 0x100a >/dev/null 2>&1; then
-			tpmc clear
-			tpmc def 0x100a 0x28 0x12000
-			tpmc write 0x100a 76 28 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-		fi
-	else
-		res=$(cryptohome --action=get_firmware_management_parameters 2>&1)
-		if [ $? -eq 0 ] && ! echo "$res" | grep -q "Unknown action"; then
-			tpm_manager_client take_ownership
-			cryptohome --action=remove_firmware_management_parameters
-		fi
-	fi
-  echo "murkmod auto-fix is done, booting to system in 3 seconds..."
+  vpd -i RW_VPD -s block_devmode=0
+  crossystem block_devmode=0
+  if [ -e /etc/init/tcsd.conf ]; then
+    initctl stop tcsd || :
+    if tpmc getp 0x100a >/dev/null 2>&1; then
+      tpmc clear
+      tpmc def 0x100a 0x28 0x12000
+      tpmc write 0x100a 76 28 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    fi
+  else
+    res=$(cryptohome --action=get_firmware_management_parameters 2>&1)
+    if [ $? -eq 0 ] && ! echo "$res" | grep -q "Unknown action"; then
+      tpm_manager_client take_ownership
+      cryptohome --action=remove_firmware_management_parameters
+    fi
+  fi
+  echo "murkmod auto-fix is done, booting to system in 3 seconds..." >>"${TTY}"
   
   sleep 3
-  echo "Booting..."
-  echo "If not booting the system automatically, use Refresh + Power to reboot."
+  echo "Booting..." >>"${TTY}"
+  echo "If not booting the system automatically, use Refresh + Power to reboot." >>"${TTY}"
 }
 
 # Updates the progress bar to reflect the provided percentage.
