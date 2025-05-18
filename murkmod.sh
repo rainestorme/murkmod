@@ -104,8 +104,10 @@ install_patched_files() {
         echo "Detected v116 or higher, using new chromeos_startup"
         install "chromeos_startup.sh" /sbin/chromeos_startup
         touch /new-startup
+        chmod 755 /sbin/chromeos_startup
     else
         install "chromeos_startup.sh" /sbin/chromeos_startup.sh
+        chmod 755 /sbin/chromeos_startup.sh
     fi
     install "mush.sh" /usr/bin/crosh
     install "pre-startup.conf" /etc/init/pre-startup.conf
@@ -116,8 +118,9 @@ install_patched_files() {
         echo "Detected v78 or higher, patching chromeos-boot-alert to prevent blocking devmode virtually"
         mv /sbin/chromeos-boot-alert /sbin/chromeos-boot-alert.old
         install "chromeos-boot-alert" /sbin/chromeos-boot-alert
+        chmod 755 /sbin/chromeos-boot-alert
     fi
-    chmod 777 /sbin/murkmod-daemon.sh /sbin/chromeos_startup.sh /sbin/chromeos_startup /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh /sbin/chromeos-boot-alert
+    chmod 777 /sbin/murkmod-daemon.sh /usr/bin/crosh /usr/share/vboot/bin/ssd_util.sh /sbin/image_patcher.sh
 }
 
 create_stateful_files() {
