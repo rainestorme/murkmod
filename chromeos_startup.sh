@@ -64,10 +64,10 @@ repair itself~ sorry OwO
 EOF
 # auto repair message
 cat <<EOF >/usr/share/chromeos-assets/text/boot_messages/en/anti_block_devmode_virtual.txt
-murkmod auto-fix - ChromeOS is trying to kill itself.
-ChromeOS detected developer mode and is trying to disable it to
-comply with FWMP. murkmod is performing auto-fix to try
-repairing your system. Your system will boot in a few seconds...
+murkmod Auto-Repair
+ChromeOS has tried to disable developer mode.
+murkmod is trying to repair your system.
+Your system will boot in a few seconds...
 EOF
 
 # single-liners
