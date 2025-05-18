@@ -184,6 +184,8 @@ mode_block_devmode() {
   echo "murkmod auto-fix is done, booting to system in 3 seconds..."
   
   sleep 3
+  echo "Booting..."
+  echo "If not booting the system automatically, use Refresh + Power to reboot."
 }
 
 # Updates the progress bar to reflect the provided percentage.
