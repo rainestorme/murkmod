@@ -136,6 +136,11 @@ mode_enter_dev() {
 # Prints message when leaving developer mode
 mode_leave_dev() {
   show_assets_message "leave_dev"
+  echo "WARNING from murkmod:" >>"${TTY}"
+  echo "You are trying to disable developer mode." >>"${TTY}"
+  echo "It will make ChromeOS unbootable, use ESC + Refresh + Power and Ctrl + D to re-enable developer mode." >>"${TTY}"
+  echo "IF YOU SERIOUSLY WANT TO DESTROY ChromeOS, leave it for 5 minutes." >>"${TTY}"
+  sleep 300 # wait 5 mins
 }
 
 # Prints messages before starting firmware update
