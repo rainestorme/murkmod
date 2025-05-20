@@ -90,5 +90,6 @@
   "UserAvatarCustomizationSelectorsEnabled": true,
   "DnsOverHttpsMode": null,
   "EditBookmarksEnabled": true,
-  "JavaScriptBlockedForUrls": []
+  "JavaScriptBlockedForUrls": [],
+  "ReportDeviceBootMode": false
 }
