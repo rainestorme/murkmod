@@ -75,6 +75,7 @@ echo "i sure hope you did that on purpose (powerwashing system)" >/usr/share/chr
 
 
 crossystem.old block_devmode=0 # prevent chromeos from comitting suicide
+vpd -i RW_VPD -s block_devmode=0 # same with vpd
 
 # we stage sshd and mkfs as a one time operation in startup instead of in the bootstrap script
 # this is because ssh-keygen was introduced somewhere around R80, where many shims are still stuck on R73
