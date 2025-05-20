@@ -1,0 +1,330 @@
+#!/bin/sh
+
+# Copyright 2012 The ChromiumOS Authors
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Provides alert messages in boot stage, called by chromeos_startup.
+
+# Two instances of this script should never be run in parallel: the alert
+# animations will fight with each other, and there is a potential race in the
+# emission of the boot-alert-request signal (see http://crosbug.com/33838).
+
+# Since this script only provides messages, never abort.
+set +e
+
+# Prints usage help for commands supports
+usage_help() {
+  cat <<EOF
+Usage: $0 <message_id> [arg ...]
+<message_id> is one of the messages ids (file name without the .txt suffix) in
+/usr/share/chromeos-assets/text/boot_messages/\$locale "
+EOF
+}
+
+# Prints out system locale by searching cached settings or VPD.
+find_current_locale() {
+  # TODO(hungte) Find some better way other than hard coding file path here.
+  local state_file='/home/chronos/Local State'
+  local locale=""
+  if [ -f "${state_file}" ]; then
+    locale="$(jq --raw-output -e ".intl.app_locale" "${state_file}")"
+  fi
+  if [ -z "${locale}" ] || [ "${locale}" = "null" ]; then
+    locale="$(cros_region_data -s locales)"
+  fi
+  echo "${locale}"
+}
+
+# Determine the right console. On Freon systems, the default VT (/run/frecon/vt0) may
+# not exist until we've invoked Frecon (via display_boot_message) and would
+# cause problems when we try to write then read (for example, warn_dev).  To
+# prevent that, fall back to /dev/null if not available.
+setup_tty() {
+  [ -x /sbin/frecon ] && TTY=/run/frecon/vt0 || TTY=/dev/tty1
+  [ -e "${TTY}" ] || TTY=/dev/null
+}
+
+# Shows boot messages in assets folder on screen center if available.
+# Arguments: message in /usr/share/chromeos-assets/text/boot_messages/$locale
+show_assets_message() {
+  local message="$1"
+  local locale locale_list
+
+  # Build locale list
+  locale="$(find_current_locale)" || locale=""
+  # Starting from R34, the initial_locale from VPD may have multiple values,
+  # separated by ',' -- and we only want to try the primary one.
+  locale="${locale%%,*}"
+  locale_list="${locale}"
+  while [ "${locale%[-_]*}" != "${locale}" ]; do
+    locale="${locale%[-_]*}"
+    locale_list="${locale_list} ${locale}"
+  done
+  locale_list="${locale_list} en-US en"
+
+  if display_boot_message "${message}" "${locale_list}"; then
+    # Frecon may create the text terminal so we want to setup TTY again.
+    setup_tty
+  else
+    # Display the message code itself as fallback.
+    echo "${message}" >>"${TTY}"
+  fi
+}
+
+# Prints the two byte hex code of the matched char or
+# exists non-zero on timeout.  It reads from the tty in arguments.
+# Arguments: tty time_in_seconds two_byte_hex_match_1 two_byte_hex_match_2 ...
+match_char_timeout() {
+  local tty="$1"
+  local delay_secs="$2"
+  shift
+  shift
+
+  local input=''
+  local match=''
+  local start_time
+  local stop_time
+  local tty_config
+
+  start_time="$(date +%s)"
+  stop_time="$((start_time + delay_secs))"
+  tty_config="$(stty -g -F "${tty}")"
+
+  stty raw -echo cread -F "${tty}"
+  while [ "${delay_secs}" -gt 0 ]; do
+    input="$(timeout -s KILL "${delay_secs}s" head -c 1 "${tty}")"
+    [ $? -eq 137 ] && break  # Timed out.
+    input="$(printf "%02x" "'${input}")"
+    for char in "$@"; do
+      if [ "${input}" = "${char}" ]; then
+        match="${input}"
+        break
+      fi
+    done
+    [ -n "${match}" ] && break
+    delay_secs="$((stop_time - $(date +%s) ))"
+  done
+  # Restores the tty's settings.
+  stty "${tty_config}" -F "${tty}"
+
+  [ -z "${match}" ] && return 1
+  printf "%s" "${match}"
+  return 0
+}
+
+# Prints message when entering developer mode
+# Argument: time to countdown (in seconds)
+mode_enter_dev() {
+  local delay_secs="${1:-30}"
+
+  show_assets_message "enter_dev1_virtual"
+
+  for dev_count_down in $(seq "${delay_secs}" -1 1); do
+    # Trailing spaces must exist to clear previous message when the printed
+    # counter width changed (ex, 100->99).
+    # TODO(hungte) merge this with assets messages so it can be localized.
+    printf '\r  %-30s' "Starting in ${dev_count_down} second(s)..." >>"${TTY}"
+    sleep 1
+  done
+
+  # Count-down
+  tput clear >>"${TTY}"
+  show_assets_message "enter_dev2"
+}
+
+# Prints message when leaving developer mode
+mode_leave_dev() {
+  show_assets_message "leave_dev"
+  echo "WARNING from murkmod:" >>"${TTY}"
+  echo "You are trying to disable developer mode." >>"${TTY}"
+  echo "It will make ChromeOS unbootable, use ESC + Refresh + Power and Ctrl + D to re-enable developer mode." >>"${TTY}"
+  echo "IF YOU SERIOUSLY WANT TO DESTROY ChromeOS, leave it for 5 minutes." >>"${TTY}"
+  sleep 300 # wait 5 mins
+}
+
+# Prints messages before starting firmware update
+mode_update_firmware() {
+  show_assets_message "update_firmware"
+}
+
+# Prints messages before starting user-initiated wipe.
+mode_power_wash() {
+  show_assets_message "power_wash"
+}
+
+# Prints message before starting to rebuild a corrupted stateful partition.
+mode_self_repair() {
+  show_assets_message "self_repair"
+}
+
+# Prints a message telling the user that developer mode has been disabled for
+# the device upon request by the device owner.  After a timeout, or after the
+# user confirms by pressing space, the system then switches back to verified
+# boot mode automatically, and reboots.
+mode_block_devmode() {
+  show_assets_message "anti_block_devmode_virtual"
+  echo "murkmod Auto-Repair is in progress..." >>"${TTY}"
+  echo "Performing deprovision device..." >>"${TTY}"
+  # from SH1mmer
+  vpd -i RW_VPD -s check_enrollment=0 >>"${TTY}"
+  echo "Unblocking devmode..." >>"${TTY}"
+  local res
+  vpd -i RW_VPD -s block_devmode=0 >>"${TTY}"
+  crossystem block_devmode=0 >>"${TTY}"
+  if [ -e /etc/init/tcsd.conf ]; then
+    initctl stop tcsd || :
+    if tpmc getp 0x100a >/dev/null 2>&1; then
+      tpmc clear
+      tpmc def 0x100a 0x28 0x12000
+      tpmc write 0x100a 76 28 10 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+    fi
+  else
+    res=$(cryptohome --action=get_firmware_management_parameters 2>&1)
+    if [ $? -eq 0 ] && ! echo "$res" | grep -q "Unknown action"; then
+      tpm_manager_client take_ownership >>"${TTY}"
+      cryptohome --action=remove_firmware_management_parameters >>"${TTY}"
+    fi
+  fi
+  echo "murkmod Auto-Repair is done, booting to system in 3 seconds..." >>"${TTY}"
+  
+  sleep 3
+  echo "Booting..." >>"${TTY}"
+  echo "If not booting the system automatically, use Refresh + Power to reboot." >>"${TTY}"
+}
+
+# Updates the progress bar to reflect the provided percentage.
+mode_update_progress() {
+  local progress="$1"
+  if ! display_boot_message update_progress "${progress}"; then
+    # Display the progress on the terminal as a fallback.
+    printf "${progress}%%\r" >>"${TTY}"
+  fi
+}
+
+# Show a message indicating that we're doing a TPM firmware update.
+mode_update_tpm_firmware() {
+  show_assets_message "update_tpm_firmware"
+}
+
+# Show a message indicating that we're doing a detachable base firmware update.
+mode_update_detachable_base_firmware() {
+  show_assets_message "update_detachable_base_firmware"
+}
+
+# Show a message indicating that we're doing a "several minutes" long
+# unspecified firmware update, with risk to the system if interrupted.
+mode_update_tcon_firmware() {
+  show_assets_message "update_firmware_slow_extra_warning"
+}
+
+# Show a message indicating that we're doing a touchpad firmware update.
+mode_update_touchpad_firmware() {
+  show_assets_message "update_touchpad_firmware"
+}
+
+# Show a message indicating that we're doing a trackpoint firmware update.
+mode_update_trackpoint_firmware() {
+  show_assets_message "update_trackpoint_firmware"
+}
+
+# Show a message indicating that we're doing a touchscreen firmware update.
+mode_update_touchscreen_firmware() {
+  show_assets_message "update_touchscreen_firmware"
+}
+
+# Show a message explaining to the user that the battery isn't sufficiently
+# charged to a apply a firmware update and ask for the charger to be plugged.
+mode_update_tpm_firmware_low_battery() {
+  show_assets_message "update_tpm_firmware_low_battery"
+}
+
+# Show a message explaining to the user that the battery isn't sufficiently
+# charged to a apply a firmware update and tell them that they need to wait
+# while the battery is charging.
+mode_update_tpm_firmware_low_battery_charging() {
+  show_assets_message "update_tpm_firmware_low_battery_charging"
+}
+
+# Show a message telling the user that the TPM firmware update failed and that
+# they need to go through recovery to retry the update.
+mode_update_tpm_firmware_failure() {
+  show_assets_message "update_tpm_firmware_failure"
+
+  # Read a space bar. Timeout after 10 years (i.e. practically no timeout).
+  local input
+  input="$(match_char_timeout "${TTY}" 315360000 20)"
+  tput clear >>"${TTY}"
+}
+
+# Show a message indicating that we're doing a "several minutes" long
+# unspecified firmware update, with risk to the system if interrupted.
+mode_update_csme_firmware() {
+  show_assets_message "update_firmware_slow_extra_warning"
+}
+
+# Show a message indicating that we're doing fwupd firmware updates.
+mode_update_fwupd_firmware() {
+  show_assets_message "update_fwupd_firmware"
+}
+
+# Show a message indicating that we're doing an unspecificed update that can
+# take upto a few minutes.
+mode_stateful_thinpool_migration() {
+  show_assets_message "update_firmware_slow_extra_warning"
+}
+
+# Show a generic update message indicating that we're migrating to
+# dm-default-key, which can take upto a few minutes.
+mode_default_key_stateful_migration() {
+  show_assets_message "update_firmware_slow_extra_warning"
+}
+
+# Main initialization and dispatcher
+main() {
+  # process args
+  if [ $# -lt 1 ]; then
+    usage_help
+    exit 1
+  fi
+  local mode
+  mode="$(echo "$1" | tr -dc "[:alnum:]_")"
+  shift
+
+  # For headless devices, we want to provide some messages so people can know
+  # what goes wrong.
+  local output
+  for output in /dev/kmsg /dev/console; do
+    (echo "chromeos-boot-alert: ${mode}" >>"${output}") 2>/dev/null || true
+  done
+
+  setup_tty
+
+  if [ -x /usr/sbin/board_boot_alert ]; then
+    # Allow overriding boot-alert behavior (usually for headless devices).
+    /usr/sbin/board_boot_alert "${mode}" "$@" && exit
+  fi
+
+  # Wait until the boot-alert-ready abstract job has started, indicating that
+  # it's safe to display an alert onscreen.
+  if ! initctl status boot-alert-ready | grep -q running; then
+    initctl emit boot-alert-request
+  fi
+
+  # Light up the screen if possible.
+  backlight_tool --set_brightness_percent=100 || true
+
+  # Hides cursor and prevents console from blanking after long inactivity.
+  setterm -cursor off -blank 0 -powersave off -powerdown 0 >>"${TTY}" || true
+
+  local handler="mode_${mode}"
+  if type "${handler}" 2>/dev/null | head -1 | grep -q "function"; then
+    "${handler}" "$@"
+  else
+    usage_help
+    exit 1
+  fi
+}
+
+# Main Entry
+main "$@"

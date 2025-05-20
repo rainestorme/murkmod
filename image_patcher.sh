@@ -104,6 +104,12 @@ patch_root() {
         install "chromeos_startup.sh" $ROOT/sbin/chromeos_startup.sh
         chmod 755 $ROOT/sbin/chromeos_startup.sh
     fi
+    if [ "$milestone" -gt "78" ]; then
+        echo "Detected v78 or higher, patching chromeos-boot-alert to prevent blocking devmode virtually"
+        move_bin "$ROOT/sbin/chromeos-boot-alert"
+        install "chromeos-boot-alert" $ROOT/sbin/chromeos-boot-alert
+        chmod 755 $ROOT/sbin/chromeos-boot-alert
+    fi
     echo "Installing murkmod components..."
     install "daemon.sh" $ROOT/sbin/murkmod-daemon.sh
     move_bin "$ROOT/usr/bin/crosh"
