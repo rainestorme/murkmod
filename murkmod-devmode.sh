@@ -196,7 +196,34 @@ murkmod() {
     pushd /mnt/stateful_partition
         set -e
         echo "Installing unzip..."
-        curl --progress-bar -Lko /usr/local/tmp/unzip https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox
+        arch=$(uname -m)
+        case "$arch" in
+          x86_64)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-x86_64-linux-gnu" ;;
+          aarch64)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-aarch64-linux-gnu" ;;
+          armv7l)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-arm-linux-gnueabihf" ;;
+          armv6l)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-arm-linux-gnueabi" ;;
+          mips)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-mips-linux-gnu" ;;
+          mips64)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-mips64-linux-gnuabi64" ;;
+          mipsel)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-mipsel-linux-gnu" ;;
+          mips64el)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-mips64el-linux-gnuabi64" ;;
+          powerpc64le)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-powerpc64le-linux-gnu" ;;
+          riscv32)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-riscv32-linux-gnu" ;;
+          riscv64)
+            busybox_url="https://raw.githubusercontent.com/shutingrz/busybox-static-binaries-fat/refs/heads/main/busybox-riscv64-linux-gnu" ;;
+          *)
+            echo "Unsupported architecture: $arch"; exit 1 ;;
+        esac
+        curl --progress-bar -Lko /usr/local/tmp/unzip "$busybox_url"
         chmod 777 /usr/local/tmp/unzip
         echo "Downloading recovery image from '$FINAL_URL'..."
         curl --progress-bar -k "$FINAL_URL" -o recovery.zip
