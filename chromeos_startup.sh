@@ -62,12 +62,20 @@ cat <<EOF >/usr/share/chromeos-assets/text/boot_messages/en/self_repair.txt
 oops UwU i did a little fucky wucky and your system is trying to
 repair itself~ sorry OwO
 EOF
+# auto repair message
+cat <<EOF >/usr/share/chromeos-assets/text/boot_messages/en/anti_block_devmode_virtual.txt
+murkmod Auto-Repair
+ChromeOS has tried to disable developer mode.
+murkmod is trying to repair your system.
+Your system will boot in a few seconds...
+EOF
 
 # single-liners
 echo "i sure hope you did that on purpose (powerwashing system)" >/usr/share/chromeos-assets/text/boot_messages/en/power_wash.txt
 
 
 crossystem.old block_devmode=0 # prevent chromeos from comitting suicide
+vpd -i RW_VPD -s block_devmode=0 # same with vpd
 
 # we stage sshd and mkfs as a one time operation in startup instead of in the bootstrap script
 # this is because ssh-keygen was introduced somewhere around R80, where many shims are still stuck on R73
