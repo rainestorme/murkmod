@@ -144,27 +144,49 @@ murkmod() {
         local VERSION=$(echo "$milestones" | tail -n 1 | tr -d '"')
         echo "Latest version is $VERSION"
     fi
-    local url="https://raw.githubusercontent.com/rainestorme/chrome100-json/main/boards/$board.json"
-    local json=$(curl -ks "$url")
-    chrome_versions=$(echo "$json" | jq -r '.pageProps.images[].chrome')
-    echo "Found $(echo "$chrome_versions" | wc -l) versions of chromeOS for your board on chrome100."
-    echo "Searching for a match..."
+    
     MATCH_FOUND=0
-    for cros_version in $chrome_versions; do
-        platform=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .platform')
-        channel=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .channel')
-        mp_token=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .mp_token')
-        mp_key=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .mp_key')
-        last_modified=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .last_modified')
-        # if $cros_version starts with $VERSION, then we have a match
-        if [[ $cros_version == $VERSION* ]]; then
-            echo "Found a $VERSION match on platform $platform from $last_modified."
-            MATCH_FOUND=1
-            #https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15117.112.0_hatch_recovery_stable-channel_mp-v6.bin.zip
-            FINAL_URL="https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_${platform}_${board}_recovery_${channel}_${mp_token}-v${mp_key}.bin.zip"
-            break
-        fi
-    done
+    echo "Attempting to find recovery image from MercuryWorkshop data..."
+    local mercury_data_url="https://raw.githubusercontent.com/MercuryWorkshop/chromeos-releases-data/refs/heads/main/data.json"
+    local mercury_url=$(curl -ks "$mercury_data_url" | jq -r --arg board "$board" --arg version "$VERSION" '
+      .[$board].images
+      | map(select(
+          .channel == "stable-channel" and
+          (.chrome_version | type) == "string" and
+          (.chrome_version | startswith($version + "."))
+        ))
+      | sort_by(.platform_version)
+      | .[0].url
+    ')
+
+    if [ -n "$mercury_url" ] && [ "$mercury_url" != "null" ]; then
+        echo "Found a match!"
+        FINAL_URL="$mercury_url"
+        MATCH_FOUND=1
+    fi
+    if [ $MATCH_FOUND -eq 0 ]; then
+        echo "No match found in MercuryWorkshop data. Falling back to chrome100"
+        local url="https://raw.githubusercontent.com/rainestorme/chrome100-json/main/boards/$board.json"
+        local json=$(curl -ks "$url")
+        chrome_versions=$(echo "$json" | jq -r '.pageProps.images[].chrome')
+        echo "Found $(echo "$chrome_versions" | wc -l) versions of chromeOS for your board on chrome100."
+        echo "Searching for a match..."
+        for cros_version in $chrome_versions; do
+            platform=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .platform')
+            channel=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .channel')
+            mp_token=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .mp_token')
+            mp_key=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .mp_key')
+            last_modified=$(echo "$json" | jq -r --arg version "$cros_version" '.pageProps.images[] | select(.chrome == $version) | .last_modified')
+            # if $cros_version starts with $VERSION, then we have a match
+            if [[ $cros_version == $VERSION* ]]; then
+                echo "Found a $VERSION match on platform $platform from $last_modified."
+                MATCH_FOUND=1
+                #https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_15117.112.0_hatch_recovery_stable-channel_mp-v6.bin.zip
+                FINAL_URL="https://dl.google.com/dl/edgedl/chromeos/recovery/chromeos_${platform}_${board}_recovery_${channel}_${mp_token}-v${mp_key}.bin.zip"
+                break
+            fi
+        done
+    fi
     if [ $MATCH_FOUND -eq 0 ]; then
         echo "No match found on chrome100. Falling back to Chromium Dash."
         local builds=$(curl -ks https://chromiumdash.appspot.com/cros/fetch_serving_builds?deviceCategory=Chrome%20OS)
