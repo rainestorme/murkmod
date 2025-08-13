@@ -28,6 +28,8 @@ It is also highly reccomended to install the murkmod helper extension. To do so:
 
 For more information on installation of murkmod, including alternate instructions, see [`docs/installation.md`](docs/installation.md)
 
+> Recovery image data provided by [MercuryWorkshop](https://github.com/MercuryWorkshop/chromeos-releases-data?tab=CC-BY-4.0-1-ov-file). Thanks!
+
 ## Features
 
 - Plugin manager
