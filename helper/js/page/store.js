@@ -13,6 +13,11 @@ function generate_loading_cards(json, elem) {
     }
     elem.innerHTML = html;
 }
+function extractValue(variableName, scriptContent) {
+    const regex = new RegExp(`^${variableName}="([^"]*)"`, "m");
+    const match = scriptContent.match(regex);
+    return match?.[1];
+}
 
 function generate_bash_card(file) {
     fetch(file.download_url)
@@ -165,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector("#store-modal").style.display = "none";
     });
 
-    
+
     // plugin builder
     // document.querySelector("#builder").addEventListener("click", function() {
     //     Swal.fire("under construction");
