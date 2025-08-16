@@ -1,3 +1,4 @@
-chrome.browserAction.onClicked.addListener(() => {
+chrome.action.onClicked.addListener(() => {
     chrome.tabs.create({url:chrome.runtime.getURL("html/index.html")},()=>{});
+});")},()=>{});
 });
