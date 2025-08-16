@@ -33,37 +33,42 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window.propagation_stage == 0 && output.includes("> (1-")) {
             tp.sendInput(id, "113\n");
             window.propagation_stage++;
-        } else if (window.propagation_stage == 1 && output.includes("[][]")) {
-            window.plugins_propagated = true;
-            plugins_raw = output.split("[][]").slice(1); // arbitrary sequence not used in text
-            plugins = [];
-            plugins_raw.forEach(plugin=>{
-                let parsed = plugin.split(",").slice(0, -1);
-                plugins.push({
-                    name: parsed[1],
-                    function: parsed[0],
-                    desc: parsed[2],
-                    author: parsed[3]
+        } else if (window.propagation_stage == 1) {
+            if (output.includes("[][]")) {
+                window.plugins_propagated = true;
+                plugins_raw = output.split("[][]").slice(1); // arbitrary sequence not used in text
+                plugins = [];
+                plugins_raw.forEach(plugin=>{
+                    let parsed = plugin.split(",").slice(0, -1);
+                    plugins.push({
+                        name: parsed[1],
+                        function: parsed[0],
+                        desc: parsed[2],
+                        author: parsed[3]
+                    });
                 });
-            });
-            console.log(plugins);
-            window.legacy_plugins = plugins;
-            var html = "";
-            for (let i in plugins) {
-                var plugin = plugins[i];
-                html += `<button id="legacy_plugins_${i}" title="Provided by ${plugin.name}">${plugin.function}</button>\n`
-            }
-            html += "<p></p>";
-            document.querySelector("#legacy_plugins").innerHTML = html;
-            for (let i in plugins) {
-                var button = document.querySelector(`#legacy_plugins_${i}`);
-                button.addEventListener("click", function(){
-                    window.run_task("4\n", "", "> (1-", function (output) {
-                        if (output.includes("> Select a plugin (or q to quit): ")) {
-                            window.send(`${(parseInt(i) + 1).toString()}\n`);
-                        }
-                    }, function () {}, true, "\u0003");
-                });
+                console.log(plugins);
+                window.legacy_plugins = plugins;
+                var html = "";
+                for (let i in plugins) {
+                    var plugin = plugins[i];
+                    html += `<button id="legacy_plugins_${i}" title="Provided by ${plugin.name}">${plugin.function}</button>\n`
+                }
+                html += "<p></p>";
+                document.querySelector("#legacy_plugins").innerHTML = html;
+                for (let i in plugins) {
+                    var button = document.querySelector(`#legacy_plugins_${i}`);
+                    button.addEventListener("click", function(){
+                        window.run_task("4", "", "> (1-", function (output) {
+                            if (output.includes("> Select a plugin (or q to quit): ")) {
+                                window.send(`${(parseInt(i) + 1).toString()}\n`);
+                            }
+                        }, function () {}, true, "\u0003");
+                    });
+                }
+            } else if (output.includes("No such file or directory") || output.includes("> (1-")) {
+                window.plugins_propagated = true;
+                console.log("no legacy plugins found");
             }
         }
     }
