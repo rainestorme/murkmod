@@ -19,7 +19,7 @@
         "accessibilityFeatures.read",
         "management"
     ],
-    "version": "0.2",
+    "version": "0.3",
     "action": {
         "default_icon": "images/stable/icon-128.png"
     }
