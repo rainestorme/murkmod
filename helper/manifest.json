@@ -1,17 +1,14 @@
 {
-    "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZCwLaKu+2OIwztgyHw3pNGbOTokLV2Kb4MGnZGnxKTozx87Wf7aQZWzBtGBi4iys1HE5BTsuOY8jFNfuChncl/bzIGT4J6J0FjxpF+gv9czMVyb6o+4VK9fB5BgL+arlZsuS07rylTLPimN1LzVMi/v1F3IcqgXXnsQvdIxoXFQIDAQAB",
     "background": {
-        "scripts": [
-            "js/extension/background.js"
-        ],
-        "persistent": false
+        "service_worker": "js/extension/background.js"
     },
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl8sdzpPbCg8pDh/1zrwU17WdrQROlsJsuxGA0RkMX0T0+b/Tarh4YcSA5NDhAqVO3hA8acmYnjkCCOMpP0roceVLBUOag9WxhpXak4A0ZPrwZi2bLPjx+gxkccyAp8bXwskSvjaL+vF/+zN8PT9yDz/Np7WJmfakksDPAZSoCnbykVbaEtpG8qbbUPgmjndrHkgV9cMjpNLAd+GnlARyQ/DceBPtA27z06N/nV+hS7TRIQJTx7XwH6rGKSJ1gn61/wtBWqZQyL3PA6997++55GYtWVB4pmLPXa0vog3GF2wFYf3geD9v2jfP4t9PhPZy9zESr6fP4nqd1HXd6pzamwIDAQAB",
     "default_locale": "en",
     "description": "A helper for murkmod tasks - the visual successor to mush",
     "icons": {
         "128": "images/stable/icon-128.png"
     },
-    "manifest_version": 2,
+    "manifest_version": 3,
     "minimum_chrome_version": "1",
     "name": "murkmod helper",
     "permissions": [
@@ -22,13 +19,8 @@
         "accessibilityFeatures.read",
         "management"
     ],
-    "version": "0.2",
-    "update_url": "https://clients2.google.com/service/update2/crx",
-    "author": {
-        "email": "rainest0rme@proton.me"
-    },
-    "browser_action": {
+    "version": "0.3",
+    "action": {
         "default_icon": "images/stable/icon-128.png"
-    },
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';"
+    }
 }
