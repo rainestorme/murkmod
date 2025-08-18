@@ -152,7 +152,7 @@ EOF
         10) runjob harddisableext ;;
         11) runjob hardenableext ;;
         12) runjob autodisableexts ;;
-        13) runjob edit /etc/opt/chrome/policies/managed/policy.json ;;
+        13) runjob edit_pollen ;;
         14) runjob install_crouton ;;
         15) runjob run_crouton ;;
         16) runjob enable_dev_boot_usb ;;
@@ -1001,6 +1001,21 @@ attempt_install_chromebrew() {
 
 attempt_dev_install() {
     doas 'dev_install'
+}
+
+edit_pollen() {
+    mkdir -p /mnt/stateful_partition/murkmod/pollen
+    if [ ! -f /mnt/stateful_partition/murkmod/pollen/policy.json ]; then
+        echo "{}" > /mnt/stateful_partition/murkmod/pollen/policy.json
+    fi
+    edit /mnt/stateful_partition/murkmod/pollen/policy.json
+    if touch /etc/opt/chrome/policies/managed/.murkmod_test 2>/dev/null; then
+        rm -f /etc/opt/chrome/policies/managed/.murkmod_test
+        cp /mnt/stateful_partition/murkmod/pollen/policy.json /etc/opt/chrome/policies/managed/policy.json
+    else
+        mkdir -p /tmp/overlay/etc/opt/chrome/policies/managed
+        cp /mnt/stateful_partition/murkmod/pollen/policy.json /tmp/overlay/etc/opt/chrome/policies/managed/policy.json
+    fi
 }
 
 if [ "$0" = "$BASH_SOURCE" ]; then

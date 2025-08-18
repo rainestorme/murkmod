@@ -153,6 +153,23 @@ else
         fi
     done
 
+    POLLEN_SRC="/mnt/stateful_partition/murkmod/pollen/policy.json"
+    POLLEN_DST_RO="/tmp/overlay/etc/opt/chrome/policies/managed/policy.json"
+    POLLEN_DST_RW="/etc/opt/chrome/policies/managed/policy.json"
+    if [ -f "$POLLEN_SRC" ]; then
+        if touch /etc/opt/chrome/policies/managed/.murkmod_test 2>/dev/null; then
+            rm -f /etc/opt/chrome/policies/managed/.murkmod_test
+            mkdir -p "$(dirname "$POLLEN_DST_RW")"
+            cp "$POLLEN_SRC" "$POLLEN_DST_RW"
+            echo "Copied pollen policy to $POLLEN_DST_RW"
+        else
+            mkdir -p "$(dirname "$POLLEN_DST_RO")"
+            mount --bind /etc/opt /tmp/overlay/etc/opt
+            cp "$POLLEN_SRC" "$POLLEN_DST_RO"
+            echo "Overlaid pollen policy to $POLLEN_DST_RO"
+        fi
+    fi
+
     echo "Plugins run. Handing over to real startup..."
     if [ ! -f /new-startup ]; then
         exec /sbin/chromeos_startup.sh.old

@@ -128,6 +128,7 @@ create_stateful_files() {
     echo "$CURRENT_MAJOR $CURRENT_MINOR $CURRENT_VERSION" > /mnt/stateful_partition/murkmod_version
     
     mkdir -p /mnt/stateful_partition/murkmod/plugins
+    mkdir -p /mnt/stateful_partition/murkmod/pollen
     touch /mnt/stateful_partition/murkmod/settings
     if [ ! -f /mnt/stateful_partition/murkmod/settings ]; then
         echo "# ----- murkmod settings -----" > /mnt/stateful_partition/murkmod/settings
@@ -150,12 +151,14 @@ do_policy_patch() {
     response2=$(curl -s "$url2")
 
     if [ "$response1" = "$response2" ]; then
-        install "pollen.json" /etc/opt/chrome/policies/managed/policy.json
+        mkdir -p /mnt/stateful_partition/murkmod/pollen
+        install "pollen.json" /mnt/stateful_partition/murkmod/pollen/policy.json
     else
         read -r -p "Use murkmod reccomended pollen config? [Y/n] " choice
+        mkdir -p /mnt/stateful_partition/murkmod/pollen
         case "$choice" in
-            n | N) install_fakemurk "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
-            *) install "pollen.json" /etc/opt/chrome/policies/managed/policy.json ;;
+            n | N) install_fakemurk "pollen.json" /mnt/stateful_partition/murkmod/pollen/policy.json ;;
+            *) install "pollen.json" /mnt/stateful_partition/murkmod/pollen/policy.json ;;
         esac
     fi
 }
