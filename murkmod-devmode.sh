@@ -109,21 +109,21 @@ trytar() {
 }
 
 defog() {
-    if [ "$(crossystem wpsw_cur 2>/dev/null)" = "1" ]; then
-        echo "Write protection is enabled - skipping the GBB flash"
-        vpd -i RW_VPD -s block_devmode=0 || true
-        vpd -i RW_VPD -s check_enrollment=1 || true
-        crossystem block_devmode=0 || true
-        return 0
+    echo "Checking WP status..."
+    output=$(flashrom --wp-status 2>&1)
+
+    if echo "$output" | grep -qi "protection mode:.*disabled"; then
+        echo "WP is off - defogging"
+        futility gbb --set --flash --flags=0x8091 || true
+    else
+        echo "WP is enabled, so we're not flashing GBB"
     fi
-    
-    echo "Write protection disabled, applying defog settings..."
-    futility gbb --set --flash --flags=0x8091 || true # we use futility here instead of the commented out command below because we expect newer chromeos versions and don't want to wait 30 seconds
-    # /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
+
     crossystem block_devmode=0 || true
     vpd -i RW_VPD -s block_devmode=0 || true
     vpd -i RW_VPD -s check_enrollment=1 || true
 }
+
 
 
 murkmod() {
