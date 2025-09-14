@@ -113,7 +113,7 @@ defog() {
     output=$(flashrom --wp-status 2>&1)
 
     if echo "$output" | grep -qi "protection mode:.*disabled"; then
-        echo "WP is off - defogging"
+        echo "WP is off - defogging GBB..."
         futility gbb --set --flash --flags=0x8091 || true
     else
         echo "WP is enabled, so we're not flashing GBB"
