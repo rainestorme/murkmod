@@ -12,7 +12,7 @@ show_logo() {
     |  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | 
     |__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | 
           \/                  \/     \/            \/
-    EOF
+EOF
     echo "The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION - Developer mode installer"
 }
 
