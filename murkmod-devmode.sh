@@ -5,7 +5,14 @@ CURRENT_MINOR=1
 CURRENT_VERSION=2
 show_logo() {
     clear
-    echo -e "                      __                      .___\n  _____  __ _________|  | __ _____   ____   __| _/\n /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | \n|  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | \n|__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | \n      \/                  \/     \/            \/\n"
+    cat << 'EOF'
+                          __                      .___
+      _____  __ _________|  | __ _____   ____   __| _/
+     /     \|  |  \_  __ \  |/ //     \ /  _ \ / __ | 
+    |  Y Y  \  |  /|  | \/    <|  Y Y  (  <_> ) /_/ | 
+    |__|_|  /____/ |__|  |__|_ \__|_|  /\____/\____ | 
+          \/                  \/     \/            \/
+EOF
     echo "The fakemurk plugin manager - v$CURRENT_MAJOR.$CURRENT_MINOR.$CURRENT_VERSION - Developer mode installer"
 }
 
@@ -102,12 +109,21 @@ trytar() {
 }
 
 defog() {
-    futility gbb --set --flash --flags=0x8091 || true # we use futility here instead of the commented out command below because we expect newer chromeos versions and don't want to wait 30 seconds
-    # /usr/share/vboot/bin/set_gbb_flags.sh 0x8091
+    echo "Checking WP status..."
+    output=$(flashrom --wp-status 2>&1)
+
+    if echo "$output" | grep -qi "protection mode:.*disabled"; then
+        echo "WP is off - defogging GBB..."
+        futility gbb --set --flash --flags=0x8091 || true
+    else
+        echo "WP is enabled, so we're not flashing GBB"
+    fi
+
     crossystem block_devmode=0 || true
     vpd -i RW_VPD -s block_devmode=0 || true
     vpd -i RW_VPD -s check_enrollment=1 || true
 }
+
 
 
 murkmod() {
