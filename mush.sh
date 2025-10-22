@@ -415,64 +415,78 @@ do_updates() {
     doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
     exit
 }
+show_plugins() {
+    local plugins_dir="/mnt/stateful_partition/murkmod/plugins"
+    local plugin_files=()
+    local plugin_info=()
+    local plugin_map=()
 
-show_plugins() {    
-    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
-    plugin_files=()
+    [[ -d "$plugins_dir" ]] || { echo "Plugins directory does not exist."; return 1; }
 
+    # Collect plugin files
     while IFS= read -r -d '' file; do
         plugin_files+=("$file")
     done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
 
-    plugin_info=()
-    for file in "${plugin_files[@]}"; do
-        plugin_script=$file
-        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_script" | cut -d= -f2-)
-        # remove quotes from around each PLUGIN_* variable
-        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
-        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
-        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
-        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
-        if grep -q "menu_plugin" "$plugin_script"; then
-            plugin_info+=("$PLUGIN_FUNCTION (provided by $PLUGIN_NAME)")
+    # Read metadata for each plugin
+    for plugin_script in "${plugin_files[@]}"; do
+        # Only read first 200 lines
+        mapfile -t meta < <(head -n 200 "$plugin_script" | sed 's/\r$//')
+
+        local name="<no name>"
+        local func="<no function>"
+        local author="<no author>"
+        local ver="<no version>"
+        local menu_marker=0
+
+        for line in "${meta[@]}"; do
+            [[ "$line" =~ ^[[:space:]]*#?[[:space:]]*menu_plugin[[:space:]]*$ ]] && menu_marker=1
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_NAME[[:space:]]*=[[:space:]]*(.*)$ ]] && name="${BASH_REMATCH[1]//\"/}" && name="${name//\'/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_FUNCTION[[:space:]]*=[[:space:]]*(.*)$ ]] && func="${BASH_REMATCH[1]//\"/}" && func="${func//\'/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_AUTHOR[[:space:]]*=[[:space:]]*(.*)$ ]] && author="${BASH_REMATCH[1]//\"/}" && author="${author//\'/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_VERSION[[:space:]]*=[[:space:]]*(.*)$ ]] && ver="${BASH_REMATCH[1]//\"/}" && ver="${ver//\'/}"
+        done
+
+        # Include plugin if it has the menu marker or a function
+        if [[ $menu_marker -eq 1 || -n "$func" ]]; then
+            plugin_info+=("$name|$func|$author|$ver")
+            plugin_map+=("$plugin_script")
         fi
     done
 
-    # Print menu options
-    for i in "${!plugin_info[@]}"; do
-        printf "%s. %s\n" "$((i+1))" "${plugin_info[$i]}"
-    done
-
-    # Prompt user for selection
-    read -p "> Select a plugin (or q to quit): " selection
-
-    if [ "$selection" = "q" ]; then
+    if [[ ${#plugin_info[@]} -eq 0 ]]; then
+        echo "No plugins found."
         return 0
     fi
 
-    # Validate user's selection
-    if ! [[ "$selection" =~ ^[1-9][0-9]*$ ]]; then
-        echo "Invalid selection. Please enter a number between 0 and ${#plugin_info[@]}"
+    # Print header
+    printf "# %-25s %-35s %-20s %-10s\n" "Name" "Function" "Author" "Version"
+    printf -- "------------------------------------------------------------------------------------------------------\n"
+
+    # Print each plugin
+    for i in "${!plugin_info[@]}"; do
+        IFS='|' read -r name func author ver <<< "${plugin_info[$i]}"
+        printf "%-3s %-25s %-35s %-20s %-10s\n" "$((i+1))" "$name" "$func" "$author" "$ver"
+    done
+
+    # Prompt user
+    read -p "> Select a plugin (or q to quit): " selection
+    selection="${selection//$'\r'/}"
+
+    [[ "$selection" == "q" ]] && return 0
+
+    if ! [[ "$selection" =~ ^[1-9][0-9]*$ ]] || (( selection < 1 || selection > ${#plugin_info[@]} )); then
+        echo "Invalid selection."
         return 1
     fi
 
-    if ((selection < 1 || selection > ${#plugin_info[@]})); then
-        echo "Invalid selection. Please enter a number between 0 and ${#plugin_info[@]}"
-        return 1
-    fi
+    local selected_file="${plugin_map[$((selection-1))]}"
 
-    # Get plugin function name and corresponding file
-    selected_plugin=${plugin_info[$((selection-1))]}
-    selected_file=${plugin_files[$((selection-1))]}
-
-    # Execute the plugin
-    bash <(cat $selected_file) # weird syntax due to noexec mount
-    return 0
+    # Run plugin directly (original method)
+    bash <(cat "$selected_file")
 }
+
+
 
 
 install_plugins() {
@@ -493,77 +507,68 @@ install_plugins() {
         fi
     done
     
+    show_plugins() {
+    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
+    plugin_files=()
     plugin_info=()
-    for content in "${file_contents[@]}"; do
-        # Create a temporary file to hold the content
-        tmp_file=$(mktemp)
-        echo "$content" > "$tmp_file"
-        
-        # Extract information from the file
-        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=.*' "$tmp_file" | cut -d= -f2-)
-        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=.*' "$tmp_file" | cut -d= -f2-)
-        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=.*' "$tmp_file" | cut -d= -f2-)
-        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=.*' "$tmp_file" | cut -d= -f2-)
-        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=.*' "$tmp_file" | cut -d= -f2-)
-        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
-        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
-        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
-        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
-        
-        # Add information to the plugin_info array
-        plugin_info+=(" $PLUGIN_NAME (version $PLUGIN_VERSION by $PLUGIN_AUTHOR) \n       $PLUGIN_DESCRIPTION")
+    plugin_map=()
 
-        
-        # Remove the temporary file
-        rm "$tmp_file"
-    done
-    
-    clear
-    echo "Available plugins (press q to exit):"
-    selected_option=0
+    [[ -d "$plugins_dir" ]] || mkdir -p "$plugins_dir"
 
-    while true; do
-        for i in "${!plugin_info[@]}"; do
-            if [ $i -eq $selected_option ]; then
-                printf " -> "
-            else
-                printf "    "
-            fi
-            printf "${plugin_info[$i]}"
-            # see if the plugin is already installed - get the filename of the plugin from its download url
-            filename=$(echo "${download_urls[$i]}" | rev | cut -d/ -f1 | rev)
-            if [ -f "/mnt/stateful_partition/murkmod/plugins/$filename" ]; then
-                echo " (installed)"
-            else
-                echo
-            fi
+    while IFS= read -r -d '' file; do
+        plugin_files+=("$file")
+    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
+
+    for plugin_script in "${plugin_files[@]}"; do
+        mapfile -t meta < <(sed -n '1,200p' "$plugin_script" | sed 's/\r$//')
+
+        PLUGIN_NAME=""
+        PLUGIN_FUNCTION=""
+        PLUGIN_DESCRIPTION=""
+        PLUGIN_AUTHOR=""
+        PLUGIN_VERSION=""
+        MENU_MARKER=0
+
+        for line in "${meta[@]}"; do
+            [[ "$line" =~ ^[[:space:]]*#?[[:space:]]*menu_plugin[[:space:]]*$ ]] && MENU_MARKER=1
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_NAME[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_NAME="${BASH_REMATCH[1]//\"/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_FUNCTION[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_FUNCTION="${BASH_REMATCH[1]//\"/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_DESCRIPTION[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_DESCRIPTION="${BASH_REMATCH[1]//\"/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_AUTHOR[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_AUTHOR="${BASH_REMATCH[1]//\"/}"
+            [[ "$line" =~ ^[[:space:]]*PLUGIN_VERSION[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_VERSION="${BASH_REMATCH[1]//\"/}"
+            [[ -n "$PLUGIN_FUNCTION" && -n "$PLUGIN_NAME" && $MENU_MARKER -eq 1 ]] && break
         done
 
-        # Read a single character from the user
-        read -s -n 1 key
-
-        # Check the pressed key and update the selected option
-        case "$key" in
-            "q") break ;;  # Exit the loop if the user presses 'q'
-            "A") ((selected_option--)) ;;  # Arrow key up
-            "B") ((selected_option++)) ;;  # Arrow key down
-            "") clear
-                echo "Using URL: ${download_urls[$selected_option]}"
-                echo "Installing plugin..."
-                doas "pushd /mnt/stateful_partition/murkmod/plugins && curl ${download_urls[$selected_option]} -O && popd" > /dev/null
-                echo "Done!"
-                ;;
-        esac
-        # Ensure the selected option stays within bounds
-        ((selected_option = selected_option < 0 ? 0 : selected_option))
-        ((selected_option = selected_option >= ${#plugin_info[@]} ? ${#plugin_info[@]} - 1 : selected_option))
-
-        # Clear the screen for the next iteration
-        clear
-        echo "Available plugins (press q to exit):"
+        [[ $MENU_MARKER -eq 1 || -n "$PLUGIN_FUNCTION" ]] || continue
+        [[ -z "$PLUGIN_NAME" ]] && PLUGIN_NAME="$(basename "$plugin_script")"
+        [[ -z "$PLUGIN_AUTHOR" ]] && PLUGIN_AUTHOR="<no author>"
+        [[ -z "$PLUGIN_VERSION" ]] && PLUGIN_VERSION="<no version>"
+        plugin_info+=("$PLUGIN_NAME|$PLUGIN_FUNCTION|$PLUGIN_AUTHOR|$PLUGIN_VERSION")
+        plugin_map+=("$plugin_script")
     done
-}
 
+    [[ ${#plugin_info[@]} -eq 0 ]] && { echo "No plugins found."; return 0; }
+
+    printf "#   %-25s %-35s %-20s %-10s\n" "Name" "Function" "Author" "Version"
+    printf -- '%.0s-' {1..100}; echo
+
+    for i in "${!plugin_info[@]}"; do
+        IFS='|' read -r name func author ver <<< "${plugin_info[$i]}"
+        printf "%-3s %-25s %-35s %-20s %-10s\n" "$((i+1))" "$name" "$func" "$author" "$ver"
+    done
+
+    read -p "> Select a plugin (or q to quit): " selection
+    selection="${selection//$'\r'/}"
+
+    [[ "$selection" = "q" ]] && return 0
+    if ! [[ "$selection" =~ ^[1-9][0-9]*$ ]] || (( selection < 1 || selection > ${#plugin_info[@]} )); then
+        echo "Invalid selection."
+        return 1
+    fi
+
+    selected_file="${plugin_map[$((selection-1))]}"
+    bash <(cat "$selected_file")
+}
 
 uninstall_plugins() {
     clear
