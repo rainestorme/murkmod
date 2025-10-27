@@ -35,7 +35,7 @@ Welcome to mush, the murkmod developer shell.
 
 If you got here by mistake, don't panic! Just close this tab and carry on.
 
-This shell contains a list of utilities for performing various actions on a murkmodded chromebook.
+This shell contains a list of utilities for performing various actions on a murkmodded Chromebook.
 
 murkmod is now maintained completely independently from fakemurk. Don't report any bugs you encounter with it to the fakemurk developers.
 
@@ -141,7 +141,7 @@ EOF
         read -r -p "> (1-25): " choice
         case "$choice" in
         1) runjob doas bash ;;
-        2) runjob doas "cd /home/chronos; sudo -i -u chronos" ;;
+        2) runjob doas "cd /home/chronos; sudo -i -u chronos" ;; 
         3) runjob /usr/bin/crosh.old ;;
         4) runjob show_plugins ;;
         5) runjob install_plugins ;;
@@ -164,14 +164,12 @@ EOF
         22) runjob attempt_restore_backup_backup ;;
         23) runjob attempt_chromebrew_install ;;
         24) runjob attempt_dev_install ;;
-        25) runjob do_updates && exit 0 ;;
+        25) runjob do_updates && exit 0 ;; # Star, why not just make a mode for updates so it doesn't delete the users' configs
         26) runjob do_dev_updates && exit 0 ;;
         101) runjob hard_disable_nokill ;;
         111) runjob hard_enable_nokill ;;
         112) runjob ext_purge ;;
         113) runjob list_plugins ;;
-        114) runjob install_plugin_legacy ;;
-        115) runjob uninstall_plugin_legacy ;;
         201) runjob api_read_file ;;
         202) runjob api_write_file ;;
         203) runjob api_append_file ;;
@@ -244,69 +242,6 @@ api_cd() {
     echo "dir?"
     read -r dirname
     cd $dirname
-}
-
-install_plugin_legacy() {
-  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
-
-  echo "Find a plugin you want to install here: "
-  echo "  https://github.com/rainestorme/murkmod/tree/main/plugins"
-  echo "Enter the name of a plugin (including the .sh) to install it (or q to quit):"
-  read -r plugin_name
-
-  local plugin_url="$raw_url/$plugin_name"
-  local plugin_info=$(curl -s $plugin_url)
-
-  if [[ $plugin_info == *"Not Found"* ]]; then
-    echo "Plugin not found"
-  else      
-    echo "Installing..."
-    doas "pushd /mnt/stateful_partition/murkmod/plugins && curl https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins/$plugin_name -O && popd" > /dev/null
-    echo "Installed $plugin_name"
-  fi
-}
-
-uninstall_plugin_legacy() {
-  local raw_url="https://raw.githubusercontent.com/rainestorme/murkmod/main/plugins"
-  echo "Enter the name of a plugin (including the .sh) to uninstall it (or q to quit):"
-  read -r plugin_name
-  doas "rm -rf /mnt/stateful_partition/murkmod/plugins/$plugin_name"
-}
-
-list_plugins() {
-    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
-    plugin_files=()
-
-    while IFS= read -r -d '' file; do
-        plugin_files+=("$file")
-    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
-
-    plugin_info=()
-    for file in "${plugin_files[@]}"; do
-        plugin_script=$file
-        PLUGIN_NAME=$(grep -o 'PLUGIN_NAME=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_FUNCTION=$(grep -o 'PLUGIN_FUNCTION=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_DESCRIPTION=$(grep -o 'PLUGIN_DESCRIPTION=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_AUTHOR=$(grep -o 'PLUGIN_AUTHOR=".*"' "$plugin_script" | cut -d= -f2-)
-        PLUGIN_VERSION=$(grep -o 'PLUGIN_VERSION=".*"' "$plugin_script" | cut -d= -f2-)
-        # remove quotes from around each PLUGIN_* variable
-        PLUGIN_NAME=${PLUGIN_NAME:1:-1}
-        PLUGIN_FUNCTION=${PLUGIN_FUNCTION:1:-1}
-        PLUGIN_DESCRIPTION=${PLUGIN_DESCRIPTION:1:-1}
-        PLUGIN_AUTHOR=${PLUGIN_AUTHOR:1:-1}
-        if grep -q "menu_plugin" "$plugin_script"; then
-            plugin_info+=("$PLUGIN_FUNCTION,$PLUGIN_NAME,$PLUGIN_DESCRIPTION,$PLUGIN_AUTHOR,$PLUGIN_VERSION")
-        fi
-    done
-
-    to_print=""
-
-    # Print menu options
-    for i in "${!plugin_info[@]}"; do
-        to_print="$to_print[][]${plugin_info[$i]}"
-    done
-
-    echo "$to_print"
 }
 
 do_dev_updates() {
@@ -415,6 +350,7 @@ do_updates() {
     doas "bash <(curl -SLk https://raw.githubusercontent.com/rainestorme/murkmod/main/murkmod.sh)"
     exit
 }
+
 show_plugins() {
     local plugins_dir="/mnt/stateful_partition/murkmod/plugins"
     local plugin_files=()
@@ -482,7 +418,7 @@ show_plugins() {
 
     local selected_file="${plugin_map[$((selection-1))]}"
 
-    # Run plugin directly (original method)
+    # Run plugin directly 
     bash <(cat "$selected_file")
 }
 
@@ -506,68 +442,6 @@ install_plugins() {
             download_urls+=("$download_url")
         fi
     done
-    
-    show_plugins() {
-    plugins_dir="/mnt/stateful_partition/murkmod/plugins"
-    plugin_files=()
-    plugin_info=()
-    plugin_map=()
-
-    [[ -d "$plugins_dir" ]] || mkdir -p "$plugins_dir"
-
-    while IFS= read -r -d '' file; do
-        plugin_files+=("$file")
-    done < <(find "$plugins_dir" -type f -name "*.sh" -print0)
-
-    for plugin_script in "${plugin_files[@]}"; do
-        mapfile -t meta < <(sed -n '1,200p' "$plugin_script" | sed 's/\r$//')
-
-        PLUGIN_NAME=""
-        PLUGIN_FUNCTION=""
-        PLUGIN_DESCRIPTION=""
-        PLUGIN_AUTHOR=""
-        PLUGIN_VERSION=""
-        MENU_MARKER=0
-
-        for line in "${meta[@]}"; do
-            [[ "$line" =~ ^[[:space:]]*#?[[:space:]]*menu_plugin[[:space:]]*$ ]] && MENU_MARKER=1
-            [[ "$line" =~ ^[[:space:]]*PLUGIN_NAME[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_NAME="${BASH_REMATCH[1]//\"/}"
-            [[ "$line" =~ ^[[:space:]]*PLUGIN_FUNCTION[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_FUNCTION="${BASH_REMATCH[1]//\"/}"
-            [[ "$line" =~ ^[[:space:]]*PLUGIN_DESCRIPTION[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_DESCRIPTION="${BASH_REMATCH[1]//\"/}"
-            [[ "$line" =~ ^[[:space:]]*PLUGIN_AUTHOR[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_AUTHOR="${BASH_REMATCH[1]//\"/}"
-            [[ "$line" =~ ^[[:space:]]*PLUGIN_VERSION[[:space:]]*=[[:space:]]*(.*)$ ]] && PLUGIN_VERSION="${BASH_REMATCH[1]//\"/}"
-            [[ -n "$PLUGIN_FUNCTION" && -n "$PLUGIN_NAME" && $MENU_MARKER -eq 1 ]] && break
-        done
-
-        [[ $MENU_MARKER -eq 1 || -n "$PLUGIN_FUNCTION" ]] || continue
-        [[ -z "$PLUGIN_NAME" ]] && PLUGIN_NAME="$(basename "$plugin_script")"
-        [[ -z "$PLUGIN_AUTHOR" ]] && PLUGIN_AUTHOR="<no author>"
-        [[ -z "$PLUGIN_VERSION" ]] && PLUGIN_VERSION="<no version>"
-        plugin_info+=("$PLUGIN_NAME|$PLUGIN_FUNCTION|$PLUGIN_AUTHOR|$PLUGIN_VERSION")
-        plugin_map+=("$plugin_script")
-    done
-
-    [[ ${#plugin_info[@]} -eq 0 ]] && { echo "No plugins found."; return 0; }
-
-    printf "#   %-25s %-35s %-20s %-10s\n" "Name" "Function" "Author" "Version"
-    printf -- '%.0s-' {1..100}; echo
-
-    for i in "${!plugin_info[@]}"; do
-        IFS='|' read -r name func author ver <<< "${plugin_info[$i]}"
-        printf "%-3s %-25s %-35s %-20s %-10s\n" "$((i+1))" "$name" "$func" "$author" "$ver"
-    done
-
-    read -p "> Select a plugin (or q to quit): " selection
-    selection="${selection//$'\r'/}"
-
-    [[ "$selection" = "q" ]] && return 0
-    if ! [[ "$selection" =~ ^[1-9][0-9]*$ ]] || (( selection < 1 || selection > ${#plugin_info[@]} )); then
-        echo "Invalid selection."
-        return 1
-    fi
-
-    selected_file="${plugin_map[$((selection-1))]}"
-    bash <(cat "$selected_file")
 }
 
 uninstall_plugins() {
@@ -646,7 +520,7 @@ uninstall_plugins() {
 }
 
 powerwash() {
-    echo "Are you sure you wanna powerwash? This will remove all user accounts and data, but won't remove fakemurk."
+    echo "Are you sure you wanna powerwash? This will remove all user accounts and data, but won't remove MurkMod."
     sleep 2
     echo "(Press enter to continue, ctrl-c to cancel)"
     swallow_stdin
@@ -657,7 +531,7 @@ powerwash() {
 }
 
 revert() {
-    echo "This option will re-enroll your chromebook and restore it to its exact state before fakemurk was run. This is useful if you need to quickly go back to normal."
+    echo "This option will re-enroll your Chromebook and restore it to its exact state before fakemurk was run. This is useful if you need to go back to normal quickly."
     echo "This is *permanent*. You will not be able to fakemurk again unless you re-run everything from the beginning."
     echo "Are you sure - 100% sure - that you want to continue? (press enter to continue, ctrl-c to cancel)"
     swallow_stdin
@@ -697,7 +571,7 @@ revert() {
     sleep 2
     doas reboot
     sleep 1000
-    echo "Your chromebook should have rebooted by now. If your chromebook doesn't reboot in the next couple of seconds, press Esc+Refresh to do it manually."
+    echo "Your Chromebook should have rebooted by now. If your Chromebook doesn't reboot in the next couple of seconds, press Esc+Refresh to do it manually."
 }
 
 harddisableext() { # calling it "hard disable" because it only reenables when you press
@@ -752,10 +626,10 @@ install_crouton() {
     if (( ${local_version%%\.*} <= 107 )); then
         doas "bash <(curl -SLk https://git.io/JZEs0) -r bullseye -t xfce"
     else
-        # theoretically we could copy or link the includes for cras, but im not entirely sure how to do that
+        # theoretically, we could copy or link the includes for cras, but I'm not sure how to do that. Star would not work with the current setup
         # CROUTON_BRANCH=longliveaudiotools supports audio at the versions we're looking at, but it's experimental and tends to be broken
         # ig we can prompt the user?
-        echo "Your version of ChromeOS is too recent to support the current main branch of Crouton. You can either install Crouton without audio support, or install the experimental audio branch. Which would you like to do?"
+        echo "Your version of ChromeOS is too recent to support the current main branch of Crouton. You can either install Crouton without audio support or install the experimental audio branch. Which would you like to do?"
         echo "1. Install without audio support"
         echo "2. Install with experimental audio support (may be extremely broken)"
         read -r -p "> (1-2): " choice
@@ -963,7 +837,7 @@ attempt_backup_update(){
     echo "Installing root patch to ${rootdev}..."
     doas dd if="${loop}p3" of="$rootdev" status=progress
 
-    echo "Setting crossystem and vpd block_devmode..." # idrk why, but it can't hurt to be safe
+    echo "Setting crossystem and vpd block_devmode..." # idrk why, but it can't hurt to be safe. Star bugs out half the time (rofs)
     doas crossystem.old block_devmode=0
     doas vpd -i RW_VPD -s block_devmode=0
 
