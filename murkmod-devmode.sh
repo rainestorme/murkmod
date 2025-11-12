@@ -179,8 +179,8 @@ murkmod() {
     fi
     
     MATCH_FOUND=0
-    echo "Attempting to find recovery image from MercuryWorkshop data..."
-    local mercury_data_url="https://raw.githubusercontent.com/MercuryWorkshop/chromeos-releases-data/refs/heads/main/data.json"
+    echo "Attempting to find recovery image from https://github.com/MercuryWorkshop/chromeos-releases-data..."
+    local mercury_data_url="https://cdn.jsdelivr.net/gh/MercuryWorkshop/chromeos-releases-data/data.json"
     local mercury_url=$(curl -ks "$mercury_data_url" | jq -r --arg board "$board" --arg version "$VERSION" '
       .[$board].images
       | map(select(
