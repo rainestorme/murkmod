@@ -506,7 +506,7 @@ install_plugins() {
             download_urls+=("$download_url")
         fi
     done
-    
+    }
     show_plugins() {
     plugins_dir="/mnt/stateful_partition/murkmod/plugins"
     plugin_files=()
